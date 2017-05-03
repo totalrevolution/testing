@@ -61,10 +61,10 @@ if not os.path.exists(INSTALL_COMPLETE) and os.path.exists(TBS):
     except Exception as e:
         xbmc.log('Failed to remove: %s' % e)
     try:
-        shutil.rmtree(STARTUP_WIZARD, ignore_errors=True)
+        shutil.rmtree(os.path.join(ADDON_DATA, ADDON_ID), ignore_errors=True)
     except Exception as e:
         xbmc.log('Failed to remove: %s' % e)
-    xbmc.executebuiltin('Reboot')
+    xbmc.executebuiltin('Quit')
 
 if not os.path.exists(STARTUP_WIZARD) and not os.path.exists(RUN_WIZARD):
     try:
