@@ -1,3 +1,7 @@
+v.2.7.6:
+- Fixed sleep functions for install of addons
+- Tidied up a lot of code in line with Python Koding
+
 v.2.7.5:
 - Integrated Python Koding modules
 - Added Registration option

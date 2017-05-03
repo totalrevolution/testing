@@ -11,7 +11,6 @@ import os
 import re
 import shutil
 import sys
-import threading
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -142,7 +141,7 @@ def Check_Zips(path, size, oem, local_path):
             dolog('### Online zip is newer, downloading new zip')
             if int(size) > (int(showprogress_size)*1000000) and showprogress == 'true':
                 xbmc.executebuiltin('Notification(Installing Updates,Please wait...,8000,%s)' % UPDATE_ICON)
-                Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path, local_size, size, content], kill_time=600, show_busy=True)
+            Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path, local_size, size, content], kill_time=30, show_busy=True)
             try:
                 os.remove(local_path)
             except:
@@ -159,10 +158,6 @@ def CPU_Check():
     CPUmatch    = re.compile('Host CPU: (.+?) available').findall(logtext)
     CPU         = CPUmatch[0] if (len(CPUmatch) > 0) else ''
     return CPU.replace(' ','%20')
-#-----------------------------------------------------------------------------
-# Extract function used for threading
-def Download_Function(url, path, dp):
-    downloader.download(url, path, dp)
 #-----------------------------------------------------------------------------
 # Enable/disable the visibility of adult add-ons (use true or false)
 def Enable_Addons(updaterepos = True):
@@ -224,10 +219,6 @@ def Encrypt(mode='e', message=''):
         finalarray = [ str(unichr(x)) for x in numbers ]
         finaltext = ''.join(finalarray)
         return finaltext.encode('utf-8')
-#-----------------------------------------------------------------------------
-# Extract function used for threading
-def Extract_Function(local_path, ADDONS, dpmode):
-    extract.all(local_path, ADDONS, dpmode)
 #-----------------------------------------------------------------------------
 # Return mac address, not currently checked on Mac OS
 def Get_Mac(protocol = ''):
@@ -380,15 +371,9 @@ def Install_Content(oem, path, local_path, local_size = '', new_size = '', conte
         else:
             dpmode = None
 
-        download_thread = threading.Thread(target=Download_Function, args=[remote_path, local_path, dpmode])
-        download_thread.start()
-        is_download_alive = True
-        
-        while is_download_alive:
-           xbmc.sleep(1000)
-           is_download_alive = download_thread.isAlive()
+        Sleep_If_Function_Active(function=Download, args=[remote_path, local_path, dpmode])
         dolog('## %s DOWNLOADED SUCCESSFULLY' % path)
-        # downloader.download(remote_path, local_path, dpmode)
+
         if remote_path.endswith('master_settings'):
             Set_New_Settings()
 
@@ -400,15 +385,9 @@ def Install_Content(oem, path, local_path, local_size = '', new_size = '', conte
             try:
                 if zipfile.is_zipfile(local_path):
                     if '~~ZIPS~~/tr_' in path:
-                        extract_thread = threading.Thread(target=Extract_Function, args=[local_path, ADDONS, dpmode])
+                        Sleep_If_Function_Active(function=Extract, args=[local_path, ADDONS, dpmode])
                     else:
-                        extract_thread = threading.Thread(target=Extract_Function, args=[local_path, HOME, dpmode])
-                    extract_thread.start()
-                    is_extract_alive = True
-                    
-                    while is_extract_alive:
-                       xbmc.sleep(1000)
-                       is_extract_alive = extract_thread.isAlive()
+                        Sleep_If_Function_Active(function=Extract, args=[local_path, HOME, dpmode])
                     dolog('## %s EXTRACTED SUCCESSFULLY' % path)
 
                 else:
@@ -483,22 +462,22 @@ if __name__ == '__main__':
             pass
     else:
 # Make sure Kodi isn't playing any files, we don't want to interrupt anything
-        if not startup:
-            isplaying = xbmc.Player().isPlaying()
-            while isplaying:
-                xbmc.sleep(1000)
+            if not startup:
                 isplaying = xbmc.Player().isPlaying()
-            # xbmc.executebuiltin('ActivateWindow(busydialog)')
+                while isplaying:
+                    xbmc.sleep(1000)
+                    isplaying = xbmc.Player().isPlaying()
+                # xbmc.executebuiltin('ActivateWindow(busydialog)')
 
-        if not os.path.exists(ZIP_PATH):
-            os.makedirs(ZIP_PATH)
+            if not os.path.exists(ZIP_PATH):
+                os.makedirs(ZIP_PATH)
 
-        local_size   = 0
-        url          = BASE+'boxer/update.php?x=%s&v=%s' % (Get_Params(),XBMC_VERSION)
-        dolog(url)
+            local_size   = 0
+            url          = BASE+'boxer/update.php?x=%s&v=%s' % (Get_Params(),XBMC_VERSION)
+            dolog(url)
 
     # If connected to the internet we do the updates
-        try:
+        # try:
             link = Open_URL(url=url,post_type='post').replace('\r','').replace('\n','').replace('\t','')
             link = Encrypt('d',link)
             update_array = re.compile('p="(.+?)"').findall(link)
@@ -570,13 +549,13 @@ if __name__ == '__main__':
                     dolog('### Error: %s' % e)
 
     # If not connected to the internet we try and load wifi settings
-        except Exception as e:
-            dolog('EXCEPTION: %s'%str(e))
-            try:
-                xbmcgui.DialogProgress().close()
-            except:
-                pass
-            xbmc.executebuiltin("Dialog.Close(busydialog)")
+        # except Exception as e:
+        #     dolog('EXCEPTION: %s'%str(e))
+        #     try:
+        #         xbmcgui.DialogProgress().close()
+        #     except:
+        #         pass
+        #     xbmc.executebuiltin("Dialog.Close(busydialog)")
         #     DIALOG.ok(ADDON.getLocalizedString(30123), ADDON.getLocalizedString(30124))
             
         #     content = Grab_Log()

@@ -972,19 +972,22 @@ def Download_Extract(url,video=''):
     except:
         pass
     
-    Sleep_If_Function_Active(function=Download_Function, args=[url], kill_time=300)
+    Sleep_If_Function_Active(function=Download, args=[url], kill_time=300)
     dolog('DOWNLOAD COMPLETE: %s'%url)
     
 # Store download speed information
     try:
         endtime   = datetime.datetime.fromtimestamp(os.path.getmtime(TARGET_ZIP))
+        dolog('END TIME: %s'%endtime)
         timediff  = endtime-starttime
+        dolog('TIME DIFF: %s'%timediff)
         libsize   = os.path.getsize(TARGET_ZIP) / (128*1024.0)
+        dolog('LIB SIZE: %s'%libsize)
         timediff  = str(timediff).replace(':','')
+        dolog('TIME DIFF: %s'%timediff)
         speed     = libsize / float(timediff)
-        writefile = open(TEMP_DL_TIME, mode='w')
-        writefile.write(str(speed))
-        writefile.close()
+        dolog('SPEED: %s'%speed)
+        Text_File(TEMP_DL_TIME, 'w', str(speed))
     except:
         dolog('### Unable to store download speed info')
 
@@ -1003,10 +1006,7 @@ def Download_Extract(url,video=''):
         path_exist = os.path.exists(INSTALL_COMPLETE)
 
 # Check if video is still playing, wait for that to finish before closing
-    isplaying = xbmc.Player().isPlaying()
-    while isplaying:
-        xbmc.sleep(500)
-        isplaying = xbmc.Player().isPlaying()
+    Sleep_If_Playback_Active()
 
 # Open home window, failing to do this causes problems with the yesno DIALOG for skin switching
     xbmc.executebuiltin('ActivateWindow(HOME)')
@@ -1033,14 +1033,7 @@ def Download_Extract(url,video=''):
     Set_Skin_Settings(guisettingsbak, skinid)
     newgui = os.path.join(ADDON_DATA, skinid, 'settings.xml')
     if os.path.exists(newgui):
-        skin_settings_thread = threading.Thread(target=Set_Skin_Settings, args=[newgui, skinid])
-        skin_settings_thread.start()
-        xbmc.sleep(1000)
-        isskinalive = True
-        while isskinalive:
-            xbmc.sleep(1000)
-            isskinalive = skin_settings_thread.isAlive()
-            dolog('--- skin_settings_thread complete ----')
+        Sleep_If_Function_Active(function=Set_Skin_Settings, args=[newgui, skinid])
 
 # Remove the zip build file
     try:
@@ -1073,16 +1066,6 @@ def Download_Extract(url,video=''):
     else:
         DIALOG.ok(ADDON.getLocalizedString(30110), ADDON.getLocalizedString(30111))
         os._exit(1)
-#-----------------------------------------------------------------------------
-# Download function
-def Download_Function(url):
-    try:
-        urllib.urlretrieve(url,TARGET_ZIP,lambda nb, bs, fs, url=url: Download_Progress(nb, bs, fs, url))
-    except:
-        DIALOG.ok(ADDON.getLocalizedString(30112), ADDON.getLocalizedString(30113))
-        if os.path.exists(ADDON_DATA):
-            shutil.rmtree(ADDON_DATA)
-        Load_Profile()
 #-----------------------------------------------------------------------------
 # Show progress of download, this function is working fine as you can see in the log. It's the Image_Screen I'm having problems with picking up percentage.
 def Download_Progress(numblocks, blocksize, filesize, url):
@@ -1337,13 +1320,7 @@ def Keyword_Search():
                     if zipfile.is_zipfile(lib):
                     
                         try:
-                            extract_thread = threading.Thread(target=Extract_Function, args=[lib, HOME, dp])
-                            extract_thread.start()
-                            is_extract_alive = True
-                            
-                            while is_extract_alive:
-                               xbmc.sleep(1000)
-                               is_extract_alive = extract_thread.isAlive()
+                            Sleep_If_Function_Active(function=Extract, args=[lib, HOME, dp])
                             dolog('## %s EXTRACTED SUCCESSFULLY' % keyword)
                             
                             xbmc.executebuiltin('RunScript(special://home/addons/script.openwindow/functions.py,dp)')
