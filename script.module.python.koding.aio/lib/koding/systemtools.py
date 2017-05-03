@@ -707,12 +707,17 @@ else:
 
 # If we're enabling/disabling an addon        
         elif setting_type == 'addon_enable':
-            query = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"%s", "enabled":%s}, "id":1}' % (setting, value)
+            query = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":%s,"enabled":%s}, "id":1}' % (setting, value)
             response = xbmc.executeJSONRPC(query)
             if 'error' in str(response):
-                xbmc.log('### Error in json: %s'%query,2)
-                xbmc.log('^ %s' % response, 2)
-                return False
+                query = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"%s", "enabled":%s}, "id":1}' % (setting, value)
+                response = xbmc.executeJSONRPC(query)
+                if 'error' in str(response):
+                    xbmc.log('### Error in json: %s'%query,2)
+                    xbmc.log('^ %s' % response, 2)
+                    return False
+                else:
+                    return True
             else:
                 return True
 
@@ -721,12 +726,12 @@ else:
             query = '{"jsonrpc":"2.0", "method":"%s","params":{%s}, "id":1}' % (setting, value)
             response = xbmc.executeJSONRPC(query)
             if 'error' in str(response):
-                xbmc.log('### Error With Setting: %s' % response)
+                xbmc.log('### Error With Setting: %s' % response,2)
                 return False
             else:
                 return True
 
-    except Exception as e:
+    except Exception:
         xbmc.log(Last_Error())
         xbmc.log(str(e))
 #----------------------------------------------------------------    

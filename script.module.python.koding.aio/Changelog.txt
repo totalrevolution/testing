@@ -1,3 +1,6 @@
+v.0.8.4:
+- Added extra json query attempt for addon_enable
+
 v.0.8.3:
 - Fixed Timestamp issue in Addon_Genre function
 
