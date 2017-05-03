@@ -1080,7 +1080,7 @@ def Download_Progress(numblocks, blocksize, filesize, url):
 def Extract_Build():
     if os.path.exists(TARGET_ZIP) and zipfile.is_zipfile(TARGET_ZIP):
         dolog('### EXTRACTING BUILD ###')
-        Sleep_If_Function_Active(function=Extract, args=[HOME])
+        Sleep_If_Function_Active(function=Extract, args=[TARGET_ZIP,HOME])
         guisettings    = os.path.join(PROFILE, 'guisettings.xml')
         guisettingsbak = os.path.join(PROFILE, 'guisettings_BAK')
         shutil.copyfile(guisettings,guisettingsbak)
@@ -1099,7 +1099,7 @@ def Finish():
         if zipfile.is_zipfile(KEYWORD_ZIP):
             try:
                 dp.create(ADDON.getLocalizedString(30051),ADDON.getLocalizedString(30052),' ', ' ')
-                extract.all(KEYWORD_ZIP,rootfolder,dp)
+                Extract(KEYWORD_ZIP,rootfolder,dp)
                 dp.close()
                 newguifile = os.path.join(HOME,'newbuild')
                 if not os.path.exists(newguifile):
@@ -1233,31 +1233,6 @@ def Installed_Addons(types='unknown', content ='unknown', properties = ''):
             pass
     return addon_dict
 #-----------------------------------------------------------------------------
-# Find the install path and temp path location based on os
-def Install_Path(path_type):
-    homearray    = HOME.split(os.sep)
-    arraylen     = len(homearray)
-    counter      = arraylen-1
-    finalpath    = ''
-
-    while finalpath == '':
-
-# Loop through home path array starting at the end and if kodi or spmc isn't in the name we remove the last item until we find a kodi folder
-        if not 'kodi' in homearray[counter].lower() and not 'spmc' in homearray[counter].lower():
-            homearray.pop(-1)
-            counter = counter-1
-
-# If we need to return the true kodi home folder
-        elif path_type == 'extract_to':
-            if homearray[-1].lower() == '.kodi':
-                return os.sep.join(homearray[:-1])
-            else:
-                return os.sep.join(homearray)
-
-# If we need to return the root folder kodi is installed to (e.g. /AppData/Roaming/)
-        elif path_type == 'root_install_path':
-            return os.sep.join(homearray[:-1])
-#-----------------------------------------------------------------------------
 # Search for an item on urlshortbot and install it, can switch oems and call the keyword.php file for restoring backups (WIP)
 def Keyword_Search():
     if not os.path.exists(PACKAGES):
@@ -1314,7 +1289,7 @@ def Keyword_Search():
                 try:
                     dolog("Attempting download "+downloadurl+" to "+lib)
                     dp.create('KEYWORD INSTALLER', 'Downloading', '', '')
-                    downloader.download(downloadurl,lib,dp)
+                    Download(downloadurl,lib,dp)
                     dolog("### Keyword "+keyword+" Successfully downloaded")
                     dp.update(0,"", "Extracting Zip Please Wait")
                 

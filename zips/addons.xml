@@ -74,7 +74,7 @@
   </extension>
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="2.7.8" provider-name="TotalRevolution">
+<addon id="script.openwindow" name="Startup Wizard" version="2.7.9" provider-name="TotalRevolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -89,7 +89,7 @@
 		<platform>all</platform>
 		<language>en</language>
 		<license>Creative Commons 4.0-NC-ND</license>
-		<news>Fixed download function</news>
+		<news>Fixed extract function</news>
 	</extension>
 </addon>
 </addons>

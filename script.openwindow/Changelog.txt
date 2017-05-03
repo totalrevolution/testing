@@ -1,3 +1,7 @@
+v.2.7.9:
+- Fixed Extract function
+- Removed traces of old download/extract in default.py
+
 v.2.7.8:
 - Fixed the download function
 
