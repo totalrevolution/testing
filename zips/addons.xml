@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
+<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.1.6">
+	<requires>
+		<import addon="xbmc.python" version="2.1.0"/>
+		<import addon="script.trtv" version="1.2.1"/>
+		<import addon="script.module.python.koding.aio" version="0.5"/>
+		<import addon="plugin.program.super.favourites" version="1.0.43" optional="true"/>
+	</requires>
+		<extension point="xbmc.python.library"      library="default.py" />
+		<extension point="xbmc.python.pluginsource" library="default.py">
+			<provides>video audio image executable</provides>
+	</extension>
+	<extension point="xbmc.service" library="service.py" start="startup" />
+	<extension point="kodi.context.item" library="context.py">
+		<item>
+			<label>Share...</label>
+			<visible>true</visible>
+		</item>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en">Maintenance - powered by TotalRevolution</summary>
+		<description>Your one stop add-on for everything you could possibly need.</description>
+		<platform>all</platform>
+		<news>Added debugging option</news>
+	</extension>
+</addon>
+
 <addon id="repository.trmodules" name="Module Repo" version="0.1" provider-name="TotalRevolution">
 	<extension point="xbmc.addon.repository" name="Module Repo">
 		<dir>
@@ -26,7 +52,7 @@
 
 <addon id="script.module.python.koding.aio"
    name="Python Koding AIO"
-   version="0.8.4"
+   version="0.8.5"
    provider-name="TotalRevolution, noobsandnerds">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -43,7 +69,7 @@
     <license>Creative Commons 4.0-NC-ND</license>
     <forum>http://noobsandnerds.com/support/showthread.php?tid=17614</forum>
     <website>http://totalrevolution.tv</website>
-    <news>Added extra json query attempt for addon_enable</news>
+    <news>Fixed bad error reporting in addon_enable and fixed example code for Sleep_If_Playback_Active function.</news>
     <source>https://github.com/totalrevolution/totalrevolution/tree/master/script.module.python.koding.aio</source>
   </extension>
 </addon>

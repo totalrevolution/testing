@@ -719,8 +719,8 @@ koding.Refresh('container')
 # Find out what is and isn't enabled in the addons*.db
     temp_list = []
     for addon_id in addon:
-        dolog('CHECKING: %s'%addon_id)
-        if not addon_id in exclude_list:
+        if not addon_id in exclude_list and addon_id != '':
+            dolog('CHECKING: %s'%addon_id)
             if addon_id in disabled_list and not new_only and enable:
                 temp_list.append(addon_id)
             elif addon_id not in disabled_list and addon_id not in enabled_list:

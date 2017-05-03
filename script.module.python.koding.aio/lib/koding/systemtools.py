@@ -707,9 +707,7 @@ else:
 
 # If we're enabling/disabling an addon        
         elif setting_type == 'addon_enable':
-            query = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":%s,"enabled":%s}, "id":1}' % (setting, value)
-            response = xbmc.executeJSONRPC(query)
-            if 'error' in str(response):
+            if setting != '':
                 query = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"%s", "enabled":%s}, "id":1}' % (setting, value)
                 response = xbmc.executeJSONRPC(query)
                 if 'error' in str(response):
@@ -718,8 +716,6 @@ else:
                     return False
                 else:
                     return True
-            else:
-                return True
 
 # If it's none of the above then it must be a json command so we use the setting_type as the method in json
         elif setting_type == 'json':
@@ -731,9 +727,8 @@ else:
             else:
                 return True
 
-    except Exception:
+    except:
         xbmc.log(Last_Error())
-        xbmc.log(str(e))
 #----------------------------------------------------------------    
 # TUTORIAL #
 def Sleep_If_Function_Active(function, args=[], kill_time=30, show_busy=True):

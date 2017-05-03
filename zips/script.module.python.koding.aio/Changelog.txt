@@ -1,3 +1,7 @@
+v.0.8.5:
+- Fixed bad error reporting in addon_enable
+- Fixed example code for Sleep_If_Playback_Active function
+
 v.0.8.4:
 - Added extra json query attempt for addon_enable
 

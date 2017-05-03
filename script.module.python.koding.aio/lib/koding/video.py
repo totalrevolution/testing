@@ -371,6 +371,7 @@ CODE: Sleep_If_Playback_Active()
 EXAMPLE CODE:
 dialog.ok('PLAY A VIDEO','We will now attempt to play a video, once you stop this video you should see a dialog.ok message.')
 xbmc.Player().play('http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi')
+xbmc.sleep(3000) # Give kodi enough time to load up the video
 koding.Sleep_If_Playback_Active()
 dialog.ok('PLAYBACK FINISHED','The playback has now been finished so this dialog code has now been initiated')
 ~"""
