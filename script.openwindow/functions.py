@@ -431,7 +431,7 @@ def Set_New_Settings():
     for line in content:
         if line != '':
             setting, value = line.split('|')
-            Set_Setting(setting, 'json', value)
+            Set_Setting(setting, 'kodi_setting', value)
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
     dpmode  = None # Mode sent through for keyword install, if set this will pause until finished extracting

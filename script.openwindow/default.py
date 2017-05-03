@@ -948,9 +948,9 @@ def Check_Updates_Full():
 def Download_Extract(url,video=''):
     dolog('Downlad_Extract started:')
     dolog('URL: %s   |   Video: %s' % (url, video))
-    Set_Setting('lookandfeel.enablerssfeeds', 'json', 'false')
-    Set_Setting('general.addonupdates', 'json', '2')
-    Set_Setting('general.addonnotifications', 'json', 'false')
+    Set_Setting('lookandfeel.enablerssfeeds', 'kodi_setting', 'false')
+    Set_Setting('general.addonupdates', 'kodi_setting', '2')
+    Set_Setting('general.addonnotifications', 'kodi_setting', 'false')
     dolog('Successfully run addon updates and notifications disable code.')
 
     global updatescreen_thread
@@ -1014,7 +1014,7 @@ def Download_Extract(url,video=''):
     guisettingsbak = os.path.join(PROFILE, 'guisettings_BAK')
     skinid = Get_Skin_ID(guisettingsbak)
     dolog('#### NEW SKIN: %s' % skinid)
-    Set_Setting('lookandfeel.skin', 'json', skinid)
+    Set_Setting('lookandfeel.skin', 'kodi_setting', skinid)
     isyesno = xbmc.getCondVisibility('Window.IsVisible(yesnodialog)')
     dolog('### initial yesnodialog status: %s' % isyesno)
     counter = 0
@@ -1123,8 +1123,8 @@ def Finish():
             pass
         dolog('### FIRST RUN: Running full update command')
         Check_Updates_Full()
-        Set_Setting('general.addonupdates', 'json', '0')
-        Set_Setting('general.addonnotifications', 'json', 'true')
+        Set_Setting('general.addonupdates', 'kodi_setting', '0')
+        Set_Setting('general.addonnotifications', 'kodi_setting', 'true')
         try:
             xbmc.executebuiltin('RunScript(script.skinshortcuts,type=buildxml&mainmenuID=9000&group=x1|x2|x3|x4|x5|x6|x7|x8|x9|x10|x11|x12|x13|x101|x202|x303|x404|x505|x606)')
         except Exception as e:

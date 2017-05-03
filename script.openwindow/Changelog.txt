@@ -1,3 +1,6 @@
+v.2.8:
+- Changed 'json' commands to 'kodi_setting' to match python koding
+
 v.2.7.9:
 - Fixed Extract function
 - Removed traces of old download/extract in default.py
