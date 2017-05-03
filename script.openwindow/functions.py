@@ -161,6 +161,7 @@ def CPU_Check():
 #-----------------------------------------------------------------------------
 # Enable/disable the visibility of adult add-ons (use true or false)
 def Enable_Addons(updaterepos = True):
+    mylist = Addon_Genre()
     xbmc.executebuiltin('UpdateLocalAddons')
     if updaterepos:
         xbmc.executebuiltin('UpdateAddonRepos')
@@ -168,10 +169,10 @@ def Enable_Addons(updaterepos = True):
         adult_list = []
         adult_dict = Addon_Genre().items()
         for item in adult_dict:
-            adult_list.append(item[0])
+            adult_list.append(item[1])
     except:
         adult_list = []
-
+    dolog('ADULT LIST: %s'%adult_list)
     Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
 #-----------------------------------------------------------------------------------------------------------------
 # Encryption function
@@ -433,7 +434,7 @@ def Set_New_Settings():
             Set_Setting(setting, 'json', value)
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
-    dpmode  = None
+    dpmode  = None # Mode sent through for keyword install, if set this will pause until finished extracting
     startup = 0
     service = 0
 
@@ -463,10 +464,7 @@ if __name__ == '__main__':
     else:
 # Make sure Kodi isn't playing any files, we don't want to interrupt anything
             if not startup:
-                isplaying = xbmc.Player().isPlaying()
-                while isplaying:
-                    xbmc.sleep(1000)
-                    isplaying = xbmc.Player().isPlaying()
+                Sleep_If_Playback_Active()
                 # xbmc.executebuiltin('ActivateWindow(busydialog)')
 
             if not os.path.exists(ZIP_PATH):
@@ -525,8 +523,10 @@ if __name__ == '__main__':
             # if not os.path.exists(RUN_WIZARD):
             Enable_Addons()
             
+# If custom code exists we run it
             custom_code = xbmc.translatePath('special://home/userdata/custom_code.py')
             if os.path.exists(custom_code):
+                dolog('#### CUSTOM CODE RUNNING: %s'%custom_code)
                 runcode = Text_File(custom_code,'r')
                 try:
                     exec(runcode)

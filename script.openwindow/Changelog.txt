@@ -1,3 +1,6 @@
+v.2.7.8:
+- Fixed the download function
+
 v.2.7.7:
 - Fixed the service - partial installs should now reinstall correctly
 

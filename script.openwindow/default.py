@@ -972,7 +972,7 @@ def Download_Extract(url,video=''):
     except:
         pass
     
-    Sleep_If_Function_Active(function=Download, args=[url], kill_time=300)
+    Sleep_If_Function_Active(function=Download, args=[url,TARGET_ZIP], kill_time=300)
     dolog('DOWNLOAD COMPLETE: %s'%url)
     
 # Store download speed information
@@ -1079,11 +1079,12 @@ def Download_Progress(numblocks, blocksize, filesize, url):
 # Function to extract the downloaded zip
 def Extract_Build():
     if os.path.exists(TARGET_ZIP) and zipfile.is_zipfile(TARGET_ZIP):
-        zin = zipfile.ZipFile(TARGET_ZIP, 'r')
-        zin.extractall(HOME)
+        dolog('### EXTRACTING BUILD ###')
+        Sleep_If_Function_Active(function=Extract, args=[HOME])
         guisettings    = os.path.join(PROFILE, 'guisettings.xml')
         guisettingsbak = os.path.join(PROFILE, 'guisettings_BAK')
         shutil.copyfile(guisettings,guisettingsbak)
+        dolog('### FINISHED EXTRACTING BUILD ###')
     Enable_Addons(False)
     xbmc.sleep(2000)
 #-----------------------------------------------------------------------------
