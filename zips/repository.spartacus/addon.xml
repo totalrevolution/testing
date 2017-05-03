@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.trmodules" name="Module Repo" version="0.1" provider-name="TotalRevolution">
+<addon id="repository.spartacus" name="Module Repo" version="2.0" provider-name="TRMC">
 	<extension point="xbmc.addon.repository" name="Module Repo">
 		<dir>
 			<info compressed="false">https://offshoregit.com/tvaresolvers/tva-common-repository/raw/master/addons.xml</info>

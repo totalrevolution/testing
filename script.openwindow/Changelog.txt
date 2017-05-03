@@ -1,3 +1,6 @@
+v.2.8.1:
+- Updated strings, all ready for translations now
+
 v.2.8:
 - Changed 'json' commands to 'kodi_setting' to match python koding
 
