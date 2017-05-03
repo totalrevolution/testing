@@ -70,7 +70,7 @@ BRANDING_VID               = xbmc.translatePath('special://home/media/branding/i
 LANGUAGE_ART               = os.path.join(ADDON_PATH,'resources','images','language.jpg')
 DEBUG                      = Addon_Setting(setting='debug')
 branding                   = xbmc.translatePath('special://home/media/branding/branding.png')
-BASE                       = 'http://totalrevolution.tv/trmc/'
+BASE                       = 'http://totalrevolution.tv/'
 
 if not os.path.exists(branding):
     branding = os.path.join(NATIVE, 'addons',ADDONID,'resources','images','branding.png')
@@ -80,8 +80,6 @@ ACTION_HOME                = 7
 ACTION_PREVIOUS_MENU       = 10
 ACTION_SELECT_ITEM         = 7
 runamount                  = 0
-download_thread            = ''
-extract_thread             = ''
 updatescreen_thread        = ''
 skin_settings_thread       = ''
 main_order                 = []
@@ -921,10 +919,10 @@ def Check_Status(extension, email=''):
                     exec(status)
                 except:
                     status = Encrypt('d', status.replace('\r','').replace('\n','').replace('\t',''))
-                    try:
-                        exec(status)
-                    except:
-                        DIALOG.ok(ADDON.getLocalizedString(30081), ADDON.getLocalizedString(30082))
+                    # try:
+                    exec(status)
+                    # except:
+                    #     DIALOG.ok(ADDON.getLocalizedString(30081), ADDON.getLocalizedString(30082))
 
 # Not connected to internet, lets open wifi settings
     #     except:
@@ -955,8 +953,6 @@ def Download_Extract(url,video=''):
     Set_Setting('general.addonnotifications', 'json', 'false')
     dolog('Successfully run addon updates and notifications disable code.')
 
-    global download_thread
-    global extract_thread
     global updatescreen_thread
     global endtime
     global skin_settings_thread
@@ -966,11 +962,8 @@ def Download_Extract(url,video=''):
     if not os.path.exists(RUN_WIZARD):
         os.makedirs(RUN_WIZARD)
 
-    download_thread     = threading.Thread(target=Download_Function, args=[url])
     updatescreen_thread = threading.Thread(target=Update_Screen)
-    extract_thread      = threading.Thread(target=Extract_Build)
 
-    download_thread.start()
     updatescreen_thread.start()
     starttime = datetime.datetime.now()
     
@@ -979,12 +972,8 @@ def Download_Extract(url,video=''):
     except:
         pass
     
-    xbmc.sleep(2000)
-    isdlalive = True
-    
-    while isdlalive:
-       xbmc.sleep(1000)
-       isdlalive = download_thread.isAlive()
+    Sleep_If_Function_Active(function=Download_Function, args=[url], kill_time=300)
+    dolog('DOWNLOAD COMPLETE: %s'%url)
     
 # Store download speed information
     try:
@@ -1000,12 +989,8 @@ def Download_Extract(url,video=''):
         dolog('### Unable to store download speed info')
 
 # Start the extraction process
-    extract_thread.start()
-    xbmc.sleep(2000)
-    isextractalive = True
-    while isextractalive:
-       xbmc.sleep(500)
-       isextractalive = extract_thread.isAlive()
+    Sleep_If_Function_Active(function=Extract_Build, kill_time=300)
+    dolog('EXTRACTION OF MASTER SETUP COMPLETE')
 
 # Now we download the updates from branding page
     Check_Updates()

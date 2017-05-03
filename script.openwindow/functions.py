@@ -41,7 +41,7 @@ OEM_ID              = os.path.join(OPENWINDOW_DATA,'id')
 KEYWORD_TEMP        = os.path.join(OPENWINDOW_DATA,'keyword_installed')
 XBMC_VERSION        = xbmc.getInfoLabel("System.BuildVersion")[:2]
 DIALOG              = xbmcgui.Dialog()
-BASE                = 'http://totalrevolution.tv/trmc/'
+BASE                = 'http://totalrevolution.tv/'
 DEBUG               = Addon_Setting(setting='debug')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
