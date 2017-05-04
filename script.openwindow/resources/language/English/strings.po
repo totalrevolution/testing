@@ -243,7 +243,7 @@ msgid "Press OK to continue."
 msgstr ""
 
 msgctxt "#30058"
-msgid "Downloading Updates"
+msgid "DOWNLOADING UPDATES"
 msgstr ""
 
 msgctxt "#30059"
@@ -660,4 +660,36 @@ msgstr ""
 
 msgctxt "#30162"
 msgid "Please try temporarily disabling your Wi-Fi and register using a wired connection only."
+msgstr ""
+
+msgctxt "#30163"
+msgid "UPDATE ADD-ON"
+msgstr ""
+
+msgctxt "#30164"
+msgid "Update available:"
+msgstr ""
+
+msgctxt "#30165"
+msgid "Would you like to install?"
+msgstr ""
+
+msgctxt "#30166"
+msgid "ANDROID APP: %s / %s"
+msgstr ""
+
+msgctxt "#30167"
+msgid "There are android apps which are required for install."
+msgstr ""
+
+msgctxt "#30168"
+msgid "There are android apps which are required for install."
+msgstr ""
+
+msgctxt "#30169"
+msgid "YES"
+msgstr ""
+
+msgctxt "#30170"
+msgid "NO"
 msgstr ""

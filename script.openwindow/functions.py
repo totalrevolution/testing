@@ -40,8 +40,9 @@ OEM_ID              = os.path.join(OPENWINDOW_DATA,'id')
 KEYWORD_TEMP        = os.path.join(OPENWINDOW_DATA,'keyword_installed')
 XBMC_VERSION        = xbmc.getInfoLabel("System.BuildVersion")[:2]
 DIALOG              = xbmcgui.Dialog()
-BASE                = 'http://totalrevolution.tv/'
+BASE                = 'http://tlbb.me/'
 DEBUG               = Addon_Setting(setting='debug')
+AUTO_UPDATE         = Addon_Setting(setting='autoupdate')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
 rerun_main          = False
@@ -66,7 +67,7 @@ def APK_Install_Loop():
 
 # If zipped up using OSX make sure we don't include hidden system files
         if not clean_apk.startswith('.'):
-            choice = DIALOG.yesno('ANDROID APP: %s / %s'% (counter,array_len),'There are android apps which are required for install.','Would you like to install:', '[COLOR=dodgerblue]%s[/COLOR]' % clean_apk, yeslabel='NO', nolabel='YES')
+            choice = DIALOG.yesno(String(30166)%(counter,array_len),String(30167),'[COLOR=dodgerblue]%s[/COLOR]'%clean_apk,String(30165),yeslabel=String(30170), nolabel=String(30169))
             if not choice:
                 xbmc.executebuiltin('StartAndroidActivity("","android.intent.action.VIEW","application/vnd.android.package-archive","file:%s")' % APK)
         if counter == array_len:
@@ -142,7 +143,7 @@ def Check_Zips(path, size, oem, local_path):
             dolog('### Online zip is newer, downloading new zip')
             if int(size) > (int(showprogress_size)*1000000) and showprogress == 'true':
                 xbmc.executebuiltin('Notification(Installing Updates,Please wait...,8000,%s)' % UPDATE_ICON)
-            Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path, local_size, size, content], kill_time=30, show_busy=True)
+            Sleep_If_Function_Active(function=Install_Content,args=[oem,path,local_path,local_size,size,content],kill_time=30,show_busy=True)
             rerun_main = True
             try:
                 os.remove(local_path)
@@ -174,7 +175,6 @@ def Enable_Addons(updaterepos = True):
             adult_list.append(item[1])
     except:
         adult_list = []
-    dolog('ADULT LIST: %s'%adult_list)
     Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
 #-----------------------------------------------------------------------------------------------------------------
 # Encryption function
@@ -358,19 +358,19 @@ def Get_Params():
         return 'Unknown'
 #---------------------------------------------------------------------------------------------------
 # If filesize differs from online we download new content
-def Install_Content(oem, path, local_path, local_size = '', new_size = '', content = ''):
+def Install_Content(oem,path,local_path,local_size='',new_size='',content=''):
     choice = 1
     if '~~ZIPS~~/tr_' in path:
         addon_zip = path.split('~~ZIPS~~/')[1]
         remote_path = BASE+'tr_addons/%s' % addon_zip
-        if DEBUG == 'true':
-            choice = DIALOG.yesno('AUTO UPDATE ADDON','Do you want to install:','','[COLOR=dodgerblue]%s[/COLOR]' % addon_zip)
+        if AUTO_UPDATE == 'false':
+            choice = DIALOG.yesno(String(30163),String(30164),'[COLOR=dodgerblue]%s[/COLOR]' % addon_zip.replace('tr_','').replace('.zip',''),String(30165))
     else:
         remote_path = BASE+'custzip/%s/.kodi/%s' % (oem, path)
     if choice:
         if int(new_size) > (int(showprogress_size)*1000000) and showprogress == 'true':
             dpmode = xbmcgui.DialogProgress()
-            dpmode.create('DOWNLOADING UPDATES','Please wait...')
+            dpmode.create(String(30058),String(30034))
         else:
             dpmode = None
 
@@ -483,11 +483,11 @@ def Main_Run():
                     
                     if str(local_size) != str(size) and not '~~ZIPS~~' in path:
                         dolog('## UPDATING %s' % path)
-                        Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path], kill_time=60, show_busy=True)
+                        Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path],kill_time=60,show_busy=True)
 
                     elif '~~ZIPS~~' in path:
                         dolog('### DOING ZIP CHECK')
-                        Check_Zips(path, size, oem, local_path)
+                        Sleep_If_Function_Active(function=Check_Zips, args=[path, size, oem, local_path],kill_time=300,show_busy=True)
 
             if not startup:
                 xbmc.executebuiltin("Dialog.Close(busydialog)")
@@ -562,5 +562,6 @@ if __name__ == '__main__':
 # Re-run the update check if addons have been downloaded so custom files can be reinstalled.
     if rerun_main:
         Main_Run()
-    Refresh(r_mode='skin')
+    if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')):
+        Refresh(r_mode='skin')
     xbmcgui.Window(10000).clearProperty('TBS_Running')

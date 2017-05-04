@@ -1,3 +1,10 @@
+v.2.8.4:
+- Do not run skinreload on first run
+- Fixed base url
+- Added more strings
+- Added threading for install of addons
+- Added option in settings to auto-install addons
+
 v.2.8.3:
 - Fixed zipsize check
 
