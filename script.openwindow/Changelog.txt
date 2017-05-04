@@ -1,3 +1,9 @@
+v.2.8.6:
+- Removed busy dialogs during update of files. Could get annoying real quick!
+
+v.2.8.5:
+- Fixed working loop on update install
+
 v.2.8.4:
 - Do not run skinreload on first run
 - Fixed base url

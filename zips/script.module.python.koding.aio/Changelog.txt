@@ -1,3 +1,6 @@
+v.0.8.6:
+- Fixed logging in Open_URL, was logging everything by default
+
 v.0.8.5:
 - Fixed bad error reporting in addon_enable
 - Fixed example code for Sleep_If_Playback_Active function

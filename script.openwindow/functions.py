@@ -143,7 +143,7 @@ def Check_Zips(path, size, oem, local_path):
             dolog('### Online zip is newer, downloading new zip')
             if int(size) > (int(showprogress_size)*1000000) and showprogress == 'true':
                 xbmc.executebuiltin('Notification(Installing Updates,Please wait...,8000,%s)' % UPDATE_ICON)
-            Sleep_If_Function_Active(function=Install_Content,args=[oem,path,local_path,local_size,size,content],kill_time=30,show_busy=True)
+            Sleep_If_Function_Active(function=Install_Content,args=[oem,path,local_path,local_size,size,content],kill_time=120,show_busy=False)
             rerun_main = True
             try:
                 os.remove(local_path)
@@ -368,13 +368,16 @@ def Install_Content(oem,path,local_path,local_size='',new_size='',content=''):
     else:
         remote_path = BASE+'custzip/%s/.kodi/%s' % (oem, path)
     if choice:
-        if int(new_size) > (int(showprogress_size)*1000000) and showprogress == 'true':
-            dpmode = xbmcgui.DialogProgress()
-            dpmode.create(String(30058),String(30034))
-        else:
+        try:
+            if int(new_size) > (int(showprogress_size)*1000000) and showprogress == 'true':
+                dpmode = xbmcgui.DialogProgress()
+                dpmode.create(String(30058),String(30034))
+            else:
+                dpmode = None
+        except:
             dpmode = None
 
-        Sleep_If_Function_Active(function=Download, args=[remote_path, local_path, dpmode])
+        Sleep_If_Function_Active(function=Download, args=[remote_path, local_path, dpmode],kill_time=120,show_busy=False)
         dolog('## %s DOWNLOADED SUCCESSFULLY' % path)
 
         if remote_path.endswith('master_settings'):
@@ -388,9 +391,9 @@ def Install_Content(oem,path,local_path,local_size='',new_size='',content=''):
             try:
                 if zipfile.is_zipfile(local_path):
                     if '~~ZIPS~~/tr_' in path:
-                        Sleep_If_Function_Active(function=Extract, args=[local_path, ADDONS, dpmode])
+                        Sleep_If_Function_Active(function=Extract, args=[local_path, ADDONS, dpmode],kill_time=120,show_busy=False)
                     else:
-                        Sleep_If_Function_Active(function=Extract, args=[local_path, HOME, dpmode])
+                        Sleep_If_Function_Active(function=Extract, args=[local_path, HOME, dpmode],kill_time=120,show_busy=False)
                     dolog('## %s EXTRACTED SUCCESSFULLY' % path)
 
                 else:
@@ -483,11 +486,11 @@ def Main_Run():
                     
                     if str(local_size) != str(size) and not '~~ZIPS~~' in path:
                         dolog('## UPDATING %s' % path)
-                        Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path],kill_time=60,show_busy=True)
+                        Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path],kill_time=60,show_busy=False)
 
                     elif '~~ZIPS~~' in path:
                         dolog('### DOING ZIP CHECK')
-                        Sleep_If_Function_Active(function=Check_Zips, args=[path, size, oem, local_path],kill_time=300,show_busy=True)
+                        Sleep_If_Function_Active(function=Check_Zips, args=[path, size, oem, local_path],kill_time=150,show_busy=False)
 
             if not startup:
                 xbmc.executebuiltin("Dialog.Close(busydialog)")
