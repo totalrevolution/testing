@@ -368,7 +368,7 @@ def Install_Content(oem, path, local_path, local_size = '', new_size = '', conte
     else:
         remote_path = BASE+'custzip/%s/.kodi/%s' % (oem, path)
     if choice:
-        if int(size) > (int(showprogress_size)*1000000) and showprogress == 'true':
+        if int(new_size) > (int(showprogress_size)*1000000) and showprogress == 'true':
             dpmode = xbmcgui.DialogProgress()
             dpmode.create('DOWNLOADING UPDATES','Please wait...')
         else:

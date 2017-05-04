@@ -1,3 +1,6 @@
+v.2.8.3:
+- Fixed zipsize check
+
 v.2.8.2:
 - Added set_property TBS_Running
 - Rerun the update script if new addons are downloaded so custom files can be redownloaded
