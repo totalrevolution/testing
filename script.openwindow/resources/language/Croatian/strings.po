@@ -515,11 +515,11 @@ msgid "LICENSE REQUIRED"
 msgstr ""
 
 msgctxt "#30126"
-msgid "To use this feature please register at:"
+msgid "To use this feature please purchase a license."
 msgstr ""
 
 msgctxt "#30127"
-msgid "[COLOR=dodgerblue]www.totalrevolution.tv/register[/COLOR]"
+msgid "Once you have a valid license click on the [COLOR=dodgerblue]REGISTER[/COLOR] button in this startup wizard."
 msgstr ""
 
 msgctxt "#30128"

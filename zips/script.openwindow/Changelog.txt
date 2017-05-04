@@ -1,3 +1,10 @@
+v.2.8.2:
+- Added set_property TBS_Running
+- Rerun the update script if new addons are downloaded so custom files can be redownloaded
+- Refresh the skin after the update
+- Cleaned up some more code in line with Python Koding (using Strings)
+- Put a url request check in wifi_check so we can determine if connected to web
+
 v.2.8.1:
 - Updated strings, all ready for translations now
 

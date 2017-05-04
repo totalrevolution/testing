@@ -44,7 +44,7 @@ BASE                = 'http://totalrevolution.tv/'
 DEBUG               = Addon_Setting(setting='debug')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
-
+rerun_main          = False
 if not os.path.exists(TBS_DATA):
     os.makedirs(TBS_DATA)
 #-----------------------------------------------------------------------------------------------------------------
@@ -114,6 +114,7 @@ def Check_Valid(mode = 'oem_check'):
 #-----------------------------------------------------------------------------
 # Check any zip files that are in packages/~~ZIPS~~/
 def Check_Zips(path, size, oem, local_path):
+    global rerun_main
     cont = 1
 # Only install if disclaimer has been agreed
     if 'full_update_pack' in path and not os.path.exists(OEM_ID):
@@ -142,6 +143,7 @@ def Check_Zips(path, size, oem, local_path):
             if int(size) > (int(showprogress_size)*1000000) and showprogress == 'true':
                 xbmc.executebuiltin('Notification(Installing Updates,Please wait...,8000,%s)' % UPDATE_ICON)
             Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path, local_size, size, content], kill_time=30, show_busy=True)
+            rerun_main = True
             try:
                 os.remove(local_path)
             except:
@@ -415,25 +417,8 @@ def Install_Content(oem, path, local_path, local_size = '', new_size = '', conte
             except:
                 dolog('### Failed to extract from %s' % local_path)
 #-----------------------------------------------------------------------------
-# Return the ethernet mac if it exists, if not return the wifi mac
-def My_Mac():
-    mymac = Get_Mac()
-    if mymac != 'Unknown' and mymac != '00:15:18:01:81:31' and mymac != None:
-        return mymac
-    else:
-        return Get_Mac('wifi')
-#-----------------------------------------------------------------------------
-def Set_New_Settings():
-    dolog('### Setting master settings ###')
-    with open(SETTINGS_PATH) as file:
-        content = file.read().splitlines()
-    
-    for line in content:
-        if line != '':
-            setting, value = line.split('|')
-            Set_Setting(setting, 'kodi_setting', value)
-#-----------------------------------------------------------------------------
-if __name__ == '__main__':
+# Run the main code (when opened as a script)
+def Main_Run():
     dpmode  = None # Mode sent through for keyword install, if set this will pause until finished extracting
     startup = 0
     service = 0
@@ -463,19 +448,19 @@ if __name__ == '__main__':
             pass
     else:
 # Make sure Kodi isn't playing any files, we don't want to interrupt anything
-            if not startup:
-                Sleep_If_Playback_Active()
-                # xbmc.executebuiltin('ActivateWindow(busydialog)')
+        if not startup:
+            Sleep_If_Playback_Active()
+            # xbmc.executebuiltin('ActivateWindow(busydialog)')
 
-            if not os.path.exists(ZIP_PATH):
-                os.makedirs(ZIP_PATH)
+        if not os.path.exists(ZIP_PATH):
+            os.makedirs(ZIP_PATH)
 
-            local_size   = 0
-            url          = BASE+'boxer/update.php?x=%s&v=%s' % (Get_Params(),XBMC_VERSION)
-            dolog(url)
+        local_size   = 0
+        url          = BASE+'boxer/update.php?x=%s&v=%s' % (Get_Params(),XBMC_VERSION)
+        dolog(url)
 
-    # If connected to the internet we do the updates
-        # try:
+# If connected to the internet we do the updates
+        try:
             link = Open_URL(url=url,post_type='post').replace('\r','').replace('\n','').replace('\t','')
             link = Encrypt('d',link)
             update_array = re.compile('p="(.+?)"').findall(link)
@@ -508,7 +493,7 @@ if __name__ == '__main__':
                 xbmc.executebuiltin("Dialog.Close(busydialog)")
             dolog('### ALL UPDATES COMPLETE')
 
-    # Loop through the APK folders and install content
+# Loop through the APK folders and install content
             if xbmc.getCondVisibility('System.Platform.Android'):
                 try:
                     xbmc.log('### System is android, checking apk installs')
@@ -519,7 +504,7 @@ if __name__ == '__main__':
                 except Exception as e:
                     dolog('Error: %s' % e)
 
-    # Loop through the addons folder enabling all that aren't adult
+# Loop through the addons folder enabling all that aren't adult
             # if not os.path.exists(RUN_WIZARD):
             Enable_Addons()
             
@@ -534,7 +519,7 @@ if __name__ == '__main__':
                     dolog('Error running custom code: %s' % e)
                 os.remove(custom_code)
 
-    # Create the install_complete directory, the main install process will wait for this until continuing.
+# Create the install_complete directory, the main install process will wait for this until continuing.
             if os.path.exists(RUN_WIZARD):
                 try:
                     os.makedirs(INSTALL_COMPLETE)
@@ -548,24 +533,34 @@ if __name__ == '__main__':
                 except Exception as e:
                     dolog('### Error: %s' % e)
 
-    # If not connected to the internet we try and load wifi settings
-        # except Exception as e:
-        #     dolog('EXCEPTION: %s'%str(e))
-        #     try:
-        #         xbmcgui.DialogProgress().close()
-        #     except:
-        #         pass
-        #     xbmc.executebuiltin("Dialog.Close(busydialog)")
-        #     DIALOG.ok(ADDON.getLocalizedString(30123), ADDON.getLocalizedString(30124))
-            
-        #     content = Grab_Log()
-        #     if xbmc.getCondVisibility('System.Platform.Android'):
-        #         xbmc.executebuiltin('StartAndroidActivity(,android.settings.WIFI_SETTINGS)')
-            
-        #     elif 'Running on OpenELEC' in content or 'Running on LibreELEC' in content:
-        #         try:
-        #             xbmcaddon.Addon(id='service.openelec.settings').getAddonInfo('name')
-        #             xbmc.executebuiltin('RunAddon(service.openelec.settings)')
-        #         except:
-        #             xbmcaddon.Addon(id='service.libreelec.settings').getAddonInfo('name')
-        #             xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
+# If it failed with update commands print error to log
+        except:
+            dolog(Last_Error())
+#-----------------------------------------------------------------------------
+# Return the ethernet mac if it exists, if not return the wifi mac
+def My_Mac():
+    mymac = Get_Mac()
+    if mymac != 'Unknown' and mymac != '00:15:18:01:81:31' and mymac != None:
+        return mymac
+    else:
+        return Get_Mac('wifi')
+#-----------------------------------------------------------------------------
+def Set_New_Settings():
+    dolog('### Setting master settings ###')
+    with open(SETTINGS_PATH) as file:
+        content = file.read().splitlines()
+    
+    for line in content:
+        if line != '':
+            setting, value = line.split('|')
+            Set_Setting(setting, 'kodi_setting', value)
+#-----------------------------------------------------------------------------
+if __name__ == '__main__':
+    xbmcgui.Window(10000).setProperty('TBS_Running', 'true')
+    Main_Run()
+
+# Re-run the update check if addons have been downloaded so custom files can be reinstalled.
+    if rerun_main:
+        Main_Run()
+    Refresh(r_mode='skin')
+    xbmcgui.Window(10000).clearProperty('TBS_Running')

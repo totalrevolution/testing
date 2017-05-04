@@ -41,23 +41,18 @@ PACKAGES                   = os.path.join(ADDONS,'packages')
 ADDON_DATA                 = xbmc.translatePath('special://profile/addon_data')
 ADDON_PATH                 = xbmcaddon.Addon(ADDONID).getAddonInfo("path")
 LANGUAGE_PATH              = os.path.join(ADDON_PATH,'resources','language')
-SPARTACUS                  = os.path.join(ADDONS,'repository.spartacus')
 OPENWINDOW_DATA            = os.path.join(ADDON_DATA,ADDONID)
 RUN_WIZARD                 = os.path.join(OPENWINDOW_DATA,'RUN_WIZARD')
 RUN_WIZARD_OLD             = os.path.join(PACKAGES,'RUN_WIZARD')
 STARTUP_WIZARD             = os.path.join(OPENWINDOW_DATA,'STARTUP_WIZARD')
 INSTALL_COMPLETE           = os.path.join(OPENWINDOW_DATA,'INSTALL_COMPLETE')
-PRE_WIZARD                 = os.path.join(OPENWINDOW_DATA,'PRE_WIZARD')
 RUN_SPEEDTEST              = os.path.join(OPENWINDOW_DATA,'RUN_SPEEDTEST')
 NON_REGISTERED             = os.path.join(OPENWINDOW_DATA,'unregistered')
-INSTALL_FILE               = os.path.join(ADDONS,ADDONID,'default.py')
 THUMBNAILS                 = os.path.join(HOME,'userdata','THUMBNAILS')
 TARGET_ZIP                 = os.path.join(PACKAGES,'target.zip')
 KEYWORD_ZIP                = os.path.join(PACKAGES,'keyword.zip')
 TEMP_DL_TIME               = os.path.join(PACKAGES,'dltime')
 XBMC_VERSION               = xbmc.getInfoLabel("System.BuildVersion")[:2]
-YAHOO_WEATHER              = os.path.join(ADDONS,'weather.yahoo')
-OPEN_WEATHER               = os.path.join(ADDONS,'weather.openweathermap.extended')
 IP_ADDRESS                 = xbmc.getIPAddress()
 DIALOG                     = xbmcgui.Dialog()
 dp                         = xbmcgui.DialogProgress()
@@ -70,10 +65,12 @@ BRANDING_VID               = xbmc.translatePath('special://home/media/branding/i
 LANGUAGE_ART               = os.path.join(ADDON_PATH,'resources','images','language.jpg')
 DEBUG                      = Addon_Setting(setting='debug')
 branding                   = xbmc.translatePath('special://home/media/branding/branding.png')
-BASE                       = 'http://totalrevolution.tv/'
+BASE                       = 'http://tlbb.me/'
 
 if not os.path.exists(branding):
-    branding = os.path.join(NATIVE, 'addons',ADDONID,'resources','images','branding.png')
+    branding = os.path.join(ADDON_PATH,'resources','images','branding.png')
+    if not os.path.exists(branding):
+        branding = os.path.join(NATIVE, 'addons',ADDONID,'resources','images','branding.png')
 
 STOP_COOKIE_CHECK          = 0
 ACTION_HOME                = 7
@@ -81,7 +78,6 @@ ACTION_PREVIOUS_MENU       = 10
 ACTION_SELECT_ITEM         = 7
 runamount                  = 0
 updatescreen_thread        = ''
-skin_settings_thread       = ''
 main_order                 = []
 
 MENU_FILE                  = os.path.join(OPENWINDOW_DATA,'menus')
@@ -535,7 +531,7 @@ class Image_Screen(xbmcgui.Window):
 # Main menu GUI page        
 class MainMenu(xbmcgui.Window):
   def __init__(self,*args,**kwargs):
-    self.header=ADDON.getLocalizedString(kwargs['header'])
+    self.header=String(kwargs['header'])
     self.background=kwargs['background']
     
     self.backbuttonfunction = kwargs['backbuttonfunction']
@@ -546,18 +542,18 @@ class MainMenu(xbmcgui.Window):
 
 # Assign the back button text, if Select Language we need to define that rather than use generic "BACK"
     if 'Reset_Run_Wizard()' in self.backbuttonfunction:
-        self.backbutton = ADDON.getLocalizedString(30003)
+        self.backbutton = String(30003)
     else:
-        self.backbutton = ADDON.getLocalizedString(kwargs['backbutton'])
+        self.backbutton = String(kwargs['backbutton'])
 
 # Assign the next button text
     if kwargs['nextbutton'] != '':
-        self.nextbutton = ADDON.getLocalizedString(kwargs['nextbutton'])
+        self.nextbutton = String(kwargs['nextbutton'])
     else:
         self.nextbutton = ''
 
     if kwargs['selectbutton'] != '':
-        self.selectbutton=ADDON.getLocalizedString(kwargs['selectbutton'])
+        self.selectbutton=String(kwargs['selectbutton'])
     else:
         self.selectbutton = ''
     self.toggleup = kwargs['toggleup']
@@ -565,10 +561,10 @@ class MainMenu(xbmcgui.Window):
     self.selectbuttonfunction = kwargs['selectbuttonfunction']
     self.toggleupfunction = kwargs['toggleupfunction']
     self.toggledownfunction = kwargs['toggledownfunction']
-    self.maintext = ADDON.getLocalizedString(kwargs['maintext'])
+    self.maintext = String(kwargs['maintext'])
 
     if kwargs['noconnectionbutton'] != '':
-        self.noconnectionbutton = ADDON.getLocalizedString(kwargs['noconnectionbutton'])
+        self.noconnectionbutton = String(kwargs['noconnectionbutton'])
     else:
         self.noconnectionbutton = ''
 
@@ -693,15 +689,15 @@ class MainMenu(xbmcgui.Window):
 #-----------------------------------------------------------------------------
 class MainMenuThreeItems(xbmcgui.Window):
   def __init__(self,*args,**kwargs):
-    self.header=ADDON.getLocalizedString(kwargs['header'])
+    self.header=String(kwargs['header'])
     self.background=kwargs['background']
     
     if kwargs['backbutton']!='':
-        self.backbutton=ADDON.getLocalizedString(kwargs['backbutton'])
+        self.backbutton=String(kwargs['backbutton'])
     else:
         self.backbutton=''
     if kwargs['nextbutton']!='':
-        self.nextbutton=ADDON.getLocalizedString(kwargs['nextbutton'])
+        self.nextbutton=String(kwargs['nextbutton'])
     else:
         self.nextbutton=''
     
@@ -712,19 +708,19 @@ class MainMenuThreeItems(xbmcgui.Window):
         self.backbutton = ''
 
     if kwargs['optionbutton1']!='':
-        self.optionbutton1=ADDON.getLocalizedString(kwargs['optionbutton1'])
+        self.optionbutton1=String(kwargs['optionbutton1'])
     else:
         self.optionbutton1=''
     if kwargs['optionbutton2']!='':
-        self.optionbutton2=ADDON.getLocalizedString(kwargs['optionbutton2'])
+        self.optionbutton2=String(kwargs['optionbutton2'])
     else:
         self.optionbutton2=''
     if kwargs['optionbutton3']!='':
-       self.optionbutton3=ADDON.getLocalizedString(kwargs['optionbutton3'])
+       self.optionbutton3=String(kwargs['optionbutton3'])
     else:
         self.optionbutton3=''
 
-    self.maintext=ADDON.getLocalizedString(kwargs['maintext'])
+    self.maintext=String(kwargs['maintext'])
     self.option1function=kwargs['option1function']
     self.option2function=kwargs['option2function']
     self.option3function=kwargs['option3function']
@@ -875,6 +871,8 @@ def Check_Cookie():
 # If cookie is younger than a day old we can continue
         elif int(mydetails[2])+1000000 > int(mydetails[1]):
             dolog('### COOKIE VALID, CAN CONTINUE')
+            if os.path.exists(NON_REGISTERED):
+                shutil.rmtree(NON_REGISTERED)
             try:
                 autorun = sys.argv[1]
             except:
@@ -908,8 +906,8 @@ def Check_Status(extension, email=''):
         xbmc.executebuiltin('Notification(Checking Internet Connection,Please wait...,5000,%s)' % INTERNET_ICON)
     if params != 'Unknown':
         # try:
-            status    = Open_URL(url=BASE+'boxer/Add_New_Master.php?x=%s&v=%s&r=%s&e=%s' % (params, XBMC_VERSION, extension, Encrypt(message=email)),post_type='post')
-            dolog('### URL: %sboxer/Add_New_Master.php?x=%s&v=%s&r=%s&e=%s' % (BASE, params, XBMC_VERSION, extension, Encrypt(message=email)))
+            status    = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (params, XBMC_VERSION, extension, Encrypt(message=email)),post_type='post')
+            dolog('### URL: %sboxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (BASE, params, XBMC_VERSION, extension, Encrypt(message=email)))
             try:
                 dolog(Encrypt('d',status))
             except:
@@ -919,16 +917,16 @@ def Check_Status(extension, email=''):
                     exec(status)
                 except:
                     status = Encrypt('d', status.replace('\r','').replace('\n','').replace('\t',''))
-                    # try:
-                    exec(status)
-                    # except:
-                    #     DIALOG.ok(ADDON.getLocalizedString(30081), ADDON.getLocalizedString(30082))
+                    try:
+                        exec(status)
+                    except:
+                        DIALOG.ok(String(30081), String(30082))
 
 # Not connected to internet, lets open wifi settings
     #     except:
     #         WiFi_Check()
     else:            
-        DIALOG.ok(ADDON.getLocalizedString(30117), ADDON.getLocalizedString(30118))
+        DIALOG.ok(String(30117), String(30118))
 #-----------------------------------------------------------------------------
 # Check for branding updates - Seems to crash out too early, we will do it on startup instead
 def Check_Updates():
@@ -955,7 +953,6 @@ def Download_Extract(url,video=''):
 
     global updatescreen_thread
     global endtime
-    global skin_settings_thread
 
     dolog('Creating RunWizard')
 
@@ -1064,7 +1061,7 @@ def Download_Extract(url,video=''):
         xbmc.executebuiltin('Reboot')
         
     else:
-        DIALOG.ok(ADDON.getLocalizedString(30110), ADDON.getLocalizedString(30111))
+        DIALOG.ok(String(30110), String(30111))
         os._exit(1)
 #-----------------------------------------------------------------------------
 # Show progress of download, this function is working fine as you can see in the log. It's the Image_Screen I'm having problems with picking up percentage.
@@ -1091,24 +1088,24 @@ def Extract_Build():
 # Final call of startup wizard. Will remove any autostart files, check if skin needs changing and revert skinshortcuts back to lower version again
 def Finish():
     if (CURRENT_SKIN == 'skin.confluence' or CURRENT_SKIN == 'skin.estuary') and os.path.exists(os.path.join(ADDON_PATH, 'resources', 'skinlist.txt')):
-        choice=DIALOG.yesno(ADDON.getLocalizedString(30044),ADDON.getLocalizedString(30045),yeslabel=ADDON.getLocalizedString(30046),nolabel=ADDON.getLocalizedString(30047))
+        choice=DIALOG.yesno(String(30044),String(30045),yeslabel=String(30046),nolabel=String(30047))
         if choice==0:
             Select_Skin()
     if os.path.exists(KEYWORD_ZIP):
-        DIALOG.ok(ADDON.getLocalizedString(30048),ADDON.getLocalizedString(30049),ADDON.getLocalizedString(30050))
+        DIALOG.ok(String(30048),String(30049),String(30050))
         if zipfile.is_zipfile(KEYWORD_ZIP):
             try:
-                dp.create(ADDON.getLocalizedString(30051),ADDON.getLocalizedString(30052),' ', ' ')
+                dp.create(String(30051),String(30052),' ', ' ')
                 Extract(KEYWORD_ZIP,rootfolder,dp)
                 dp.close()
                 newguifile = os.path.join(HOME,'newbuild')
                 if not os.path.exists(newguifile):
                     os.makedirs(newguifile)
             except:
-                DIALOG.ok(ADDON.getLocalizedString(30053),ADDON.getLocalizedString(30054))
+                DIALOG.ok(String(30053),String(30054))
         os.remove(KEYWORD_ZIP)
         Remove_Textures()
-        DIALOG.ok(ADDON.getLocalizedString(30055),ADDON.getLocalizedString(30056),ADDON.getLocalizedString(30057))
+        DIALOG.ok(String(30055),String(30056),String(30057))
     try:
         xbmc.executebuiltin('Skin.SetString(Branding,off)')
     except:
@@ -1127,13 +1124,13 @@ def Finish():
         Set_Setting('general.addonnotifications', 'kodi_setting', 'true')
         try:
             xbmc.executebuiltin('RunScript(script.skinshortcuts,type=buildxml&mainmenuID=9000&group=x1|x2|x3|x4|x5|x6|x7|x8|x9|x10|x11|x12|x13|x101|x202|x303|x404|x505|x606)')
-        except Exception as e:
-            dolog('Failed to run skinshortcuts update: %s' % e)
+        except:
+            dolog('Failed to run skinshortcuts update: %s' % Last_Error())
 #-----------------------------------------------------------------------------
 # Return the activation link to user
 def Get_Activation(registration_link):
-    if DIALOG.yesno(ADDON.getLocalizedString(30119), ADDON.getLocalizedString(30120), '', '[COLOR=dodgerblue]%s[/COLOR]' % registration_link, yeslabel='SKIP REGISTRATION', nolabel='CHECK STATUS'):
-        DIALOG.ok(ADDON.getLocalizedString(30121), ADDON.getLocalizedString(30122))
+    if DIALOG.yesno(String(30119), String(30120), '', '[COLOR=dodgerblue]%s[/COLOR]' % registration_link, yeslabel='SKIP REGISTRATION', nolabel='CHECK STATUS'):
+        DIALOG.ok(String(30121), String(30122))
     else:
         Check_Cookie()
 #-----------------------------------------------------------------------------
@@ -1240,7 +1237,7 @@ def Keyword_Search():
     counter = 0
     success = 0
     downloadurl = ''
-    keyword     =  Keyboard(ADDON.getLocalizedString(30031))
+    keyword     =  Keyboard(String(30031))
     if keyword == 'masteron':
         ADDON2.setSetting('master','true')
         return
@@ -1284,7 +1281,7 @@ def Keyword_Search():
                     xbmc.executebuiltin('RunScript(special://home/addons/script.openwindow/functions.py)')
                 elif os.path.exists(xbmc.translatePath('special://xbmc/addons/script.openwindow/functions.py')):
                     xbmc.executebuiltin('RunScript(special://xbmc/addons/script.openwindow/functions.py)')
-                DIALOG.ok(ADDON.getLocalizedString(30023),ADDON.getLocalizedString(30086))
+                DIALOG.ok(String(30023),String(30086))
             if success == 0 and keyword !='':
                 try:
                     dolog("Attempting download "+downloadurl+" to "+lib)
@@ -1314,19 +1311,19 @@ def Keyword_Search():
                     else:
                         try:
                             if os.path.getsize(KEYWORD_ZIP) > 100000:
-                                dp.create(ADDON.getLocalizedString(30038),ADDON.getLocalizedString(30039),'', ADDON.getLocalizedString(30034))
+                                dp.create(String(30038),String(30039),'',String(30034))
                                 os.rename(KEYWORD_ZIP,restore_dir+'20150815123607.tar')
-                                dp.update(0,"", ADDON.getLocalizedString(30040))
+                                dp.update(0,"",String(30040))
                                 dp.close()
                                 xbmc.executebuiltin('reboot')
 # If file downloaded is neither a zip or a tar then remove and give error message
                             else:
-                                DIALOG.ok(ADDON.getLocalizedString(30041),ADDON.getLocalizedString(30042),ADDON.getLocalizedString(30043))
+                                DIALOG.ok(String(30041),String(30042),String(30043))
                         except:
-                            DIALOG.ok(ADDON.getLocalizedString(30041),ADDON.getLocalizedString(30042),ADDON.getLocalizedString(30043))
+                            DIALOG.ok(String(30041),String(30042),String(30043))
                     
                 except:
-                    DIALOG.ok(ADDON.getLocalizedString(30041),ADDON.getLocalizedString(30042),ADDON.getLocalizedString(30043))
+                    DIALOG.ok(String(30041),String(30042),String(30043))
 
             if os.path.exists(lib):
                 os.remove(lib)
@@ -1419,7 +1416,7 @@ def Clean_Tree(path):
 #-----------------------------------------------------------------------------
 # Text details showing benefits of registration
 def Registration_Details():
-    Text_Boxes(ADDON.getLocalizedString(30079),ADDON.getLocalizedString(30080))
+    Text_Box(String(30079),String(30080))
 #-----------------------------------------------------------------------------
 def Reset_Run_Wizard():
     if os.path.exists(STARTUP_WIZARD):
@@ -1447,9 +1444,9 @@ def Set_Language():
             language_array.append(item)
 
     while not choice:
-        country = DIALOG.select(ADDON.getLocalizedString(30004),language_array)
+        country = DIALOG.select(String(30004),language_array)
         selected_country = language_array[country].replace('[COLOR=dodgerblue]','').replace('[/COLOR]','')
-        choice = DIALOG.yesno(ADDON.getLocalizedString(30004), ADDON.getLocalizedString(30144) % selected_country.upper(), '', ADDON.getLocalizedString(30145))
+        choice = DIALOG.yesno(String(30004),String(30144) % selected_country.upper(),'',String(30145))
 
 # Temporarily rename the branding video so it doesn't show on profile reload
     if os.path.exists(BRANDING_VID) and os.path.exists(BRANDING_VID+'.bak'):
@@ -1640,30 +1637,7 @@ def Set_Skin_Settings(path, skinid):
 #-----------------------------------------------------------------------------
 # Not registered, show details of how to register
 def Show_Registration():
-    DIALOG.ok(ADDON.getLocalizedString(30125),ADDON.getLocalizedString(30126),ADDON.getLocalizedString(30127),ADDON.getLocalizedString(30128) % My_Mac())
-#-----------------------------------------------------------------------------
-# Function to show a full text window
-def Text_Boxes(heading,anounce):
-  class TextBox():
-    WINDOW=10147
-    CONTROL_LABEL=1
-    CONTROL_TEXTBOX=5
-    def __init__(self,*args,**kwargs):
-      xbmc.executebuiltin("ActivateWindow(%d)" % (self.WINDOW, )) # activate the text viewer window
-      self.win=xbmcgui.Window(self.WINDOW) # get window
-      xbmc.sleep(500) # give window time to initialize
-      self.setControls()
-    def setControls(self):
-      self.win.getControl(self.CONTROL_LABEL).setLabel(heading) # set heading
-      try:
-        f=open(anounce); text=f.read()
-      except:
-        text=anounce
-      self.win.getControl(self.CONTROL_TEXTBOX).setText(str(text))
-      return
-  TextBox()
-  while xbmc.getCondVisibility('Window.IsVisible(10147)'):
-      xbmc.sleep(500)
+    DIALOG.ok(String(30125),String(30126),String(30127))
 #-----------------------------------------------------------------------------
 # Auto select the relevant third party window to open into
 def TR_Check(mode):
@@ -1678,7 +1652,7 @@ def TR_Check(mode):
         Show_Registration()
 #-----------------------------------------------------------------------------
 def Third_Party_Choice():
-    choice = DIALOG.yesno(ADDON.getLocalizedString(30091),ADDON.getLocalizedString(30092),yeslabel=ADDON.getLocalizedString(30093),nolabel=ADDON.getLocalizedString(30094))
+    choice = DIALOG.yesno(String(30091),String(30092),yeslabel=String(30093),nolabel=String(30094))
     if choice:
         ADDON2.setSetting('thirdparty','true')
     else:
@@ -1696,7 +1670,7 @@ def Update_Screen():
         header='Update In Progress',
         background='register.png',
         icon='update_software.png',
-        maintext=ADDON.getLocalizedString(30074),
+        maintext=String(30074),
         )
     mydisplay.doModal()
     del mydisplay
@@ -1733,40 +1707,43 @@ def Weather_Info():
 #-----------------------------------------------------------------------------
 # Not connected so bring up Internet dialog and redirect to wifi settings
 def WiFi_Check():
-    xbmc.executebuiltin("Dialog.Close(busydialog)")
-    DIALOG.ok(ADDON.getLocalizedString(30123), ADDON.getLocalizedString(30124))
+    try:
+        url_code = Validate_Link(BASE)
+    except:
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
+        DIALOG.ok(String(30123), String(30124))
 
-    content = Grab_Log()
-    if xbmc.getCondVisibility('System.Platform.Android'):
-        xbmc.executebuiltin('StartAndroidActivity(,android.settings.WIFI_SETTINGS)')
-    
-    elif 'Running on OpenELEC' in content or 'Running on LibreELEC' in content:
+        content = Grab_Log()
+        if xbmc.getCondVisibility('System.Platform.Android'):
+            xbmc.executebuiltin('StartAndroidActivity(,android.settings.WIFI_SETTINGS)')
+        
+        elif 'Running on OpenELEC' in content or 'Running on LibreELEC' in content:
 
-        if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)") or xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
-            if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)"): 
-                xbmcaddon.Addon(id='service.openelec.settings').getAddonInfo('name')
-                xbmc.executebuiltin('RunAddon(service.openelec.settings)')
-            elif xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
-                xbmcaddon.Addon(id='service.libreelec.settings').getAddonInfo('name')
-                xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
-            xbmc.sleep(1500)
-            xbmc.executebuiltin('Control.SetFocus(1000,2)')
-            xbmc.sleep(500)
-            xbmc.executebuiltin('Control.SetFocus(1200,0)')
-    if DIALOG.yesno(ADDON.getLocalizedString(30140), ADDON.getLocalizedString(30141),yeslabel=ADDON.getLocalizedString(30142),nolabel=ADDON.getLocalizedString(30143)):
-        os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
+            if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)") or xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
+                if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)"): 
+                    xbmcaddon.Addon(id='service.openelec.settings').getAddonInfo('name')
+                    xbmc.executebuiltin('RunAddon(service.openelec.settings)')
+                elif xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
+                    xbmcaddon.Addon(id='service.libreelec.settings').getAddonInfo('name')
+                    xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
+                xbmc.sleep(1500)
+                xbmc.executebuiltin('Control.SetFocus(1000,2)')
+                xbmc.sleep(500)
+                xbmc.executebuiltin('Control.SetFocus(1200,0)')
+        if DIALOG.yesno(String(30140), String(30141),yeslabel=String(30142),nolabel=String(30143)):
+            os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
 
 # If user chooses offline mode remove RUN_WIZARD and create STARTUP_WIZARD so it doesn't auto start every boot
-        if os.path.exists(RUN_WIZARD):
-            shutil.rmtree(RUN_WIZARD)
-            try:
-                os.makedirs(STARTUP_WIZARD)
-            except:
-                pass
-    else:
-        if not os.path.exists(RUN_WIZARD):
-            os.makedirs(RUN_WIZARD)
-        Load_Profile()
+            if os.path.exists(RUN_WIZARD):
+                shutil.rmtree(RUN_WIZARD)
+                try:
+                    os.makedirs(STARTUP_WIZARD)
+                except:
+                    pass
+        else:
+            if not os.path.exists(RUN_WIZARD):
+                os.makedirs(RUN_WIZARD)
+            Load_Profile()
 #-----------------------------------------------------------------------------
 # Create the initial folders required for add-on to work
 if not os.path.exists(PACKAGES):
@@ -1799,7 +1776,7 @@ if os.path.exists(TEMP_DL_TIME):
             livestreams = 30103
             onlinevids = 30104
         if avgspeed != 0:
-            DIALOG.ok(ADDON.getLocalizedString(30105), ADDON.getLocalizedString(30106) + ADDON.getLocalizedString(livestreams),'',ADDON.getLocalizedString(30107) + ADDON.getLocalizedString(onlinevids))
+            DIALOG.ok(String(30105), String(30106) + String(livestreams),'', String(30107) + String(onlinevids))
     try:
         os.remove(TEMP_DL_TIME)
     except:
