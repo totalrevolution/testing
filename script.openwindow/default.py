@@ -1745,7 +1745,7 @@ def WiFi_Check():
                 os.makedirs(RUN_WIZARD)
             Load_Profile()
 #-----------------------------------------------------------------------------
-if __name__ == __main__:
+if __name__ == '__main__':
 # Create the initial folders required for add-on to work
     if not os.path.exists(PACKAGES):
         os.makedirs(PACKAGES)

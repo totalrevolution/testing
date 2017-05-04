@@ -1,3 +1,6 @@
+v.2.8.8:
+- Fixed the typo in default __main__
+
 v.2.8.7:
 - Increased timeouts for installing of zips
 - Added registered check in service
