@@ -1,3 +1,6 @@
+v.2.9:
+- Hidden standard kodi home window from after initial extraction on android
+
 v.2.8.9:
 - Added Android Krypton support for skinswitch
 

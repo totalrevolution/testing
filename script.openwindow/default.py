@@ -1004,9 +1004,6 @@ def Download_Extract(url,video=''):
 
 # Check if video is still playing, wait for that to finish before closing
     Sleep_If_Playback_Active()
-
-# Open home window, failing to do this causes problems with the yesno DIALOG for skin switching
-    xbmc.executebuiltin('ActivateWindow(HOME)')
     
     guisettingsbak = os.path.join(PROFILE, 'guisettings_BAK')
     skinid = Get_Skin_ID(guisettingsbak)
@@ -1016,6 +1013,8 @@ def Download_Extract(url,video=''):
     while not skin_ok:
         xbmc.sleep(1000)
         skin_ok = xbmc.getCondVisibility("System.HasAddon(%s)"%skinid)
+# Open home window, failing to do this causes problems with the yesno DIALOG for skin switching
+    xbmc.executebuiltin('ActivateWindow(HOME)')
     dolog('#### NEW SKIN: %s' % skinid)
     Set_Setting('lookandfeel.skin', 'kodi_setting', skinid)
     isyesno = xbmc.getCondVisibility('Window.IsVisible(yesnodialog)')
