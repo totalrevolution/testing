@@ -1,3 +1,6 @@
+v.2.8.9:
+- Added Android Krypton support for skinswitch
+
 v.2.8.8:
 - Fixed the typo in default __main__
 
