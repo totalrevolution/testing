@@ -537,6 +537,48 @@ koding.Text_Box('ERROR MESSAGE',Last_Error())
     return error
 #----------------------------------------------------------------
 # TUTORIAL #
+def Network_Settings():
+    """
+Attempt to open the WiFi/network settings for the current running operating system.
+
+I have no access to any iOS based systems so if anybody wants to add support for
+that and you know the working code please contact me at info@totalrevolution.tv
+The Linux one is also currently untested and of course there are many different
+distros so if you know of any improved code please do pass on. Thank you.
+
+CODE: Network_Settings()
+
+EXAMPLE CODE:
+koding.Network_Settings()
+~"""
+    content = Grab_Log()
+    if xbmc.getCondVisibility('System.Platform.Android'):
+        xbmc.executebuiltin('StartAndroidActivity(,android.settings.WIFI_SETTINGS)')
+    
+    elif xbmc.getCondVisibility('System.Platform.OSX'):
+        os.system('open /System/Library/PreferencePanes/Network.prefPane/')
+
+    elif xbmc.getCondVisibility('System.Platform.Windows'):
+        os.system('ncpa.cpl')
+
+    elif 'Running on OpenELEC' in content or 'Running on LibreELEC' in content:
+
+        if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)") or xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
+            if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)"): 
+                xbmcaddon.Addon(id='service.openelec.settings').getAddonInfo('name')
+                xbmc.executebuiltin('RunAddon(service.openelec.settings)')
+            elif xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
+                xbmcaddon.Addon(id='service.libreelec.settings').getAddonInfo('name')
+                xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
+            xbmc.sleep(1500)
+            xbmc.executebuiltin('Control.SetFocus(1000,2)')
+            xbmc.sleep(500)
+            xbmc.executebuiltin('Control.SetFocus(1200,0)')
+
+    elif xbmc.getCondVisibility('System.Platform.Linux'):
+        os.system('nm-connection-editor')
+#----------------------------------------------------------------
+# TUTORIAL #
 def Refresh(r_mode=['addons', 'repos'], profile_name='default'):
     """
 Refresh a number of items in kodi, choose the order they are
