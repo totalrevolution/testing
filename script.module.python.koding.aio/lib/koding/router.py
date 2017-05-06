@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import koding
+import directory
 import tutorials
 import video
 import xbmc
@@ -27,6 +27,7 @@ dialog       = xbmcgui.Dialog()
 
 master_modes = {
 # Required for certain koding functions to work
+    "populate_list":    {'function': directory.Populate_List, 'args': ["url","start_point","end_point","separator","skip"]},
     "play_video":       {'function': video.Play_Video, 'args': ["url"]},
     "show_tutorial":    {'function': tutorials.Show_Tutorial, 'args': ["url"]},
     "tutorials":        {'function': tutorials.Grab_Tutorials, 'args': []},

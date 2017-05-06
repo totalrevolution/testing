@@ -1,3 +1,9 @@
+v.0.8.7:
+- Added OK_Dialog function
+- Added YesNo_Dialog function
+- Added Compress function - this will probably end up replacing Archive_Tree longer term
+- Suppressed error popup message when online code fails
+
 v.0.8.6:
 - Fixed logging in Open_URL, was logging everything by default
 

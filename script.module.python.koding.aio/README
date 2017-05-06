@@ -824,6 +824,44 @@ Show a short notification for x amount of seconds
 
 ------------------------------------------------------------------------------------------
 
+OK DIALOG:
+This will bring up a short text message in a dialog.ok window.
+
+	CODE: OK_Dialog(title,message)
+
+	AVAILABLE PARAMS:
+
+	    (*) title  -  This is title which appears in the header of the window.
+
+	    (*) message  -  This is the main text you want to appear.
+
+	EXAMPLE CODE:
+		koding.OK_Dialog(title='TEST DIALOG',message='This is a test dialog ok box. Click OK to quit.')
+
+------------------------------------------------------------------------------------------
+
+YES/NO DIALOG:
+This will bring up a short text message in a dialog.yesno window. This will return True or False
+
+	CODE: YesNo_Dialog(title,message,[yeslabel,nolabel])
+
+	AVAILABLE PARAMS:
+
+	    (*) title  -  This is title which appears in the header of the window.
+
+	    (*) message  -  This is the main text you want to appear.
+
+	    yes  -  Optionally change the default "YES" to a custom string
+
+	    no  -  Optionally change the default "NO" to a custom string
+
+	EXAMPLE CODE:
+	mychoice = koding.YesNo_Dialog(title='TEST DIALOG',message='This is a yes/no dialog with custom labels.\nDo you want to see an example of a standard yes/no.',yes='Go on then',no='Nooooo!')
+	if mychoice:
+	    koding.YesNo_Dialog(title='STANDARD DIALOG',message='This is an example of a standard one without sending custom yes/no params through.')
+
+------------------------------------------------------------------------------------------
+
 D I R E C T O R Y   F U N C T I O N S
 
 ------------------------------------------------------------------------------------------
@@ -1077,6 +1115,39 @@ This will check for any cached artwork and wipe if it's not been accessed more t
 	EXAMPLE CODE:
 		dialog.ok('Clean Textures','We are going to clear any old cached images not accessed at least 10 times in the past 5 days')
 		koding.Cleanup_Textures(frequency=5)
+
+------------------------------------------------------------------------------------------
+
+COMPRESS FILES:
+Compress files in either zip or tar format. This will most likely be replacing Archive_Tree longer term
+as this has better functionality but it's currently missing the custom message and exclude files options.
+
+	CODE: Compress(src,dst,[compression,parent])
+
+	AVAILABLE PARAMS:
+
+	    (*) src  -  This is the source folder you want to compress
+
+	    (*) dst  -  This is the destination file you want to create
+
+	    compression  -  By default this is set to 'zip' but you can also use 'tar'
+
+	    parent  -  By default this is set to False which means it will compress
+	    everything inside the path given. If set to True it will do the same but
+	    it will include the parent folder name - ideal if you want to zip up
+	    an add-on folder and be able to install via Kodi Settings.
+
+	EXAMPLE CODE:
+		koding_path = xbmc.translatePath('special://home/addons/script.module.python.koding.aio')
+		zip_dest = xbmc.translatePath('special://home/test_addon.zip')
+		zip_dest2 = xbmc.translatePath('special://home/test_addon2.zip')
+		tar_dest = xbmc.translatePath('special://home/test_addon.tar')
+		tar_dest2 = xbmc.translatePath('special://home/test_addon2.tar')
+		koding.Compress(src=koding_path,dst=zip_dest,compression='zip',parent=True)
+		koding.Compress(src=koding_path,dst=zip_dest2,compression='zip',parent=False)
+		koding.Compress(src=koding_path,dst=tar_dest,compression='tar',parent=True)
+		koding.Compress(src=koding_path,dst=tar_dest2,compression='tar',parent=False)
+		koding.Text_Box('CHECK HOME FOLDER','If you check your Kodi home folder you should now have 4 different compressed versions of the Python Koding add-on.\n\ntest_addon.zip: This has been zipped up with parent set to True\n\ntest_addon2.zip: This has been zipped up with parent set to False.\n\ntest_addon.tar: This has been compressed using tar format and parent set to True\n\ntest_addon2.tar: This has been compressed using tar format and parent set to False.\n\nFeel free to manually delete these.')
 
 ------------------------------------------------------------------------------------------
 
