@@ -38,7 +38,16 @@ class Generator:
         final_zip = os.path.join('zips',addon_id,'%s-%s.zip' % (addon_id,version))
         if not os.path.exists(final_zip):
             print "NEW ADD-ON - Creating zip for: %s v.%s" % (addon_id,version)
-            shutil.make_archive(os.path.join(addon_folder,'%s-%s'%(addon_id,version)), 'zip', addon_id)
+            zip = zipfile.ZipFile(final_zip, 'w', compression=zipfile.ZIP_DEFLATED )
+            root_len = len(os.path.dirname(os.path.abspath(addon_id)))
+            for root, dirs, files in os.walk(addon_id):
+                archive_root = os.path.abspath(root)[root_len:]
+
+                for f in files:
+                        fullpath = os.path.join( root, f )
+                        archive_name = os.path.join( archive_root, f )
+                        zip.write( fullpath, archive_name, zipfile.ZIP_DEFLATED )
+            zip.close()
             
 # Copy over the icon, fanart and addon.xml to the zip directory
             copyfiles = ['icon.png','fanart.jpg','addon.xml']
