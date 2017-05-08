@@ -1751,6 +1751,8 @@ def WiFi_Check():
         os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
         if OFFLINE_MODE == 'true':
             choice = DIALOG.yesno(String(30140), String(30141),yeslabel=String(30142),nolabel=String(30143))
+        else:
+            DIALOG.ok(String(30140),String(30171))
 
         if choice:
 # If user chooses offline mode remove RUN_WIZARD and create STARTUP_WIZARD so it doesn't auto start every boot
