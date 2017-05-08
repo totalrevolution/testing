@@ -1735,8 +1735,9 @@ def WiFi_Check():
                 xbmc.executebuiltin('Control.SetFocus(1000,2)')
                 xbmc.sleep(500)
                 xbmc.executebuiltin('Control.SetFocus(1200,0)')
+# If no interent connection create non_registered so the register option will appear on next run
+        os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
         if DIALOG.yesno(String(30140), String(30141),yeslabel=String(30142),nolabel=String(30143)):
-            os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
 
 # If user chooses offline mode remove RUN_WIZARD and create STARTUP_WIZARD so it doesn't auto start every boot
             if os.path.exists(RUN_WIZARD):
