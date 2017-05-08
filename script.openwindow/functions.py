@@ -40,12 +40,17 @@ OEM_ID              = os.path.join(OPENWINDOW_DATA,'id')
 KEYWORD_TEMP        = os.path.join(OPENWINDOW_DATA,'keyword_installed')
 XBMC_VERSION        = xbmc.getInfoLabel("System.BuildVersion")[:2]
 DIALOG              = xbmcgui.Dialog()
-BASE                = 'http://tlbb.me/'
 DEBUG               = Addon_Setting(setting='debug')
 AUTO_UPDATE         = Addon_Setting(setting='autoupdate')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
 rerun_main          = False
+
+try:
+    BASE = Open_URL(url='http://tlbb.me/')
+except:
+    BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
+
 if not os.path.exists(TBS_DATA):
     os.makedirs(TBS_DATA)
 #-----------------------------------------------------------------------------------------------------------------

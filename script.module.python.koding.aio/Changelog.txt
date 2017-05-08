@@ -1,3 +1,10 @@
+v.0.8.9:
+- Added extra logging for Main runcode
+- Added proper exceptions if URL could not be opened
+
+v.0.8.8:
+- Removed rogue ampersand in addon.xml
+
 v.0.8.7:
 - Added OK_Dialog function
 - Added YesNo_Dialog function

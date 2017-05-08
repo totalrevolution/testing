@@ -64,8 +64,13 @@ INTERNET_ICON              = os.path.join(ADDON_PATH,'resources','images','inter
 BRANDING_VID               = xbmc.translatePath('special://home/media/branding/intro.mp4')
 LANGUAGE_ART               = os.path.join(ADDON_PATH,'resources','images','language.jpg')
 DEBUG                      = Addon_Setting(setting='debug')
+OFFLINE_MODE               = Addon_Setting(setting='offline')
 branding                   = xbmc.translatePath('special://home/media/branding/branding.png')
-BASE                       = 'http://tlbb.me/'
+
+try:
+    BASE = Open_URL(url='http://tlbb.me/')
+except:
+    BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
 
 if not os.path.exists(branding):
     branding = os.path.join(ADDON_PATH,'resources','images','branding.png')
@@ -905,7 +910,7 @@ def Check_Status(extension, email=''):
     if extension == '1':
         xbmc.executebuiltin('Notification(Checking Internet Connection,Please wait...,5000,%s)' % INTERNET_ICON)
     if params != 'Unknown':
-        # try:
+        try:
             status = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (params, XBMC_VERSION, extension, Encrypt(message=email)),post_type='post')
             dolog('### URL: %sboxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (BASE, params, XBMC_VERSION, extension, Encrypt(message=email)))
             try:
@@ -923,8 +928,8 @@ def Check_Status(extension, email=''):
                         DIALOG.ok(String(30081), String(30082))
 
 # Not connected to internet, lets open wifi settings
-    #     except:
-    #         WiFi_Check()
+        except:
+            WiFi_Check()
     else:            
         DIALOG.ok(String(30117), String(30118))
 #-----------------------------------------------------------------------------
@@ -1062,8 +1067,9 @@ def Download_Extract(url,video=''):
         except:
             pass
 
-    if xbmc.getCondVisibility('System.Platform.Android'):
-        xbmc.executebuiltin('Reboot')
+# DISABLED - seems like this may be causing android error message on 6.0
+    # if xbmc.getCondVisibility('System.Platform.Android'):
+    #     xbmc.executebuiltin('Reboot')
         
     else:
         DIALOG.ok(String(30110), String(30111))
@@ -1735,10 +1741,12 @@ def WiFi_Check():
                 xbmc.executebuiltin('Control.SetFocus(1000,2)')
                 xbmc.sleep(500)
                 xbmc.executebuiltin('Control.SetFocus(1200,0)')
-# If no interent connection create non_registered so the register option will appear on next run
+        choice = False
         os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
-        if DIALOG.yesno(String(30140), String(30141),yeslabel=String(30142),nolabel=String(30143)):
+        if OFFLINE_MODE == 'true':
+            choice = DIALOG.yesno(String(30140), String(30141),yeslabel=String(30142),nolabel=String(30143))
 
+        if choice:
 # If user chooses offline mode remove RUN_WIZARD and create STARTUP_WIZARD so it doesn't auto start every boot
             if os.path.exists(RUN_WIZARD):
                 shutil.rmtree(RUN_WIZARD)

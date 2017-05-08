@@ -28,7 +28,11 @@ INSTALL_ORIG     = os.path.join(PACKAGES, 'INSTALL_COMPLETE')
 INSTALL_COMPLETE = os.path.join(ADDON_DATA, ADDON_ID, 'INSTALL_COMPLETE')
 TBS              = os.path.join(ADDONS, 'plugin.program.tbs')
 INTERNET_ICON    = os.path.join(ADDON_PATH,'resources','images','internet.png')
-BASE             = 'http://tlbb.me/'
+
+try:
+    BASE = Open_URL(url='http://tlbb.me/')
+except:
+    BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
 
 while xbmc.Player().isPlaying():
     xbmc.sleep(500)
