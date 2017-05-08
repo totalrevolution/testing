@@ -1,3 +1,7 @@
+v.2.9.2:
+- Updated strings
+- Removed NON_REGISTERED placeholder if download completes
+
 v.2.9.1:
 - Create unregistered placeholder so register button appears after no connection
 - Changed to use force close instead of reboot on Android (causes error messages on 6.0)

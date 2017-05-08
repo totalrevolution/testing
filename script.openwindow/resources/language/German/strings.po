@@ -693,3 +693,7 @@ msgstr ""
 msgctxt "#30170"
 msgid "NO"
 msgstr ""
+
+msgctxt "#30171"
+msgid "If you\'re now connected to the internet please click OK to retry setting up this device."
+msgstr ""

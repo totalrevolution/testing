@@ -982,7 +982,8 @@ def Download_Extract(url,video=''):
     
     Sleep_If_Function_Active(function=Download, args=[url,TARGET_ZIP], kill_time=300)
     dolog('DOWNLOAD COMPLETE: %s'%url)
-    
+    if os.path.exists(NON_REGISTERED):
+        shutil.rmtree(NON_REGISTERED)
 # Store download speed information
     try:
         endtime   = datetime.datetime.fromtimestamp(os.path.getmtime(TARGET_ZIP))
