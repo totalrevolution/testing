@@ -389,7 +389,7 @@ def Get_ID(setid=False):
     """
 A simple function to set user id and group id to the current running App
 for system commands. For example if you're using the subprocess command
-you could send through the preexec_fn paramater as koding.Run_As_Kodi.
+you could send through the preexec_fn paramater as koding.Get_ID(setid=True).
 This function will also return the uid and gid in form of a dictionary.
 
 CODE: Get_ID([setid])
@@ -410,7 +410,8 @@ dialog.ok('USER & GROUP ID','User ID: %s'%uid, 'Group ID: %s'%gid)
     if setid:
         os.setgid(uid)
         os.setuid(gid)
-    return {"uid":uid,"gid":gid}
+    if not setid:
+        return {"uid":uid,"gid":gid}
 #----------------------------------------------------------------
 # TUTORIAL #
 def Grab_Log(log_type = 'std', formatting = 'original', sort_order = 'reverse'):

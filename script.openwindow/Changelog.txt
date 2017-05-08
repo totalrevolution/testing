@@ -1,3 +1,6 @@
+v.2.9.4:
+- Fixed Get_ID and Fresh_Install for Android
+
 v.2.9.3:
 - Fixed auto-close after initial install
 
