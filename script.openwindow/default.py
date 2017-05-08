@@ -1729,24 +1729,7 @@ def WiFi_Check():
     except:
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         DIALOG.ok(String(30123), String(30124))
-
-        content = Grab_Log()
-        if xbmc.getCondVisibility('System.Platform.Android'):
-            xbmc.executebuiltin('StartAndroidActivity(,android.settings.WIFI_SETTINGS)')
-        
-        elif 'Running on OpenELEC' in content or 'Running on LibreELEC' in content:
-
-            if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)") or xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
-                if xbmc.getCondVisibility("System.HasAddon(service.openelec.settings)"): 
-                    xbmcaddon.Addon(id='service.openelec.settings').getAddonInfo('name')
-                    xbmc.executebuiltin('RunAddon(service.openelec.settings)')
-                elif xbmc.getCondVisibility("System.HasAddon(service.libreelec.settings)"):
-                    xbmcaddon.Addon(id='service.libreelec.settings').getAddonInfo('name')
-                    xbmc.executebuiltin('RunAddon(service.libreelec.settings)')
-                xbmc.sleep(1500)
-                xbmc.executebuiltin('Control.SetFocus(1000,2)')
-                xbmc.sleep(500)
-                xbmc.executebuiltin('Control.SetFocus(1200,0)')
+        Network_Settings()
         choice = False
         os.makedirs(NON_REGISTERED) if (not os.path.exists(NON_REGISTERED)) else dolog("NON_REGISTERED PATH EXISTS")
         if OFFLINE_MODE == 'true':
