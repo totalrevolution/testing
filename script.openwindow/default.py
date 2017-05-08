@@ -1078,9 +1078,9 @@ def Download_Extract(url,video=''):
     # if xbmc.getCondVisibility('System.Platform.Android'):
     #     xbmc.executebuiltin('Reboot')
         
-    else:
-        DIALOG.ok(String(30110), String(30111))
-        os._exit(1)
+    # else:
+    DIALOG.ok(String(30110), String(30111))
+    os._exit(1)
 #-----------------------------------------------------------------------------
 # Show progress of download, this function is working fine as you can see in the log. It's the Image_Screen I'm having problems with picking up percentage.
 def Download_Progress(numblocks, blocksize, filesize, url):

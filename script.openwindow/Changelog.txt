@@ -1,3 +1,6 @@
+v.2.9.3:
+- Fixed auto-close after initial install
+
 v.2.9.2:
 - Updated strings
 - Removed NON_REGISTERED placeholder if download completes
