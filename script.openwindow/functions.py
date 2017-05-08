@@ -45,11 +45,17 @@ AUTO_UPDATE         = Addon_Setting(setting='autoupdate')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
 rerun_main          = False
-
+BASE                = 'http://tlbb.me/'
 try:
-    BASE = Open_URL(url='http://tlbb.me/')
+    my_base = Open_URL(url='http://tlbb.me/')
+    if my_base.startswith('This url could not be opened'):
+        try:
+            BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
+        except:
+            dolog('Unable to access any valid base domain')
 except:
-    BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
+    pass
+
 
 if not os.path.exists(TBS_DATA):
     os.makedirs(TBS_DATA)
