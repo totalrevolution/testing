@@ -1,4 +1,8 @@
 <settings>
+<!-- Set default to false if you don't want to allow the unit to boot up in offline mode -->
+	<setting id="offline"			type="bool"			default="true"	visible="false"/>
+
+<!--  Main visible settings -->
 	<setting id="debug"				type="bool"			default="false"	visible="true" 	label="Enable debug mode"/>
 	<setting id="autoupdate"		type="bool"			default="true"	visible="true" 	label="Auto Update Add-ons"/>
 	<setting id="showprogress"		type="bool"			default="true"	visible="true"	label="30149"/>

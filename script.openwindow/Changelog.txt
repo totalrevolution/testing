@@ -1,3 +1,9 @@
+v.2.9.1:
+- Create unregistered placeholder so register button appears after no connection
+- Changed to use force close instead of reboot on Android (causes error messages on 6.0)
+- Added backup server check
+- Added option in settings to allow device to run in offline mode
+
 v.2.9:
 - Hidden standard kodi home window from after initial extraction on android
 
