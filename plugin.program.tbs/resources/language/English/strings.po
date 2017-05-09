@@ -1329,3 +1329,11 @@ msgstr ""
 msgctxt "#30329"
 msgid "Enable debugging mode"
 msgstr ""
+
+msgctxt "#30330"
+msgid "Updates Complete"
+msgstr ""
+
+msgctxt "#30331"
+msgid "No more updates to show"
+msgstr ""

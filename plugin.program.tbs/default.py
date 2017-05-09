@@ -18,12 +18,12 @@ import zipfile
 try: from sqlite3 import dbapi2 as database
 except: from pysqlite2 import dbapi2 as database
 
-from koding import Add_Dir, Addon_Setting, dolog, Last_Error, Grab_Log, Notify, String, System, Text_File
+from koding import *
 
 try:
     AddonID = xbmcaddon.Addon().getAddonInfo('id')
 except:
-    AddonID = koding.Caller()
+    AddonID = Caller()
 
 ADDON            =  xbmcaddon.Addon(id=AddonID)
 ADDON_PATH       =  ADDON.getAddonInfo('path')
@@ -31,32 +31,32 @@ USB              =  Addon_Setting(setting='zip')
 thirdparty       =  Addon_Setting(setting='thirdparty')
 userid           =  Addon_Setting(setting='userid')
 debug            =  Addon_Setting(setting='debug')
-dialog           =  xbmcgui.Dialog()
-dp               =  xbmcgui.DialogProgress()
 HOME             =  xbmc.translatePath('special://home/')
 USERDATA         =  xbmc.translatePath('special://profile/')
-ADDON_DATA       =  os.path.join(USERDATA,'addon_data')
+ADDON_DATA       =  os.path.join(USERDATA,  'addon_data')
 TBSDATA          =  os.path.join(ADDON_DATA,AddonID)
-PLAYLISTS        =  os.path.join(USERDATA,'playlists')
-MEDIA            =  os.path.join(HOME,'media')
-DATABASE         =  os.path.join(USERDATA,'Database')
-THUMBNAILS       =  os.path.join(USERDATA,'Thumbnails')
-ADDONS           =  os.path.join(HOME,'addons')
-PACKAGES         =  os.path.join(ADDONS,'packages')
-BRANDART         =  os.path.join(MEDIA, 'branding','Splash.png')
-KEYWORD_FILE     =  os.path.join(HOME, 'userdata', 'addon_data', 'script.openwindow', 'keyword')
-FAVS             =  os.path.join(USERDATA,'favourites.xml')
-GUI              =  os.path.join(USERDATA,'guisettings.xml')
-SOURCE           =  os.path.join(USERDATA,'sources.xml')
-ADVANCED         =  os.path.join(USERDATA,'advancedsettings.xml')
-RSS              =  os.path.join(USERDATA,'RssFeeds.xml')
-KEYMAPS          =  os.path.join(USERDATA,'keymaps','keyboard.xml')
-PROGRESS_TEMP    =  os.path.join(TBSDATA,'progresstemp')
+PLAYLISTS        =  os.path.join(USERDATA,  'playlists')
+MEDIA            =  os.path.join(HOME,      'media')
+DATABASE         =  os.path.join(USERDATA,  'Database')
+THUMBNAILS       =  os.path.join(USERDATA,  'Thumbnails')
+ADDONS           =  os.path.join(HOME,      'addons')
+PACKAGES         =  os.path.join(ADDONS,    'packages')
+BRANDART         =  os.path.join(MEDIA,     'branding','Splash.png')
+KEYMAPS          =  os.path.join(USERDATA,  'keymaps','keyboard.xml')
+KEYWORD_FILE     =  os.path.join(HOME,      'userdata','addon_data','script.openwindow','keyword')
+FAVS             =  os.path.join(USERDATA,  'favourites.xml')
+GUI              =  os.path.join(USERDATA,  'guisettings.xml')
+SOURCE           =  os.path.join(USERDATA,  'sources.xml')
+ADVANCED         =  os.path.join(USERDATA,  'advancedsettings.xml')
+RSS              =  os.path.join(USERDATA,  'RssFeeds.xml')
+PROGRESS_TEMP    =  os.path.join(TBSDATA,   'progresstemp')
 SLEEPER          =  os.path.join(ADDON_PATH,'resources','tmr')
-KEYWORD_CREATE   =  os.path.join(TBSDATA,'keyword_create.txt')
+KEYWORD_CREATE   =  os.path.join(TBSDATA,   'keyword_create.txt')
 CONFIG           =  '/storage/.config/'
 STORAGE          =  '/storage/'
 
+dialog           =  xbmcgui.Dialog()
+dp               =  xbmcgui.DialogProgress()
 skin             =  xbmc.getSkinDir()
 artpath          =  os.path.join(ADDON_PATH,'resources')
 checkicon        =  os.path.join(artpath,'check.png')
@@ -83,8 +83,8 @@ else:
 
 master_modes = {
 # Required for certain koding functions to work
-    "show_tutorial"      : "koding.Show_Tutorial(url)",
-    "tutorials"          : "koding.Grab_Tutorials()",
+    "show_tutorial"      : "Show_Tutorial(url)",
+    "tutorials"          : "Grab_Tutorials()",
     'addon_browser'      : 'Addon_Browser(url)',
     'addon_removal_menu' : 'Addon_Removal_Menu(url)',
     'adult_filter'       : 'Adult_Filter(url)',
@@ -97,10 +97,11 @@ master_modes = {
     'check_shares'       : 'Check_My_Shares(url)',
     'check_updates'      : 'Addon_Check_Updates()',
     'clear_cache'        : 'Clear_Cache()',
+    'create_username'    : 'Create_Username()',
     'disable_master'     : 'Disable_Master()',
     'enable_shares'      : 'Enable_Shares(url)',
     'exec_xbmc'          : 'Exec_XBMC(url)',
-    'fresh_install'      : 'koding.Fresh_Install()',
+    'fresh_install'      : 'Fresh_Install()',
     'full_clean'         : 'Full_Clean()',
     'grab_updates'       : 'Grab_Updates(url)',
     'hide_passwords'     : 'Hide_Passwords()',
@@ -109,12 +110,12 @@ master_modes = {
     'install_from_zip'   : 'Install_From_Zip()',
     'ipcheck'            : 'IP_Check()',
     'keywords'           : 'Keyword_Search()',
-    'kill_xbmc'          : 'koding.Force_Close()',
+    'kill_xbmc'          : 'Force_Close()',
     'log'                : 'Log_Viewer()',
     'main_menu_install'  : 'Main_Menu_Install(url)',
     'open_sf'            : 'Open_SF()',
     'openelec_settings'  : 'OpenELEC_Settings()',
-    'play_video'         : 'koding.Play_Video(url)',
+    'play_video'         : 'Play_Video(url)',
     'remove_addon_data'  : 'Remove_Addon_Data()',
     'remove_addons'      : 'Remove_Addons(url)',
     'remove_crash_logs'  : 'Remove_Crash_Logs()',
@@ -177,22 +178,22 @@ def Addon_Removal_Menu(removal_types='all'):
     descarray = []
     patharray = []
     finalpath = []
-    koding.Main('adult_enable')
-    koding.Refresh('addons')
+    Main('adult_enable')
+    Refresh('addons')
     my_addons = []
 
-    currently_installed = koding.Get_Contents(ADDONS,['packages','temp'])
+    currently_installed = Get_Contents(ADDONS,['packages','temp'])
     dolog(repr(currently_installed))
     if removal_types == 'all' or 'video' in removal_types:
-        my_addons = koding.Installed_Addons(content='video', properties='name,path,description,thumbnail')
+        my_addons = Installed_Addons(content='video', properties='name,path,description,thumbnail')
     if removal_types == 'all' or 'audio' in removal_types:
-        my_addons += koding.Installed_Addons(content='audio', properties='name,path,description,thumbnail')
+        my_addons += Installed_Addons(content='audio', properties='name,path,description,thumbnail')
     if removal_types == 'all' or 'image' in removal_types:
-        my_addons += koding.Installed_Addons(content='image', properties='name,path,description,thumbnail')
+        my_addons += Installed_Addons(content='image', properties='name,path,description,thumbnail')
     if removal_types == 'all' or 'program' in removal_types:
-        my_addons += koding.Installed_Addons(content='executable', properties='name,path,description,thumbnail')
+        my_addons += Installed_Addons(content='executable', properties='name,path,description,thumbnail')
     if removal_types == 'all' or 'repo' in removal_types:
-        my_addons += koding.Installed_Addons(types='xbmc.addon.repository', properties='name,path,description,thumbnail')
+        my_addons += Installed_Addons(types='xbmc.addon.repository', properties='name,path,description,thumbnail')
     for item in my_addons:
         if not item["addonid"] in skiparray and item["path"] in currently_installed:
             namearray.append(item["name"])
@@ -223,10 +224,10 @@ def Addon_Browser(function='list',header='',skiparray=[]):
     idarray   = []
     my_addons = []
 
-    my_addons =  koding.Installed_Addons(content='video', properties='name,description,thumbnail')
-    my_addons += koding.Installed_Addons(content='audio', properties='name,description,thumbnail')
-    my_addons += koding.Installed_Addons(content='image', properties='name,description,thumbnail')
-    my_addons += koding.Installed_Addons(content='executable', properties='name,path,description,thumbnail')
+    my_addons =  Installed_Addons(content='video', properties='name,description,thumbnail')
+    my_addons += Installed_Addons(content='audio', properties='name,description,thumbnail')
+    my_addons += Installed_Addons(content='image', properties='name,description,thumbnail')
+    my_addons += Installed_Addons(content='executable', properties='name,path,description,thumbnail')
 
     for item in my_addons:
         if not item["addonid"].encode('utf-8') in skiparray:
@@ -253,7 +254,7 @@ def Adult_Filter(value, loadtype = ''):
     success = 0
     if value == 'true':
         try:
-            password = koding.converthex(koding.Text_File(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.tbs/x'),'r'))
+            password = converthex(Text_File(xbmc.translatePath('special://home/userdata/addon_data/plugin.program.tbs/x'),'r'))
         except:
             password = ''
 
@@ -261,7 +262,7 @@ def Adult_Filter(value, loadtype = ''):
         if password == '' or password == 'not set':
             password = '69'
 
-        userpw   = koding.Keyboard(String(30002)).replace('%20',' ')
+        userpw   = Keyboard(String(30002)).replace('%20',' ')
         if userpw != password:
             value = 'false'
             dialog.ok(String(30000),String(30001))
@@ -271,18 +272,18 @@ def Adult_Filter(value, loadtype = ''):
 
     if value == 'false':
         filter_type = 'disabled'
-        koding.Main('adult_disable')
+        Main('adult_disable')
     else:
         filter_type = 'enabled'
         from koding import Main
-        koding.Sleep_If_Function_Active(function=Main, args=['adult_enable'])
+        Sleep_If_Function_Active(function=Main, args=['adult_enable'])
     if loadtype != 'menu' and loadtype != 'startup':
         dialog.ok(String(30003) % filter_type.upper(), String(30004) % filter_type)
     return success
 #-----------------------------------------------------------------------------------------------------------------
 # Check for storage location on android
 def Android_Path_Check():
-    content = koding.Grab_Log()
+    content = Grab_Log()
     localstorage  = re.compile('External storage path = (.+?);').findall(content)
     localstorage  = localstorage[0] if (len(localstorage) > 0) else 'Unknown'
     return localstorage
@@ -292,13 +293,13 @@ def ASCII_Checker():
     failed_array = []
     sourcefile   = dialog.browse(3, String(30005), 'files', '', False, False)
     dp.create(String(30006),'',String(30007),'')
-    asciifiles = koding.ASCII_Check(sourcefile,dp)
+    asciifiles = ASCII_Check(sourcefile,dp)
     if len(asciifiles) > 0:
         mytext = String(30008)
         for item in asciifiles:
             mytext += item+'\n'
-        koding.Text_Box(String(30009),mytext)
-        koding.Sleep_If_Window_Active()
+        Text_Box(String(30009),mytext)
+        Sleep_If_Window_Active()
         if dialog.yesno(String(30010),String(30011)):
             if dialog.yesno(String(30012),String(30013)):
                 for item in asciifiles:
@@ -314,8 +315,8 @@ def ASCII_Checker():
             mytext = String(30014)
             for item in asciifiles:
                 mytext += item+'\n'
-            koding.Text_Box(String(30015),mytext)
-            koding.Sleep_If_Window_Active()
+            Text_Box(String(30015),mytext)
+            Sleep_If_Window_Active()
         else:
             dialog.ok(String(30016),String(30017))
     else:
@@ -376,20 +377,19 @@ def Categories():
     # Add_Dir('folder','Android Apps','', 'android_apps', 'Additional_Tools.png','','','')
 #---------------------------------------------------------------------------------------------------
 def Change_ID():
-    newid = koding.Keyboard(String(30036))
+    newid = Keyboard(String(30036))
     if newid != '':
         ADDON.setSetting('userid', encryptme('e',newid))
     else:
         ADDON.setSetting('userid', '')
-    koding.Refresh('container')
+    Refresh('container')
 #---------------------------------------------------------------------------------------------------
 # Function to check the download path set in settings
 def Check_Download_Path():
     path = os.path.join(USB,'testCBFolder')
-    
     if not os.path.exists(USB):
         dialog.ok(String(30037),String(30038)) 
-        koding.Open_Settings()
+        Open_Settings()
 #-----------------------------------------------------------------------------------------------------------------    
 def Check_File_Date(url, datefile, localdate, dst):
     try:
@@ -401,9 +401,9 @@ def Check_File_Date(url, datefile, localdate, dst):
         if int(last_modified) > int(localdate):
             urllib.urlretrieve(url,dst)
             if dst==epgdst:
-                koding.Extract(dst,ADDON_DATA)         
+                Extract(dst,ADDON_DATA)         
             else:
-                koding.Extract(dst,STORAGE)
+                Extract(dst,STORAGE)
             Text_File(last_modified,'w')
         try:
             if os.path.exists(dst):
@@ -423,7 +423,7 @@ def Check_My_Shares(url = ''):
     for row in cur.execute("SELECT * FROM shares;"):
         cleanpath = urllib.unquote(row[0])
         dolog(cleanpath)
-        localcheck = koding.md5_check(os.path.join(SF_Root, 'HOME_'+cleanpath, 'favourites.xml'))
+        localcheck = md5_check(os.path.join(SF_Root, 'HOME_'+cleanpath, 'favourites.xml'))
         if row[1] != localcheck:
             message = 1
             if dialog.yesno(String(30247), String(30248) % cleanpath):
@@ -462,7 +462,6 @@ def Clean_HTML(data):
 # Function to clear all known cache files
 def Clear_Cache():
     choice = xbmcgui.Dialog().yesno(String(30039), String(30040), nolabel=String(30041),yeslabel=String(30042))
-    
     if choice == 1:
         Wipe_Cache()
         Remove_Textures_Dialog()
@@ -474,6 +473,9 @@ def CPU_Check():
     CPU         = CPUmatch[0] if (len(CPUmatch) > 0) else ''
     return CPU.replace(' ','%20')
 #-----------------------------------------------------------------------------------------------------------------
+def Create_Username():
+    command = Open_URL 
+#-----------------------------------------------------------------------------------------------------------------
 # Open a database
 def DB_Open(db_path):
     global cur
@@ -481,21 +483,12 @@ def DB_Open(db_path):
     con = database.connect(db_path)
     cur = con.cursor()
 #---------------------------------------------------------------------------------------------------
-# Function to wipe path
-def Delete_Path(path):
-    choice = dialog.yesno(String(30044),String(30045))
-    if choice == 1:
-        dp.create(String(30046),String(30047),'', String(30048))
-        shutil.rmtree(path, ignore_errors=True)
-        dp.close()
-        xbmc.executebuiltin('Container.Refresh')
-#---------------------------------------------------------------------------------------------------
 # Function to delete the userdata/addon_data folder
 def Delete_Userdata():
-    tbs_data = os.path.join(ADDON_DATA,'plugin.program.tbs')
-    ow_data = os.path.join(ADDON_DATA,'script.openwindow')
+    tbs_data    = os.path.join(ADDON_DATA,'plugin.program.tbs')
+    ow_data     = os.path.join(ADDON_DATA,'script.openwindow')
     ignore_list = [tbs_data, ow_data]
-    koding.Delete_Folders(filepath=ADDON_DATA, ignore=ignore_list)
+    Delete_Folders(filepath=ADDON_DATA, ignore=ignore_list)
     zipcheck = xbmc.translatePath(os.path.join(ADDON_DATA,'plugin.program.tbs','zipcheck'))
     if os.path.exists(zipcheck):
         os.remove(zipcheck)
@@ -514,49 +507,49 @@ def DLE(command,repo_link,repo_id):
     
     if command=='delete':
         shutil.rmtree(xbmc.translatePath(repo_link))
-        koding.Refresh(['addons','repos'])
+        Refresh(['addons','repos'])
     
     if command=='addons' or command=='ADDON_DATA' or command=='media' or command=='config' or command=='playlists' or command == 'custom':
 #        dp.create('Installing Content','','')
         if not os.path.exists(os.path.join(ADDONS,repo_id)) or repo_id == '':
             try:
-                koding.Download(repo_link, downloadpath)
+                Download(repo_link, downloadpath)
             except:
                 pass       
         if command=="addons":
             try:
-                koding.Extract(downloadpath, ADDONS)
-                koding.Refresh(['addons','repos'])
+                Extract(downloadpath, ADDONS)
+                Refresh(['addons','repos'])
             except:
                 pass
 
         if command=='ADDON_DATA':
             try:
-                koding.Extract(downloadpath, ADDON_DATA)
+                Extract(downloadpath, ADDON_DATA)
             except:
                 dolog("### FAILED TO EXTRACT TO "+ADDON_DATA)
         
         if command=='media':
             try:
-                koding.Extract(downloadpath, MEDIA)
+                Extract(downloadpath, MEDIA)
             except:
                 pass
         
         if command=='config':
             try:
-                koding.Extract(downloadpath, CONFIG)
+                Extract(downloadpath, CONFIG)
             except:
                 pass
 
         if command=='playlists':
             try:
-                koding.Extract(downloadpath, PLAYLISTS)
+                Extract(downloadpath, PLAYLISTS)
             except:
                 pass
 
         if command=='custom':
             try:
-                koding.Extract(downloadpath, repo_id)
+                Extract(downloadpath, repo_id)
             except:
                 dolog("### Failed to extract update "+repo_link)
             
@@ -628,14 +621,14 @@ def Exec_XBMC(command):
 #-----------------------------------------------------------------------------
 # Extract function used for threading
 def Extract_Function(local_path, ADDONS, dpmode):
-    koding.Extract(local_path, ADDONS, dpmode)
+    Extract(local_path, ADDONS, dpmode)
 #-----------------------------------------------------------------------------------------------------------------          
 # Firmware update
 def Firmware_Update(url):
     dl_path = '/tmp/cache/update.zip'
     os.system('mkdir -p /tmp/cache\nmount -t ext4 /dev/cache /tmp/cache\nrm -f /tmp/cache/*.zip')
     dp.create(String(30051),String(30048))
-    koding.Download(url,dl_path,dp)
+    Download(url,dl_path,dp)
     os.system('mkdir -p /tmp/cache/recovery')
     os.system('echo -e "--update_package=/cache/update.zip\n--wipe_cache" > /tmp/cache/recovery/command || exit 1\numount /tmp/cache\nreboot recovery')
 #---------------------------------------------------------------------------------------------------
@@ -658,31 +651,31 @@ def Full_Clean():
 
 # For more accurate info we need to add a loop to only check folders with cache in the name. Actual wipe does this but getsize does not.
     if os.path.exists(atv2_cache_a):
-        size += koding.Folder_Size(atv2_cache_a,'b')
+        size += Folder_Size(atv2_cache_a,'b')
     if os.path.exists(atv2_cache_b):
-        size += koding.Folder_Size(atv2_cache_b,'b')
+        size += Folder_Size(atv2_cache_b,'b')
     if os.path.exists(downloader_cache_path):
-        size += koding.Folder_Size(downloader_cache_path,'b')
+        size += Folder_Size(downloader_cache_path,'b')
     if os.path.exists(imageslideshow_cache_path):
-        size += koding.Folder_Size(imageslideshow_cache_path,'b')
+        size += Folder_Size(imageslideshow_cache_path,'b')
     if os.path.exists(iplayer_cache_path):
-        size += koding.Folder_Size(iplayer_cache_path,'b')
+        size += Folder_Size(iplayer_cache_path,'b')
     if os.path.exists(itv_cache_path):
-        size += koding.Folder_Size(itv_cache_path,'b')
+        size += Folder_Size(itv_cache_path,'b')
     if os.path.exists(navix_cache_path):
-        size += koding.Folder_Size(navix_cache_path,'b')
+        size += Folder_Size(navix_cache_path,'b')
     if os.path.exists(phoenix_cache_path):
-        size += koding.Folder_Size(phoenix_cache_path,'b')
+        size += Folder_Size(phoenix_cache_path,'b')
     if os.path.exists(ramfm_cache_path):
-        size += koding.Folder_Size(ramfm_cache_path,'b')
+        size += Folder_Size(ramfm_cache_path,'b')
     if os.path.exists(wtf_cache_path):
-        size += koding.Folder_Size(wtf_cache_path,'b')
+        size += Folder_Size(wtf_cache_path,'b')
     if os.path.exists(genesisCache):
-        size += koding.Folder_Size(genesisCache,'b')
+        size += Folder_Size(genesisCache,'b')
     if os.path.exists(tempdir):
-        size += koding.Folder_Size(tempdir,'b')
-    size += koding.Folder_Size(THUMBNAILS,'b')
-    size += koding.Folder_Size(PACKAGES,'b')
+        size += Folder_Size(tempdir,'b')
+    size += Folder_Size(THUMBNAILS,'b')
+    size += Folder_Size(PACKAGES,'b')
     size = "%.2f" % (float(size / 1024) / 1024)
     choice = dialog.yesno(String(30053),String(30054)%size)
     if choice == 1:
@@ -694,30 +687,11 @@ def Full_Clean():
         choice = dialog.yesno(String(30055),String(30056),yeslabel=String(30057),nolabel=String(30058))
         if choice == 1:
             Remove_Textures()
-            koding.Delete_Folders(THUMBNAILS)
-            koding.Force_Close()
+            Delete_Folders(THUMBNAILS)
+            Force_Close()
         else:
-            koding.Cleanup_Textures()
+            Cleanup_Textures()
 #-----------------------------------------------------------------------------------------------------------------  
-# Get params and clean up into string or integer
-def Get_Params():
-        param=[]
-        paramstring=sys.argv[2]
-        if len(paramstring)>=2:
-                params=sys.argv[2]
-                cleanedparams=params.replace('?','')
-                if (params[len(params)-1]=='/'):
-                        params=params[0:len(params)-2]
-                pairsofparams=cleanedparams.split('&')
-                param={}
-                for i in range(len(pairsofparams)):
-                        splitparams={}
-                        splitparams=pairsofparams[i].split('=')
-                        if (len(splitparams))==2:
-                                param[splitparams[0]]=splitparams[1]
-                                
-        return param
-#-----------------------------------------------------------------------------------------------------------------
 # Return mac address, not currently checked on Mac OS
 def Get_Mac(protocol):
     cont    = 0
@@ -828,10 +802,10 @@ def Grab_Updates(url, runtype = ''):
     previous    = ''
 
     if urlparams != 'Unknown':
-        if url == 'http://tlbb.me/comm.php?multi&z=c&x=':
+        if url == 'http://tlbb.me/boxer/comm_live.php?multi&z=c&x=':
             multi = 1
             url=url.replace('multi&','')
-        if url == 'http://tlbb.me/comm.php?update&z=c&x=':
+        if url == 'http://tlbb.me/boxer/comm_live.php?update&z=c&x=':
             Notify(String(30059),String(30007),'1000',os.path.join(ADDONS,'script.openwindow','resources','images','update_software.png'))
             url=url.replace('update&','')
         xbmc.executebuiltin("ActivateWindow(busydialog)")
@@ -839,7 +813,7 @@ def Grab_Updates(url, runtype = ''):
 
             try:
                 dolog("### URL: "+url+encryptme('e',urlparams))
-                link = Open_URL2(url+encryptme('e',urlparams))
+                link = Open_URL(post_type='post',url=url+encryptme('e',urlparams))
                 if link != '' and not 'sleep' in link:
                     link = encryptme('d',link).replace('\n',';').replace('|_|',' ').replace('|!|','\n').replace('http://venztech.com/repo_jpegs/','http://tlbb.me/repo_jpegs/')
                 try:
@@ -868,7 +842,7 @@ def Grab_Updates(url, runtype = ''):
                     dolog("### command: "+command)
                     dolog("### SF_command: "+SF_command)
 
-                    Open_URL2(koding.converthex('687474703a2f2f746c62622e6d652f636f6d6d2e7068703f783d')+encryptme('e',urlparams)+'&y='+commline)
+                    Open_URL(post_type='post',url=converthex('687474703a2f2f746c62622e6d652f636f6d6d2e7068703f783d')+encryptme('e',urlparams)+'&y='+commline)
                     dolog("### COMMAND *CLEANED: "+command.replace('|#|',';'))
                     dolog("### LINK *ORIG: "+link)
                     if SF_command!='None':
@@ -884,7 +858,7 @@ def Grab_Updates(url, runtype = ''):
 
                                 if 'extract.all' in item:
                                     try:
-                                        item = item.replace('extract.all','koding.Extract')
+                                        item = item.replace('extract.all','Extract')
                                         exec item
                                         if os.path.exists(os.path.join(PACKAGES,'updates.zip')):
                                             os.remove(os.path.join(PACKAGES,'updates.zip'))
@@ -913,7 +887,7 @@ def Grab_Updates(url, runtype = ''):
 
                                 if 'extract.all' in command:
                                     try:
-                                        command = command.replace('extract.all','koding.Extract')
+                                        command = command.replace('extract.all','Extract')
                                         exec command
                                         if os.path.exists(os.path.join(PACKAGES,'updates.zip')):
                                             os.remove(os.path.join(PACKAGES,'updates.zip'))
@@ -948,12 +922,10 @@ def Grab_Updates(url, runtype = ''):
                             else:
                                 dolog("### Timer same, no changes required")
                         if sleep != '23:59:59':
-                            if runtype != 'silent':
-                                Notify('Updates Complete','No more updates to show','1000',os.path.join(ADDONS,'plugin.program.tbs','resources','tick.png'))
-                            koding.Refresh(['addons','repos'])
+                            Refresh(['addons','repos'])
                             mysuccess = 1
-            except Exception as e:
-                dolog("### Failed with update command: "+str(e))
+            except:
+                dolog("### Failed with update command: "+Last_Error())
                 failed = 1
         try:
             xbmc.executebuiltin("Dialog.Close(busydialog)")
@@ -972,8 +944,10 @@ def Grab_Updates(url, runtype = ''):
         xbmc.executebuiltin('RunScript(special://xbmc/addons/script.openwindow/functions.py)')
     Sync_Settings()
     Remove_Files()
+    if runtype != 'silent':
+        Notify(String(30330),String(30331),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','tick.png'))
 #---------------------------------------------------------------------------------------------------
-# Hide passwords in addon settings - THANKS TO MIKEY1234 FOR THIS CODE (taken from Xunity Maintenance)
+# Hide passwords in addon settings
 def Hide_Passwords():
     if dialog.yesno(String(30094), String(30095)):
         for root, dirs, files in os.walk(ADDONS):
@@ -1003,9 +977,9 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
 
 #    try:
         for item in choices:
-            dolog('http://tlbb.me/boxer/category_search.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))))
-            sharelist_URL  = 'http://tlbb.me/boxer/category_search.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item])))
-            content_list   = Open_URL2(sharelist_URL)
+            dolog('http://tlbb.me/boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))))
+            sharelist_URL  = 'http://tlbb.me/boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item])))
+            content_list   = Open_URL(post_type='post',url=sharelist_URL)
             clean_link     = encryptme('d',content_list)
             dolog('#### %s' % clean_link)
 
@@ -1042,7 +1016,7 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
                     Remove_Menu('from_the_%s_menu' % change_text.lower().replace(' ', '_'), item)
 #            content_list   = Open_URL2(sharelist_URL)
 
-                Open_URL2(install_share)
+                Open_URL(post_type='post',url=install_share)
 
 # Clean the arrays so they don't show old data
             del shares_contentarray[:]
@@ -1051,7 +1025,7 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
             del shares_contenturl[:]
             del match[:]
         xbmc.executebuiltin('ActivateWindow(HOME)')
-        Grab_Updates('http://tlbb.me/comm.php?multi&z=c&x=','ignoreplayer')
+        Grab_Updates('http://tlbb.me/boxer/comm_live.php?multi&z=c&x=','ignoreplayer')
 #---------------------------------------------------------------------------------------------------
 # Menu to install content via the TR add-on
 def Install_Content(url):
@@ -1059,7 +1033,7 @@ def Install_Content(url):
         Add_Dir(String(30098),'','disable_master',False,'','','')
     if ADDON.getSetting('userid') != '':
         Add_Dir(String(30099) % encryptme('d',userid),'','change_id',False,'','','')
-    Add_Dir(String(30100),'http://tlbb.me/comm.php?z=c&x=', 'grab_updates',False,'','','')
+    Add_Dir(String(30100),'http://tlbb.me/boxer/comm_live.php?z=c&x=', 'grab_updates',False,'','','')
     Add_Dir(String(30101),'','keywords',False,'Keywords.png','','')
     Add_Dir(String(30102),'','install_from_zip',False,'','','')
     Add_Dir(String(30103),'','browse_repos',False,'','','')
@@ -1088,9 +1062,9 @@ def Install_Venz_Menu(function):
 
 # Add an item to one of the main menu categories or add a sub-menu item
             if menutype == 'add_main' or menutype == 'add_sub' or function.startswith('manualsearch'):
-                categoryURL  = 'http://tlbb.me/boxer/category_search.php?&x=%s' % (encryptme('e','%s&%s&0&%s' % (urlparams, function, social_shares)))
+                categoryURL  = 'http://tlbb.me/boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s' % (urlparams, function, social_shares)))
                 dolog(categoryURL)
-                link_orig  = Open_URL2(categoryURL)
+                link_orig  = Open_URL(post_type='post',url=categoryURL)
                 link       = encryptme('d',link_orig)
                 dolog('#### '+encryptme('d',link_orig))
             
@@ -1126,7 +1100,7 @@ def IP_Check():
     try:
         if ip_site == "whatismyipaddress.com":
            BaseURL       = 'http://whatismyipaddress.com/'
-           link          = Open_URL(BaseURL, 30).replace('\n','').replace('\r','')
+           link          = Open_URL(BaseURL).replace('\n','').replace('\r','')
            if not 'Access Denied' in link:
                ipmatch       = re.compile('whatismyipaddress.com/ip/(.+?)"').findall(link)
                ipfinal       = ipmatch[0] if (len(ipmatch) > 0) else 'Unknown'
@@ -1136,7 +1110,7 @@ def IP_Check():
                dialog.ok('www.whatismyipaddress.com',"[B][COLOR gold]Address: [/COLOR][/B] %s" % ipfinal, '[B][COLOR gold]Provider: [/COLOR][/B] %s' % provider, '[B][COLOR gold]Location: [/COLOR][/B] %s' % location)
         else:
             BaseURL       = 'https://www.iplocation.net/find-ip-address'
-            link          = Open_URL(BaseURL, 30).replace('\n','').replace('\r','')
+            link          = Open_URL(BaseURL).replace('\n','').replace('\r','')
             segment       = re.compile('<table class="iptable">(.+?)<\/table>').finall(link)
             ipmatch       = re.compile('font-weight: bold;">(.+?)<\/span>').findall(segment[0])
             ipfinal       = ipmatch[0] if (len(ipmatch) > 0) else 'Unknown'
@@ -1157,7 +1131,7 @@ def Keyword_Search():
     success     = 0
     downloadurl = ''
     title       = 'Enter Keyword'
-    keyword     = koding.Keyboard(title)
+    keyword     = Keyboard(title)
     if keyword == 'masteron':
         ADDON.setSetting('master','true')
         xbmc.executebuiltin('Container.Refresh')
@@ -1178,7 +1152,7 @@ def Keyword_Search():
     elif keyword:
         url='http://urlshortbot.com/totalrevolution'
         if os.path.exists(KEYWORD_FILE):
-            url  = koding.Text_File(KEYWORD_FILE,'r')
+            url  = Text_File(KEYWORD_FILE,'r')
         downloadurl = url+keyword
         lib         = os.path.join(PACKAGES, keyword+'.zip')
         urlparams   = URL_Params()
@@ -1190,12 +1164,12 @@ def Keyword_Search():
             if keyword.startswith('switchme'):
                 keywordoem = keyword.replace('switchme','')
                 try:
-                    link = Open_URL2('http://tlbb.me/boxer/addtooem.php?x='+encryptme('e',urlparams)+'&o='+encryptme('e',keywordoem))
+                    link = Open_URL(post_type='post',url='http://tlbb.me/boxer/add_to_oem_live.php?x='+encryptme('e',urlparams)+'&o='+encryptme('e',keywordoem))
                 except:
                     link = 'fail'
             else:
                 try:
-                    link = Open_URL2('http://tlbb.me/keyword.php?x='+encryptme('e',urlparams)+'k='+encryptme('e',keyword))
+                    link = Open_URL(post_type='post',url='http://tlbb.me/boxer/keyword.php?x='+encryptme('e',urlparams)+'k='+encryptme('e',keyword))
                 except:
                     link = 'fail'
             if 'Success' in link:
@@ -1210,13 +1184,13 @@ def Keyword_Search():
             try:
                 dolog("Attempting download "+downloadurl+" to "+lib)
                 dp.create(String(30108),String(30109),'', String(30048))
-                koding.Download(downloadurl,lib)
+                Download(downloadurl,lib)
                 dolog("### Keyword "+keyword+" Successfully downloaded")
             
                 if zipfile.is_zipfile(lib):
                 
                     try:
-                        koding.Sleep_If_Function_Active(Extract_Function, [lib, HOME, dp])
+                        Sleep_If_Function_Active(Extract_Function, [lib, HOME, dp])
                         dolog('## %s EXTRACTED SUCCESSFULLY' % keyword)
                         
                         if os.path.exists(xbmc.translatePath('special://home/addons/script.openwindow/functions.py')):
@@ -1255,7 +1229,7 @@ def Keyword_Search():
 # View the log from within Kodi
 def Log_Viewer():
     logpath = xbmc.translatePath('special://logpath')
-    valid_logfile = koding.Get_Contents(path=logpath,folders=False,filter='.log')
+    valid_logfile = Get_Contents(path=logpath,folders=False,filter='.log')
     if len(valid_logfile) >= 1:
         if dialog.yesno(String(30118),String(30119),yeslabel=String(30120),nolabel=String(30121)):
             Upload_Log()
@@ -1268,8 +1242,8 @@ def Log_Viewer():
             elif choice == 2: content=Grab_Log()
             elif choice == 3: content=Grab_Log(sort_order='original')
             elif choice == 4: content=Grab_Log(log_type='old')
-            koding.Text_Box(String(30118), content)
-            koding.Sleep_If_Window_Active()
+            Text_Box(String(30118), content)
+            Sleep_If_Window_Active()
     else:
         dialog.ok(String(30327),String(30328))
 #---------------------------------------------------------------------------------------------------
@@ -1296,9 +1270,9 @@ def Main_Menu_Install(menumode):
 
     if menumode == 'add':
         urlparams = URL_Params()
-        menu_options = Open_URL2('http://tlbb.me/boxer/my_details.php?x=%s&m=1' % encryptme('e', urlparams))
+        menu_options = Open_URL(post_type='post',url='http://tlbb.me/boxer/my_details_live.php?x=%s&m=1' % encryptme('e', urlparams))
         menu_options = encryptme('d', menu_options)
-        listcount = koding.Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,menu_options,True])
+        listcount = Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,menu_options,True])
         if xbmc.getCondVisibility('Skin.String(Custom6HomeItem.Disable)') and 'comedy' in menu_options:
             Add_Dir('%s %s'%(String(30060),String(30061)),'Skin.SetString(Custom6HomeItem.Disable,)','exec_xbmc',False,'special://home/media/branding/backgrounds/HOME_COMEDY/HOME_COMEDY_001.jpg','','')
         if xbmc.getCondVisibility('Skin.String(Custom3HomeItem.Disable)') and 'cooking' in menu_options:
@@ -1336,7 +1310,7 @@ def Main_Menu_Install(menumode):
             xbmc.executebuiltin('ActivateWindow(home)')
 
     if menumode == 'remove':
-        listcount = koding.Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,'',False])
+        listcount = Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,'',False])
         if not xbmc.getCondVisibility('Skin.String(Custom6HomeItem.Disable)'):
             Add_Dir('%s %s'%(String(30076),String(30061)),'Skin.SetString(Custom6HomeItem.Disable,True)','exec_xbmc',False,'special://home/media/branding/backgrounds/HOME_COMEDY/HOME_COMEDY_001.jpg','','')
         if not xbmc.getCondVisibility('Skin.String(Custom3HomeItem.Disable)'):
@@ -1490,65 +1464,15 @@ def Open_SF():
     choice = menu_array[choice]
     xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=HOME_%s",return)' % choice.replace(' ', '_'))
 #-----------------------------------------------------------------------------------------------------------------
-# Function to open a URL and return the contents
-def Open_URL(url, t=10):
-    req = urllib2.Request(url)
-    req.add_header('User-Agent' , 'Mozilla/5.0 (Windows; U; Windows NT 10.0; WOW64; Windows NT 5.1; en-GB; rv:1.9.0.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36 Gecko/2008092417 Firefox/3.0.3')
-    counter = 0
-    success = False
-    while counter < 5 and success == False: 
-        response = urllib2.urlopen(req, timeout = t)
-        link     = response.read()
-        response.close()
-        counter += 1
-        if link != '':
-            success = True
-    if success == True:
-        return link.replace('\r','').replace('\n','').replace('\t','')
-    else:
-        dialog.ok(String(30129),String(30130))
-        return
-    return link
-#-----------------------------------------------------------------------------------------------------------------
-## Function to open a URL, try 3 times then respond with blank
-def Open_URL2(url):
-    dolog(url)
-    req = urllib2.Request(url)
-    req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    response = urllib2.urlopen(req, timeout = 10)
-    if response != '':
-        link     = response.read()
-        response.close()
-        return link.replace('\r','').replace('\n','').replace('\t','')
-    else:
-        return response
-#---------------------------------------------------------------------------------------------------
-# Open URL for updating a social share
-def Open_URL_Share(url):
-    req = urllib2.Request(url)
-    req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    try:
-        response = urllib2.urlopen(req, timeout = 30)
-    except:
-        response = 'no response'
-    if response != 'no response':
-        link     = response.read()
-        response.close()
-    else:
-       link = 'no response'
-        
-    return link.replace('\r','').replace('\n','').replace('\t','')
-#---------------------------------------------------------------------------------------------------
 # Function to install venz pack
 def Open_Link(url):
-    response = Open_URL2(url)
+    response = Open_URL(post_type='post',url=url)
     dolog("### "+response)
     if "record" in response:
-        Grab_Updates('http://tlbb.me/comm.php?z=c&x=','ignoreplayer')
+        Grab_Updates('http://tlbb.me/boxer/comm_live.php?z=c&x=','ignoreplayer')
         xbmc.executebuiltin('Container.Refresh')
     else:
         dialog.ok(String(30131),String(30132))
-
 #---------------------------------------------------------------------------------------------------
 # Check if system is OE or LE
 def OpenELEC_Check():
@@ -1585,7 +1509,7 @@ def Play_Store_Scrape(i):
     description = 'N/A'
 
     base_url = "https://play.google.com/store/apps/details?id=" +i
-    link = Open_URL(base_url)
+    link = Open_URL(url=base_url)
     if link != False:
         link = link.replace('\n','').replace('\r','')
         raw_content = re.compile(r'<div class="id-app-title[\s\S]*?id-cluster-container details-section recommendation').findall(link)
@@ -1660,7 +1584,7 @@ def pop(xmlfile):
             filedate = contents
                 
         else:
-            koding.Download(xmlfile,os.path.join(ADDONS,AddonID,'resources','skins','DefaultSkin','media','latest.jpg'))
+            Download(xmlfile,os.path.join(ADDONS,AddonID,'resources','skins','DefaultSkin','media','latest.jpg'))
             writefile = open(latest, mode='w+')
             writefile.write(filedate)
             writefile.close()
@@ -1668,13 +1592,6 @@ def pop(xmlfile):
     popup = SPLASH(xmlfile,ADDON.getAddonInfo('path'),'DefaultSkin',close_time=34)
     popup.doModal()
     del popup
-#---------------------------------------------------------------------------------------------------
-# Set/Pull the os variables in Android
-def preexec_fn():
-    uid = os.getuid()
-    gid = os.getgid()
-    os.setgid(uid)
-    os.setuid(gid)
 #---------------------------------------------------------------------------------------------------
 # Function to clear the addon_data
 def Remove_Addon_Data():
@@ -1699,7 +1616,7 @@ def Remove_Addon_Data():
         addon_id    = None
         if os.path.isdir(os.path.join(ADDON_DATA,file)):
             try:
-                addon_id    = koding.Get_Addon_ID(file)
+                addon_id    = Get_Addon_ID(file)
                 Addon       = xbmcaddon.Addon(addon_id)
                 name        = Addon.getAddonInfo('name')
                 iconimage   = Addon.getAddonInfo('icon')
@@ -1740,20 +1657,20 @@ def Remove_Addons(url):
             addontype = String(30147)
             dialog_text = String(30145)
         if dialog.yesno(String(30148) % addontype, String(30149)% dialog_text,'[COLOR=dodgerblue]%s[/COLOR]'% item[0]):
-            addon_id = koding.Get_Addon_ID(item[1])
-            koding.Set_Setting(setting_type='addon_enable',setting=addon_id, value='false')
-            koding.Delete_Folders(item[1])
+            addon_id = Get_Addon_ID(item[1])
+            Set_Setting(setting_type='addon_enable',setting=addon_id, value='false')
+            Delete_Folders(item[1])
             if not 'addon_data' in item[1]:
                 if dialog.yesno(String(30133),String(30150)):
                     try:
-                        koding.Delete_Folders(item[1])
+                        Delete_Folders(item[1])
                     except:
                         pass
 #---------------------------------------------------------------------------------------------------
 # Function to clear the packages folder
 def Remove_Crash_Logs():
     if dialog.yesno(String(30153), String(30154), nolabel=String(30041),yeslabel=String(30042)):
-        koding.Delete_Crashlogs()
+        Delete_Crashlogs()
         dialog.ok(String(30155), '', String(30156))
 #-----------------------------------------------------------------------------
 # Remove a path, whether folder or file it will be deleted
@@ -1785,9 +1702,9 @@ def Remove_Menu(function, menutype = ''):
     contenturl   = []
     urlparams = URL_Params()
     dolog('### OPENING URL TO GRAB DETAILS OF WHAT TO REMOVE:')
-    dolog('http://tlbb.me/boxer/category_search.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))))
-    sharelist_URL  = 'http://tlbb.me/boxer/category_search.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype)))
-    content_list   = Open_URL2(sharelist_URL)
+    dolog('http://tlbb.me/boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))))
+    sharelist_URL  = 'http://tlbb.me/boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype)))
+    content_list   = Open_URL(post_type='post',url=sharelist_URL)
     clean_link     = encryptme('d',content_list)
     dolog('#### RETURN: %s' % clean_link)
 # Grab all the shares which match the master sub-category
@@ -1806,20 +1723,20 @@ def Remove_Menu(function, menutype = ''):
                 Notify(String(30086),String(30087),'5000',os.path.join(ADDONS,'plugin.program.tbs','resources','update.png'))
                 xbmc.executebuiltin('ActivateWindow(HOME)')
                 for item in choices:
-                    Open_URL2(contenturl[item])
+                    Open_URL(post_type='post',url=contenturl[item])
         else:
             for item in contenturl:
                 dolog('### URL TO REMOVE: %s' % item)
-                Open_URL2(item)
+                Open_URL(post_type='post',url=item)
 
-        Grab_Updates('http://tlbb.me/comm.php?multi&z=c&x=','ignoreplayer')
+        Grab_Updates('http://tlbb.me/boxer/comm_live.php?multi&z=c&x=','ignoreplayer')
     elif menutype == '':
         dialog.ok(String(30089),String(30090))
 #---------------------------------------------------------------------------------------------------
 # Function to clear the packages folder
 def Remove_Packages(url=''):
     if dialog.yesno(String(30157), String(30158), nolabel=String(30041),yeslabel=String(30042)):
-        koding.Delete_Folders(PACKAGES)
+        Delete_Folders(PACKAGES)
     if url == '':
         dialog.ok(String(30155), '', String(30159))
 #---------------------------------------------------------------------------------------------------
@@ -1827,7 +1744,7 @@ def Remove_Packages(url=''):
 def Remove_Textures_Dialog():
     if dialog.yesno(String(30160),String(30161)):
         Remove_Textures()
-        koding.Delete_Folders(THUMBNAILS)
+        Delete_Folders(THUMBNAILS)
     
         if dialog.yesno(String(30162), String(30163),'', nolabel=String(30164),yeslabel=String(30165)):
             System('quit')
@@ -1952,7 +1869,7 @@ def Restore_Zip_File(url):
         DIR = ADDON_DATA
 
     if 'Backup' in url:
-        koding.Delete_Folders(PACKAGES)
+        Delete_Folders(PACKAGES)
         dp.create(String(30176), String(30177), '', String(30048))
         zipobj       = zipfile.ZipFile(ZIPFILE , 'w', zipfile.ZIP_DEFLATED)
         rootlen      = len(DIR)
@@ -1983,14 +1900,14 @@ def Restore_Zip_File(url):
     else:
         dp.create(String(30178), String(30179), '', String(30048))
         dp.update(0, "", "%s %s" % (String(30178), String(30048)))
-        koding.Extract(ZIPFILE,DIR,dp)
+        Extract(ZIPFILE,DIR,dp)
         xbmc.sleep(500)
         xbmc.executebuiltin('UpdateLocalAddons ')    
         xbmc.executebuiltin("UpdateAddonRepos")        
 
         if 'Backup' in url:
             dialog.ok(String(30180), String(30181))
-            koding.Force_Close()
+            Force_Close()
 
         else:
             dialog.ok(String(30166), String(30167))      
@@ -2115,7 +2032,7 @@ def SF(command,SF_folder,SF_link):
 #---------------------------------------------------------------------------------------------------
 # Social TV Menu
 def Social_Menu():
-    Add_Dir(String(30100), 'http://tlbb.me/comm.php?z=c&x=','grab_updates',False,'','','')
+    Add_Dir(String(30100), 'http://tlbb.me/boxer/comm_live.php?z=c&x=','grab_updates',False,'','','')
     if thirdparty == 'true':
         Add_Dir(String(30187),'false','enable_shares',False,'','','')
     else:
@@ -2123,6 +2040,7 @@ def Social_Menu():
     # Add_Dir(String(30189),'keyword','addon_browser',False,'','','')
     Add_Dir(String(30190),'','open_sf',False,'','','')
     Add_Dir(String(30191),'manual','check_shares',False,'','','')
+    Add_Dir('Create username','', "create_username", False,'','','')
 #    Add_Dir('','[COLOR=grey]Friend Requests (Coming Soon)[/COLOR]', '', '', '','','','')
 #    Add_Dir('','[COLOR=grey]My Content (Coming Soon)[/COLOR]', '', '', '','','','')
 #-----------------------------------------------------------------------------------------------------------------
@@ -2142,7 +2060,7 @@ def Search_Content_Main(type):
 #-----------------------------------------------------------------------------------------------------------------
 # Search for Venz content
 def Search_Content(menutype):
-    vq = koding.Keyboard(String(30186))
+    vq = Keyboard(String(30186))
 # if blank or the user cancelled the keyboard, return
     if ( not vq ): return False, 0
 
@@ -2152,13 +2070,13 @@ def Search_Content(menutype):
 #-----------------------------------------------------------------------------------------------------------------
 def SetNone():
     urlparams = URL_Params()
-    link = Open_URL(encryptme('d','6773736f392e2e736b61612d6c642e7264736d6e6d642d6f676f3e773c011510030A')+encryptme('e',urlparams))
+    link = Open_URL(post_type='post',url=encryptme('d','6773736f392e2e736b61612d6c642e7264736d6e6d642d6f676f3e773c011510030A')+encryptme('e',urlparams))
 #-----------------------------------------------------------------------------------------------------------------
 def Sync_Settings():
     dolog('##### SYNC SETTINGS STARTED #####')
     from koding import End_Path, Find_In_Text
     path = os.path.join(ADDON_DATA,AddonID,'settings')
-    contents = koding.Get_Contents(path=path,folders=False, subfolders=True, filter='.xml')
+    contents = Get_Contents(path=path,folders=False, subfolders=True, filter='.xml')
     dolog('Settings files found: '+repr(contents))
     for item in contents:
         temp_path    = item.replace(End_Path(item),'')
@@ -2197,9 +2115,9 @@ def Sync_Settings():
 def Text_Guide(url):
     try:
         heading,text = url.split('|')
-        koding.Text_Box(heading, text)
+        Text_Box(heading, text)
     except:
-        koding.Text_Box('', url)
+        Text_Box('', url)
 #-----------------------------------------------------------------------------------------------------------------
 # Maintenance section
 def Tools():
@@ -2277,7 +2195,7 @@ def Upload_Log():
 #---------------------------------------------------------------------------------------------------
 # Simple function to force refresh the repo's and addons folder
 def Update_Repo():
-    koding.Refresh(['addons','repos'])  
+    Refresh(['addons','repos'])  
     xbmcgui.Dialog().ok(String(30166), String(30227))
 #---------------------------------------------------------------------------------------------------
 # Grab system info
@@ -2372,7 +2290,7 @@ def Wipe_Cache():
 def Wipe_Kodi():
     stop = 0
     if dialog.yesno(String(30137), String(30228), yeslabel=String(30229),nolabel=String(30230)):
-        if not koding.Fresh_Install():
+        if not Fresh_Install():
 # Check Confluence is running before doing a wipe
             if skin!="skin.confluence" and skin!="skin.estuary":
                 dialog.ok(String(30231),String(30232))
@@ -2392,27 +2310,27 @@ def Wipe_Kodi():
                         mybackuppath = os.path.join(CBPATH,'My_Builds')
                         if not os.path.exists(mybackuppath):
                             os.makedirs(mybackuppath)
-                        vq = koding.Keyboard(String(30227))
+                        vq = Keyboard(String(30227))
                         if ( not vq ): return False, 0
                         title = urllib.quote_plus(vq)
                         backup_zip = xbmc.translatePath(os.path.join(mybackuppath,title+'.zip'))
                         exclude_dirs_full =  ['plugin.program.nan.maintenance','plugin.program.tbs']
                         exclude_files_full = ["xbmc.log","xbmc.old.log","kodi.log","kodi.old.log",'.DS_Store','.setup_complete','XBMCHelper.conf','.gitignore']
                         message_header = String(30228)
-                        koding.Archive_Tree(sourcefile=HOME, destfile=backup_zip, exclude_dirs=exclude_dirs_full, exclude_files=exclude_files_full,message_header=message_header)
+                        Archive_Tree(sourcefile=HOME, destfile=backup_zip, exclude_dirs=exclude_dirs_full, exclude_files=exclude_files_full,message_header=message_header)
                 if not stop:
                     keeprepos = dialog.yesno(String(30229),String(30240), yeslabel=String(30241), nolabel=String(30242))
                     EXCLUDES  = ['firstrun','plugin.program.tbs','plugin.program.totalinstaller','addons','addon_data','userdata','sources.xml','favourites.xml']
                     Wipe_Home(EXCLUDES)
-                    koding.Force_Close()
+                    Force_Close()
 #-----------------------------------------------------------------------------------------------------------------
 # For loop to wipe files in special://home but leave ones in EXCLUDES untouched
 def Wipe_Home(excludefiles):
     ow_path       = xbmc.translatePath('special://home/addons/script.openwindow')
     requests_path = xbmc.translatePath('special://home/addons/script.module.requests')
     resolver_path = xbmc.translatePath('special://home/addons/script.module.urlresolver')
-    koding_path   = xbmc.translatePath('special://home/addons/script.module.python.koding.aio')
-    koding.Delete_Folders(filepath=HOME, ignore=[ow_path,requests_path,resolver_path,koding_path])
+    koding_path   = xbmc.translatePath('special://home/addons/script.module.python.aio')
+    Delete_Folders(filepath=HOME, ignore=[ow_path,requests_path,resolver_path,koding_path])
 #-----------------------------------------------------------------------------------------------------------------
 # Report back with the version of Kodi installed
 def XBMC_Version(url):
@@ -2420,7 +2338,7 @@ def XBMC_Version(url):
     version, compiled   = xbmc_version.split(' ')
     version             = version.strip()
     compiled            = compiled.strip()
-    kodi_type           = koding.Running_App() 
+    kodi_type           = Running_App() 
     dialog.ok(String(30243), String(30244) % kodi_type, String(30245) % compiled, String(30246) % version)
 #-----------------------------------------------------------------------------------------------------------------
 # Update a social share
@@ -2453,17 +2371,14 @@ def Update_Share(fullpath):
 
 # Attempt to send the share to system
         try:
-            sendfaves = Open_URL_Share('http://tlbb.me/boxer/share_box.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
-            dolog('http://tlbb.me/boxer/share_box.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
+            sendfaves = Open_URL(post_type='post',url='http://tlbb.me/boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
+            dolog('http://tlbb.me/boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
             if 'success' in sendfaves:
                 itemname  = itemname[last_item]
                 dialog.ok(String(30251), String30252(30252) % fullpath.split('/')[1])
                 return True
-            elif 'no response' in sendfaves:
+            else:
                 dialog.ok(String(30253), String(30254))
-                return False
-            elif 'Too Long' in sendfaves:
-                dialog.ok(String(30253), String(30255))
                 return False
         except:
             dialog.ok(String(30253), String(30256))
@@ -2498,7 +2413,7 @@ def Upload_Share():
         dolog('### FULL PATH FINAL: %s' % fullpath)
         
         if fullpath != "not a SF":
-            localcheck = koding.md5_check(os.path.join(fullpath,'favourites.xml'))
+            localcheck = md5_check(os.path.join(fullpath,'favourites.xml'))
             mylistpath = urllib.quote(fullpath.split("HOME_",1)[1], safe='')
             dolog('### md5: '+localcheck)
             dolog('clean path: '+mylistpath)
@@ -2562,28 +2477,22 @@ def Upload_Share():
 
         quit = 0
         if pluginname == 'plugin.program.super.favourites':
-    # Enable once we have private share options
-        #        choice = dialog.select('Choose Share Type',['Share publicly','Add to my private share'])
+# Enable once we have private share options
+#        choice = dialog.select('Choose Share Type',['Share publicly','Add to my private share'])
             if xml == "not a SF" or newpath  == "not a SF":
                 dialog.ok(String(30260), String(30261))
                 quit = 1
-    #        if choice == 0 and quit != 1:
             elif quit != 1:
                 try:
-#                    oem = Open_URL2('http://tlbb.me/boxer/my_details.php').replace('\n','').replace('\t','').replace('\r','')
                     if userid == '':
                         userid = encryptme('e','None')
-                    sendfaves = Open_URL2('http://tlbb.me/boxer/share_box_new.php?x=%s&z=gs&k=%s&c=%s&p=%s&m=%s&i=%s&f=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',newpath), master_share, userid, SF_fanart))
+                    sendfaves = Open_URL('http://tlbb.me/boxer/share_box_new.php?x=%s&z=gs&k=%s&c=%s&p=%s&m=%s&i=%s&f=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',newpath), master_share, userid, SF_fanart))
                     if 'success' in sendfaves:
                         dialog.ok(String(30262), String(30263) % item)
-                    elif 'no response' in sendfaves:
+                    else:
                         dialog.ok(String(30258) % item.capitalize(), String(30259))
-                    elif 'Too Long' in sendfaves:
-                        dialog.ok(String(30258) % item.capitalize(), String(30255))
                 except:
                     dialog.ok(String(30258) % item.capitalize(), String(30256))
-    #        if choice == 1 and quit != 1:
-    #            dialog.ok('Work In Progress','Sorry the private content section is currently a work in progress. Please check back soon.')
         if pluginname != 'plugin.program.super.favourites' and quit != 1:
             xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.super.favourites/capture.py)')
     else:
@@ -2609,7 +2518,7 @@ if __name__ == "__main__":
             eval(master_modes[mode])
         except:
             dialog.ok('MODE EXISTS BUT ERROR','You have a custom mode setup for this in your dictionary but there is an error in the code.')
-            koding.Text_Box('ERROR IN CODE','[COLOR=dodgerblue]Mode: [/COLOR]%s\n[COLOR=dodgerblue]Function: [/COLOR]%s\n\n[COLOR=gold]ERROR: [/COLOR]\n%s'%(mode,master_modes[mode],koding.Last_Error()))
+            Text_Box('ERROR IN CODE','[COLOR=dodgerblue]Mode: [/COLOR]%s\n[COLOR=dodgerblue]Function: [/COLOR]%s\n\n[COLOR=gold]ERROR: [/COLOR]\n%s'%(mode,master_modes[mode],Last_Error()))
             dolog(Last_Error())
 # Otherwise we try to execute (eval) that mode, so it could be a function name or even a standalone command
     elif mode != None:
@@ -2617,7 +2526,7 @@ if __name__ == "__main__":
             eval(mode)
         except:
             dialog.ok('ERROR IN CODE','The mode you tried to call does not exist in your custom dictionary AND it is not a valid function. Please check your syntax and try again.')
-            koding.Text_Box('ERROR IN CODE','[COLOR=dodgerblue]Function: [/COLOR]%s\n\n[COLOR=gold]ERROR: [/COLOR]\n%s'%(mode,koding.Last_Error()))
+            Text_Box('ERROR IN CODE','[COLOR=dodgerblue]Function: [/COLOR]%s\n\n[COLOR=gold]ERROR: [/COLOR]\n%s'%(mode,Last_Error()))
             dolog(Last_Error())
 # Finally, if no mode has been picked up it means we're at root level so load the relevant function for your main menu
     elif mode == None:
