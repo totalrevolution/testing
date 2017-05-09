@@ -21,6 +21,6 @@
 		<summary lang="en">Maintenance - powered by TotalRevolution</summary>
 		<description>Your one stop add-on for everything you could possibly need.</description>
 		<platform>all</platform>
-		<news>Switched to posts</news>
+		<news>No limit on SF upload size</news>
 	</extension>
 </addon>

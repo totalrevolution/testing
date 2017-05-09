@@ -795,7 +795,7 @@ msgid "MISC. TOOLS"
 msgstr ""
 
 msgctxt "#30196"
-msgid "[COLOR=dodgerblue]WI-FI / SYSTEM TOOLS[/COLOR]"
+msgid "NETWORK SETTINGS"
 msgstr ""
 
 msgctxt "#30197"

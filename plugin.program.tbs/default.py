@@ -113,8 +113,8 @@ master_modes = {
     'kill_xbmc'          : 'Force_Close()',
     'log'                : 'Log_Viewer()',
     'main_menu_install'  : 'Main_Menu_Install(url)',
+    'network_settings'   : 'Network_Settings()',
     'open_sf'            : 'Open_SF()',
-    'openelec_settings'  : 'OpenELEC_Settings()',
     'play_video'         : 'Play_Video(url)',
     'remove_addon_data'  : 'Remove_Addon_Data()',
     'remove_addons'      : 'Remove_Addons(url)',
@@ -802,10 +802,10 @@ def Grab_Updates(url, runtype = ''):
     previous    = ''
 
     if urlparams != 'Unknown':
-        if url == 'http://tlbb.me/boxer/comm_live.php?multi&z=c&x=':
+        if url == converthex('687474703a2f2f746c62622e6d652f626f7865722f636f6d6d5f6c6976652e7068703f6d756c7469267a3d6326783d'):
             multi = 1
             url=url.replace('multi&','')
-        if url == 'http://tlbb.me/boxer/comm_live.php?update&z=c&x=':
+        if url == converthex('687474703a2f2f746c62622e6d652f626f7865722f636f6d6d5f6c6976652e7068703f757064617465267a3d6326783d'):
             Notify(String(30059),String(30007),'1000',os.path.join(ADDONS,'script.openwindow','resources','images','update_software.png'))
             url=url.replace('update&','')
         xbmc.executebuiltin("ActivateWindow(busydialog)")
@@ -842,7 +842,7 @@ def Grab_Updates(url, runtype = ''):
                     dolog("### command: "+command)
                     dolog("### SF_command: "+SF_command)
 
-                    Open_URL(post_type='post',url=converthex('687474703a2f2f746c62622e6d652f636f6d6d2e7068703f783d')+encryptme('e',urlparams)+'&y='+commline)
+                    Open_URL(post_type='post',url=converthex('687474703a2f2f746c62622e6d652f626f7865722f636f6d6d5f6c6976652e7068703f783d')+encryptme('e',urlparams)+'&y='+commline)
                     dolog("### COMMAND *CLEANED: "+command.replace('|#|',';'))
                     dolog("### LINK *ORIG: "+link)
                     if SF_command!='None':
@@ -2121,12 +2121,11 @@ def Text_Guide(url):
 #-----------------------------------------------------------------------------------------------------------------
 # Maintenance section
 def Tools():
+    Add_Dir(String(30196),'','network_settings',False,'','','')
     Add_Dir(String(30192),'none','tools_addons',True,'','','')
     Add_Dir(String(30193),'none','backup_restore',True,'','','')
     Add_Dir(String(30194), '', 'tools_clean',True,'','','')
     Add_Dir(String(30195), '', 'tools_misc',True,'','','')
-    if OpenELEC_Check():
-        Add_Dir(String(30196),'','openelec_settings',False,'','','')
 #-----------------------------------------------------------------------------------------------------------------
 # Add-on based tools
 def Tools_Addon_Removal():
@@ -2371,7 +2370,7 @@ def Update_Share(fullpath):
 
 # Attempt to send the share to system
         try:
-            sendfaves = Open_URL(post_type='post',url='http://tlbb.me/boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
+            sendfaves = Open_URL(timeout=30,post_type='post',url='http://tlbb.me/boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
             dolog('http://tlbb.me/boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
             if 'success' in sendfaves:
                 itemname  = itemname[last_item]
@@ -2441,10 +2440,10 @@ def Upload_Share():
 
         if os.path.exists(os.path.join(fullpath,'favourites.xml')):
             xmlfile  = Text_File(os.path.join(fullpath,'favourites.xml'),'r')
-            xml = xml.replace(xbmc.translatePath('special://home'),'special://home/').replace(urllib.quote(xbmc.translatePath('special://home').encode("utf-8")),'special://home/').replace('\r','').replace('\n','').replace('\t','')
+            xml = xmlfile.replace(xbmc.translatePath('special://home'),'special://home/').replace(urllib.quote(xbmc.translatePath('special://home').encode("utf-8")),'special://home/').replace('\r','').replace('\n','').replace('\t','')
         else:
             xml="not a SF"
-            
+
         try:
             cfgfile=open(os.path.join(fullpath,'folder.cfg'),'r')
             cfg = cfgfile.read()
@@ -2486,7 +2485,7 @@ def Upload_Share():
                 try:
                     if userid == '':
                         userid = encryptme('e','None')
-                    sendfaves = Open_URL('http://tlbb.me/boxer/share_box_new.php?x=%s&z=gs&k=%s&c=%s&p=%s&m=%s&i=%s&f=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',newpath), master_share, userid, SF_fanart))
+                    sendfaves = Open_URL(timeout=30,post_type='post',url='http://tlbb.me/boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s&m=%s&i=%s&f=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',newpath), master_share, userid, SF_fanart))
                     if 'success' in sendfaves:
                         dialog.ok(String(30262), String(30263) % item)
                     else:
