@@ -1,3 +1,6 @@
+v.4.1.7:
+- No limit on SF upload size
+
 v.4.1.6:
 - Fixed the default home menu items, they weren't being set in settings correctly
 

@@ -1,3 +1,6 @@
+v.2.9.6:
+- Only refresh skin if xml has been downloaded
+
 v.2.9.5:
 - Only refresh skin if homepage has focus
 

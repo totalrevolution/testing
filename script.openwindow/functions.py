@@ -45,6 +45,7 @@ AUTO_UPDATE         = Addon_Setting(setting='autoupdate')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
 rerun_main          = False
+refresh_skin        = False
 BASE                = 'http://tlbb.me/'
 try:
     my_base = Open_URL(url='http://tlbb.me/')
@@ -433,6 +434,7 @@ def Install_Content(oem,path,local_path,local_size='',new_size='',content=''):
 #-----------------------------------------------------------------------------
 # Run the main code (when opened as a script)
 def Main_Run():
+    global refresh_skin
     dpmode  = None # Mode sent through for keyword install, if set this will pause until finished extracting
     startup = 0
     service = 0
@@ -497,6 +499,8 @@ def Main_Run():
                     
                     if str(local_size) != str(size) and not '~~ZIPS~~' in path:
                         dolog('## UPDATING %s' % path)
+                        if path.endswith('.xml') and 'skin.' in path:
+                            refresh_skin = True
                         Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path],kill_time=600,show_busy=False)
 
                     elif '~~ZIPS~~' in path:
@@ -577,7 +581,7 @@ if __name__ == '__main__':
     if rerun_main:
         Main_Run()
     current_window = System(command='Window.Property(xmlfile)',function='info')
-    if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')) and current_window == 'Home.xml':
+    if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')) and current_window == 'Home.xml' and refresh_skin:
         xbmc.log('refreshing skin',2)
         Refresh(r_mode='skin')
     xbmcgui.Window(10000).clearProperty('TBS_Running')
