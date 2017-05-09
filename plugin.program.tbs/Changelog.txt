@@ -1,3 +1,6 @@
+v.4.1.8:
+- Fixed startup error
+
 v.4.1.7:
 - No limit on SF upload size
 
