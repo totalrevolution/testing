@@ -1,3 +1,6 @@
+v.2.9.5:
+- Only refresh skin if homepage has focus
+
 v.2.9.4:
 - Fixed Get_ID and Fresh_Install for Android
 

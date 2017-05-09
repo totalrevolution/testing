@@ -576,6 +576,8 @@ if __name__ == '__main__':
 # Re-run the update check if addons have been downloaded so custom files can be reinstalled.
     if rerun_main:
         Main_Run()
-    if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')):
+    current_window = System(command='Window.Property(xmlfile)',function='info')
+    if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')) and current_window == 'Home.xml':
+        xbmc.log('refreshing skin',2)
         Refresh(r_mode='skin')
     xbmcgui.Window(10000).clearProperty('TBS_Running')
