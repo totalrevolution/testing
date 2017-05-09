@@ -251,6 +251,7 @@ def Addon_Browser(function='list',header='',skiparray=[]):
 #-----------------------------------------------------------------------------------------------------------------
 # Enable/disable the visibility of adult add-ons (use true or false)
 def Adult_Filter(value, loadtype = ''):
+    from koding import Main
     success = 0
     if value == 'true':
         try:
