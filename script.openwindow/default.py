@@ -147,9 +147,7 @@ def show(xmlfile,exec_file):
         del d
         
         if ACTION:
-            params = Get_Params()
-            dolog('params: %s' % params)
-            url_return = Open_URL(url=BASE+'boxer/my_details.php?x=%s&y=%s' % (params, ACTION),post_type='post').replace('\r','').replace('\n','').replace('\t','')
+            url_return = Open_URL(url=BASE+'boxer/my_details.php',post_type='post',payload={"x":Get_Params(),"y":ACTION}).replace('\r','').replace('\n','').replace('\t','')
             dolog('### mydetails orig: %s' % url_return)
             dolog('### mydetails new: %s' % Encrypt('d', url_return))
             url_return = Encrypt('d', url_return)
@@ -913,7 +911,7 @@ def Check_Status(extension, email=''):
         xbmc.executebuiltin('Notification(Checking Internet Connection,Please wait...,5000,%s)' % INTERNET_ICON)
     if params != 'Unknown':
         try:
-            status = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (params, XBMC_VERSION, extension, Encrypt(message=email)),post_type='post')
+            status = Open_URL(url=BASE+'boxer/Check_License.php',post_type='post',payload={"x":params,"v":XBMC_VERSION,"r":extension,"e":Encrypt(message=email)})
             dolog('### URL: %sboxer/Check_License.php?x=%s&v=%s&r=%s&e=%s' % (BASE, params, XBMC_VERSION, extension, Encrypt(message=email)))
             try:
                 dolog(Encrypt('d',status))
@@ -1280,12 +1278,12 @@ def Keyword_Search():
             if keyword.startswith('switchme'):
                 keywordoem = keyword.replace('switchme','')
                 try:
-                    link = Open_URL(url=BASE+'boxer/addtooem.php?x=%s&o=%s' % (urlparams,Encrypt('e',keywordoem)),post_type='post')
+                    link = Open_URL(url=BASE+'boxer/addtooem.php',post_type='post',payload={"x":urlparams,"o":Encrypt('e',keywordoem)})
                 except:
                     link = 'fail'
             else:
                 try:
-                    link = Open_URL(url=BASE+'boxer/keyword.php?x='+Encrypt('e',urlparams)+'k='+Encrypt('e',keyword),post_type='post')
+                    link = Open_URL(url=BASE+'boxer/keyword.php',post_type='post',payload={"x":urlparams,"k":Encrypt('e',keyword)})
                 except:
                     link = 'fail'
             if 'Success' in link:
@@ -1656,8 +1654,7 @@ def Show_Registration():
 # Auto select the relevant third party window to open into
 def TR_Check(mode):
     try:
-        url = BASE+'boxer/thirdparty.php?x=%s&y=%s' % (Get_Params(),mode)
-        link = Encrypt('d',Open_URL(url=url,post_type='post'))
+        link = Encrypt('d',Open_URL(url=BASE+'boxer/thirdparty.php',post_type='post',payload={"x":Get_Params(),"y":mode}))
         if link != '':
             exec(link)
         else:

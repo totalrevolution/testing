@@ -1,3 +1,6 @@
+v.2.9.9.2:
+- Changed all open_url functions to proper posts
+
 v.2.9.9.1:
 - Removed url base check from default and functions, now only in service
 - Edited Toggle of addons, was making 2 calls to server

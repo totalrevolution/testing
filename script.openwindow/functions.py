@@ -104,18 +104,16 @@ def Build_Info():
 # Update registration status
 def Check_License():
     try:
-        initial_code = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=3' % (Get_Params(), XBMC_VERSION),post_type='post')
+        initial_code = Open_URL(url=BASE+'boxer/Check_License.php',post_type='post',payload={"x":Get_Params(),"v":XBMC_VERSION,"r":"3"})
         exec(Encrypt('d',initial_code))
     except:
         dolog(Last_Error())
 #-----------------------------------------------------------------------------
 # Return true or false whether licensed or not
 def Check_Valid(mode = 'oem_check'):
-    url = BASE+'boxer/my_details.php?x=%s&v=valid' % Get_Params()
-
 # If connected to the internet we do the updates
     try:
-        link = Open_URL(url=url,post_type='post').replace('\r','').replace('\n','').replace('\t','')
+        link = Open_URL(url=BASE+'boxer/my_details.php',post_type='post',payload={"x":Get_Params(),"v":"valid"}).replace('\r','').replace('\n','').replace('\t','')
         link = Encrypt('d',link)
         if mode == 'conn_test' and link != '':
             return True
@@ -184,11 +182,13 @@ def Enable_Addons(updaterepos = True):
     xbmc.executebuiltin('UpdateLocalAddons')
     if updaterepos:
         xbmc.executebuiltin('UpdateAddonRepos')
-    adult_list = []
-    if mylist:
-        adult_dict = mylist.items()
+    try:
+        adult_list = []
+        adult_dict = Addon_Genre().items()
         for item in adult_dict:
             adult_list.append(item[1])
+    except:
+        adult_list = []
     Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
 #-----------------------------------------------------------------------------------------------------------------
 # Encryption function
@@ -460,7 +460,7 @@ def Main_Run():
 # Run the initial start code from server
     if service:
         try:
-            startcode = Open_URL(url=BASE+'boxer/startcode.php?x=%s&v=%s' % (Get_Params(),XBMC_VERSION),post_type='post')
+            startcode = Open_URL(url=BASE+'boxer/startcode.php',post_type='post',payload={"x":Get_Params(),"v":XBMC_VERSION})
             exec(Encrypt('d',startcode))
         except:
             pass
@@ -474,12 +474,10 @@ def Main_Run():
             os.makedirs(ZIP_PATH)
 
         local_size   = 0
-        url          = BASE+'boxer/update.php?x=%s&v=%s' % (Get_Params(),XBMC_VERSION)
-        dolog(url)
 
 # If connected to the internet we do the updates
         try:
-            link = Open_URL(url=url,post_type='post').replace('\r','').replace('\n','').replace('\t','')
+            link = Open_URL(url=BASE+'boxer/update.php',post_type='post',payload={"x":Get_Params(),"v":XBMC_VERSION}).replace('\r','').replace('\n','').replace('\t','')
             link = Encrypt('d',link)
             update_array = re.compile('p="(.+?)"').findall(link)
             for item in update_array:
