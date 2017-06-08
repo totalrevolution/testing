@@ -1,5 +1,43 @@
+v.4.2.6.1:
+- Disabled WIP stuff (MY FRIENDS, UPDATE ACCOUNT PASSWORD, SHARE VIDEO) so it's ready for a public release
+- Create Keyword only appears if signed in with username.
+
+v.4.2.6:
+- Social update will check for default home items and enable if they've not already been disabled by user.
+- WIP share video with friend.
+
+v.4.2.5:
+- Recoded so it's now fully utilising python koding framework
+- Now creates a list of home menu enable/disable that need to be run at each social update
+- Added new Friend Request messaging/media share options (not yet live)
+- Removed trtv as a dependency as clients may want to remove that
+
+v.4.2.3.3:
+- Friend Request option added (basis of future features)
+- User Registration function added.
+- Fixed the IP lookup for whatismyipaddress.com
+- Fixed the IP lookup for iplocation.net
+- Added MY LOGS section to MY PROFILE
+- Added option for user to set their own adult password (MY PROFILE)
+
+v.4.2.3:
+- New upload log feature, logs now accessible via http://tlbb.me/log
+
+v.4.2.2:
+- New Social Sharing menu
+- Added ability to remove shares locally
+- Added ability to remove public shares
+- Added ability to update shares on server
+
+v.4.2.1:
+- Added option to periodically check for internet connection
+- Cleaned up some old strings
+- Reverted back to the newer post method for uploads, fixed bug introduced in v.4.1.7
+- Cleaned up all modules so they use Python Koding framework
+- Fixed social share upload, was the adding wrong case final path to db
+
 v.4.2:
-- Temp reverted back to 4.1.6 as the new post version is causing a weird update message.
+- Reverted back to 4.1.6 as an update error has occured somewhere between then and now
 
 v.4.1.9:
 - Fixed startup error

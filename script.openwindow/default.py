@@ -1,7 +1,13 @@
-﻿#       Copyright (C) 2016 TotalRevolution
-#
-#  This software is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License
-#  You can find a copy of the license in the add-on folder
+﻿# -*- coding: utf-8 -*-
+
+# script.openwindow
+# Startup Wizard (c) by whufclee (info@totalrevolution.tv)
+
+# Total Revolution Startup Wizard is licensed under a
+# Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+
+# You should have received a copy of the license along with this
+# work. If not, see http://creativecommons.org/licenses/by-nc-nd/4.0.
 
 import datetime
 import downloader
@@ -66,10 +72,10 @@ LANGUAGE_ART               = os.path.join(ADDON_PATH,'resources','images','langu
 DEBUG                      = Addon_Setting(setting='debug')
 OFFLINE_MODE               = Addon_Setting(setting='offline')
 branding                   = xbmc.translatePath('special://home/media/branding/branding.png')
-BASE                       = 'http://tlbb.me/'
+BASE                       = 'http://totalrevolution.tv/'
 try:
-    my_base = Open_URL(url='http://tlbb.me/')
-    if my_base.startswith('This url could not be opened'):
+    my_base = Open_URL(url=BASE)
+    if my_base.startswith('This url could not be opened') or my_base == False:
         try:
             BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
         except:

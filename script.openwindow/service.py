@@ -1,8 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
-#       Copyright (C) 2016 TotalRevolution
-#
-#  This software is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License
-#  You can find a copy of the license in the add-on folder
+
+# script.openwindow
+# Startup Wizard (c) by Lee Randall (info@totalrevolution.tv)
+
+# Total Revolution Startup Wizard is licensed under a
+# Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+
+# You should have received a copy of the license along with this
+# work. If not, see http://creativecommons.org/licenses/by-nc-nd/4.0.
 
 import os
 import shutil
@@ -28,17 +33,22 @@ INSTALL_ORIG     = os.path.join(PACKAGES, 'INSTALL_COMPLETE')
 INSTALL_COMPLETE = os.path.join(ADDON_DATA, ADDON_ID, 'INSTALL_COMPLETE')
 TBS              = os.path.join(ADDONS, 'plugin.program.tbs')
 INTERNET_ICON    = os.path.join(ADDON_PATH,'resources','images','internet.png')
-BASE             = 'http://tlbb.me/'
-try:
-    my_base = Open_URL(url='http://tlbb.me/')
-    if my_base.startswith('This url could not be opened'):
-        try:
-            BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
-        except:
-            dolog('Unable to access any valid base domain')
-except:
-    pass
-
+#---------------------------------------------------------------------------------------------------
+# Base domain checker
+def My_Base():
+    try:
+        BASE = 'http://tlbb.me/'
+        my_base = Open_URL(url=BASE)
+        if my_base.startswith('This url could not be opened') or my_base == False:
+            try:
+                BASE = converthex(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
+            except:
+                dolog('Unable to access any valid base domain')
+    except:
+        pass
+    Addon_Setting(setting='base',value=BASE)
+#---------------------------------------------------------------------------------------------------
+My_Base()
 while xbmc.Player().isPlaying():
     xbmc.sleep(500)
 
@@ -67,8 +77,7 @@ if os.path.exists(STARTUP_ORIG):
         xbmc.log(str(e))
 
 try:
-    initial_code = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=3' % (Get_Params(), XBMC_VERSION),post_type='post')
-    exec(Encrypt('d',initial_code))
+    Check_License()
 except:
     dolog(Last_Error())
     if not os.path.exists(NON_REGISTERED):

