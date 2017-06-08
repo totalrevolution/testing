@@ -1013,12 +1013,13 @@ def Grab_Updates(url, runtype = ''):
         if url == BASE+'boxer/comm_live.php?update&z=c&x=':
             Notify(String(30059),String(30007),'1000',os.path.join(ADDONS,'script.openwindow','resources','images','update_software.png'))
             url=url.replace('update&','')
+        url,params = url.split('?')
         xbmc.executebuiltin("ActivateWindow(busydialog)")
         while mysuccess != 1 and failed != 1:
 
             try:
                 dolog("### URL: "+url+encryptme('e',urlparams))
-                link = Open_URL(post_type='post',url=url+encryptme('e',urlparams))
+                link = Open_URL(post_type='post',url=url,payload={"x":encryptme('e',urlparams),"z":"c"})
                 if link != '' and not 'sleep' in link:
                     link = encryptme('d',link).replace('\n',';').replace('|_|',' ').replace('|!|','\n').replace('http://venztech.com/repo_jpegs/',BASE+'repo_jpegs/')
                 try:
@@ -1188,8 +1189,8 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
 #    try:
         for item in choices:
             dolog(BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))))
-            sharelist_URL  = BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item])))
-            content_list   = Open_URL(post_type='post',url=sharelist_URL)
+            sharelist_URL  = BASE+'boxer/cat_search_live.php'
+            content_list   = Open_URL(post_type='post',url=sharelist_URL,payload={"x":encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))} )
             clean_link     = encryptme('d',content_list)
             dolog('#### %s' % clean_link)
 
@@ -1255,12 +1256,12 @@ def Install_From_Zip():
     xbmc.executebuiltin('ActivateWindow(10040,"addons://install/",return)')
 #---------------------------------------------------------------------------------------------------
 # Function to grab the main sub-categories 
-@route(mode='install_venz_menu', args=['function'])
-def Install_Venz_Menu(function):
+@route(mode='install_venz_menu', args=['url'])
+def Install_Venz_Menu(url):
     menutype    = ''
     menu        = ''
-    if '||' in function:
-        function,menutype,menu = function.split('||')
+    if '||' in url:
+        url,menutype,menu = url.split('||')
     menu = menu.replace('_',' ').lower()
 
     urlparams  = URL_Params()
@@ -1274,10 +1275,10 @@ def Install_Venz_Menu(function):
             contenturl   = []
 
 # Add an item to one of the main menu categories or add a sub-menu item
-            if menutype == 'add_main' or menutype == 'add_sub' or function.startswith('manualsearch'):
-                categoryURL  = BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s' % (urlparams, function, social_shares)))
+            if menutype == 'add_main' or menutype == 'add_sub' or url.startswith('manualsearch'):
+                categoryURL  = BASE+'boxer/cat_search_live.php'
                 dolog(categoryURL)
-                link_orig  = Open_URL(post_type='post',url=categoryURL)
+                link_orig  = Open_URL(url=categoryURL,post_type='post',payload={"x":encryptme('e','%s&%s&0&%s' % (urlparams, url, social_shares))})
                 link       = encryptme('d',link_orig)
                 dolog('#### '+encryptme('d',link_orig))
             
@@ -1292,7 +1293,7 @@ def Install_Venz_Menu(function):
                     xbmc.executebuiltin('ActivateWindow(HOME)')
                     dolog('Choices: %s' % choices)
                     if len(choices) > 0:
-                        Install_Shares(function, menutype, menu, choices, contentarray, imagearray, descarray)
+                        Install_Shares(url, menutype, menu, choices, contentarray, imagearray, descarray)
                 else:
                     if thirdparty == 'true':
                         OK_Dialog(String(30079),String(30080))
@@ -1302,7 +1303,7 @@ def Install_Venz_Menu(function):
 
 # If this is a remove item
             else:
-                Remove_Menu(function)
+                Remove_Menu(url)
         except:
             Notify(String(30082),String(30083),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','cross.png'))
     else:
@@ -2205,8 +2206,7 @@ def Remove_Menu(function, menutype = ''):
     urlparams = URL_Params()
     dolog('### OPENING URL TO GRAB DETAILS OF WHAT TO REMOVE:')
     dolog(BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))))
-    sharelist_URL  = BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype)))
-    content_list   = Open_URL(post_type='post',url=sharelist_URL)
+    content_list   = Open_URL(post_type='post',url=BASE+'boxer/cat_search_live.php',payload={"x":encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))})
     clean_link     = encryptme('d',content_list)
     dolog('#### RETURN: %s' % clean_link)
 # Grab all the shares which match the master sub-category
@@ -2452,19 +2452,19 @@ def Scan_APKs(showdialogs = True):
     return True
 #---------------------------------------------------------------------------------------------------
 # Main search menu for Venz content
-@route(mode='search_content_main', args=['content_type'])
-def Search_Content_Main(content_type):
+@route(mode='search_content_main', args=['url'])
+def Search_Content_Main(url):
     dolog(type)
-    if 'from_the' in content_type and '_menu' in content_type:
-        Install_Venz_Menu(content_type+'||remove_main||'+content_type.replace('from_the_','').replace('_menu',''))
-    elif content_type == 'main_menu':
-        Install_Venz_Menu(content_type)
-    elif not 'from_the' in content_type and content_type != 'main_menu' and not "submenu" in content_type:
-        Add_Dir(String(30182) % content_type.replace('_',' '),'to_the_'+content_type+'_menu||add_main||'+content_type,'install_venz_menu',True,'','')
-        Add_Dir(String(30183) % content_type.replace('_',' '),'to_the_'+content_type+'_menu||add_main||'+content_type,'search_content',True,'Manual_Search.png','','')
-    elif "submenu" in content_type:
-        Add_Dir(String(30184) % content_type.replace('_submenu','').replace('_',' ').title()+' Sub-menu','to_the_'+content_type+'||add_sub||'+content_type.replace('_submenu',''),'install_venz_menu',True,'','','')
-        Add_Dir(String(30185) % content_type.replace('_submenu','').replace('_',' ').title()+' Sub-menu','from_the_'+content_type+'||remove_sub||'+content_type.replace('_submenu',''),'install_venz_menu',True,'','')   
+    if 'from_the' in url and '_menu' in url:
+        Install_Venz_Menu(url+'||remove_main||'+url.replace('from_the_','').replace('_menu',''))
+    elif url == 'main_menu':
+        Install_Venz_Menu(url)
+    elif not 'from_the' in url and url != 'main_menu' and not "submenu" in url:
+        Add_Dir(String(30182) % url.replace('_',' '),'to_the_'+url+'_menu||add_main||'+url,'install_venz_menu',True,'','')
+        Add_Dir(String(30183) % url.replace('_',' '),'to_the_'+url+'_menu||add_main||'+url,'search_content',True,'Manual_Search.png','','')
+    elif "submenu" in url:
+        Add_Dir(String(30184) % url.replace('_submenu','').replace('_',' ').title()+' Sub-menu','to_the_'+url+'||add_sub||'+url.replace('_submenu',''),'install_venz_menu',True,'','','')
+        Add_Dir(String(30185) % url.replace('_submenu','').replace('_',' ').title()+' Sub-menu','from_the_'+url+'||remove_sub||'+url.replace('_submenu',''),'install_venz_menu',True,'','')   
 #---------------------------------------------------------------------------------------------------
 # Search for Venz content
 @route(mode='search_content', args=['menutype'])

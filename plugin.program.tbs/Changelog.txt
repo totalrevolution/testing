@@ -1,3 +1,6 @@
+v.4.2.6.2:
+- Fixed open_url statements so they use proper posts (sf installs especially)
+
 v.4.2.6.1:
 - Disabled WIP stuff (MY FRIENDS, UPDATE ACCOUNT PASSWORD, SHARE VIDEO) so it's ready for a public release
 - Create Keyword only appears if signed in with username.
