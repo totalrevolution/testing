@@ -54,16 +54,6 @@ showprogress        = Addon_Setting(setting='showprogress')
 rerun_main          = False
 refresh_skin        = False
 
-try:
-    my_base = Open_URL(url=BASE)
-    if my_base.startswith('This url could not be opened') or my_base == False:
-        try:
-            BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
-        except:
-            dolog('Unable to access any valid base domain')
-except:
-    pass
-
 if not os.path.exists(TBS_DATA):
     os.makedirs(TBS_DATA)
 #-----------------------------------------------------------------------------------------------------------------
@@ -194,13 +184,11 @@ def Enable_Addons(updaterepos = True):
     xbmc.executebuiltin('UpdateLocalAddons')
     if updaterepos:
         xbmc.executebuiltin('UpdateAddonRepos')
-    try:
-        adult_list = []
-        adult_dict = Addon_Genre().items()
+    adult_list = []
+    if mylist:
+        adult_dict = mylist.items()
         for item in adult_dict:
             adult_list.append(item[1])
-    except:
-        adult_list = []
     Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
 #-----------------------------------------------------------------------------------------------------------------
 # Encryption function

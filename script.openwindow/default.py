@@ -73,16 +73,6 @@ DEBUG                      = Addon_Setting(setting='debug')
 OFFLINE_MODE               = Addon_Setting(setting='offline')
 branding                   = xbmc.translatePath('special://home/media/branding/branding.png')
 BASE                       = 'http://totalrevolution.tv/'
-try:
-    my_base = Open_URL(url=BASE)
-    if my_base.startswith('This url could not be opened') or my_base == False:
-        try:
-            BASE = Encrypt(message=Open_URL('https://raw.githubusercontent.com/totalrevolution/testing/master/temp_files/BASE.txt'))
-        except:
-            dolog('Unable to access any valid base domain')
-except:
-    pass
-
 
 if not os.path.exists(branding):
     branding = os.path.join(ADDON_PATH,'resources','images','branding.png')
