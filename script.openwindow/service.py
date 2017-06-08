@@ -37,7 +37,7 @@ INTERNET_ICON    = os.path.join(ADDON_PATH,'resources','images','internet.png')
 # Base domain checker
 def My_Base():
     try:
-        BASE = 'http://tlbb.me/'
+        BASE = 'http://totalrevolution.tv/'
         my_base = Open_URL(url=BASE)
         if my_base.startswith('This url could not be opened') or my_base == False:
             try:
