@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.2">
+<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.2.6.1">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.trtv" version="1.2.1"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
 		<import addon="plugin.program.super.favourites" version="1.0.43" optional="true"/>
 	</requires>
@@ -22,7 +21,7 @@
 		<summary lang="en">Maintenance - powered by TotalRevolution</summary>
 		<description>Your one stop add-on for everything you could possibly need.</description>
 		<platform>all</platform>
-		<news>Temp reverted back to 4.1.6 version</news>
+		<news>Friend Requests added</news>
 	</extension>
 </addon>
 
@@ -52,7 +51,7 @@
 
 <addon id="script.module.python.koding.aio"
    name="Python Koding AIO"
-   version="0.9"
+   version="0.9.2"
    provider-name="TotalRevolution, noobsandnerds">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -69,12 +68,12 @@
     <license>Creative Commons 4.0-NC-ND</license>
     <forum>http://noobsandnerds.com/support/showthread.php?tid=17614</forum>
     <website>http://totalrevolution.tv</website>
-    <news>Added exception in Get_ID - the function is not available on every platform</news>
+    <news>Added Delete_Cookies and fixed Addon_Settings so can now set to a blank string</news>
     <source>https://github.com/totalrevolution/totalrevolution/tree/master/script.module.python.koding.aio</source>
   </extension>
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="2.9.6" provider-name="TotalRevolution">
+<addon id="script.openwindow" name="Startup Wizard" version="2.9.8" provider-name="TotalRevolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -89,7 +88,7 @@
 		<platform>all</platform>
 		<language>en</language>
 		<license>Creative Commons 4.0-NC-ND</license>
-		<news>Only refresh skin if xml has been downloaded</news>
+		<news>Fixed base check for compatibility with new Python Koding</news>
 	</extension>
 </addon>
 </addons>

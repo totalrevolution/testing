@@ -68,8 +68,7 @@ NON_REGISTERED   =  os.path.join(ADDON_DATA,'script.openwindow','unregistered')
 XBMC_VERSION     =  xbmc.getInfoLabel("System.BuildVersion")[:2]
 CONFIG           =  '/storage/.config/'
 STORAGE          =  '/storage/'
-# BASE             =  Addon_Setting(addon_id='script.openwindow',setting='base')
-BASE = 'http://totalrevolution.tv/'
+BASE             =  Addon_Setting(addon_id='script.openwindow',setting='base')
 dialog           =  xbmcgui.Dialog()
 dp               =  xbmcgui.DialogProgress()
 skin             =  xbmc.getSkinDir()
@@ -1751,7 +1750,9 @@ def My_Details():
     if userid != '':
         if username != '':
             username = String(30350)%username
-            my_array = [String(30100),username,String(30354),String(30189)]
+# Enable this one when keyword creator is completed
+            # my_array = [String(30100),username,String(30354),String(30189)]
+            my_array = [String(30100),username,String(30354)]
         else:
             username = String(30348)
             my_array = [String(30100),username,String(30354)]
