@@ -1007,24 +1007,21 @@ def Download_Extract(url,video=''):
         dolog('### Branding update in progress (%s seconds)' % updatecount)
         updatecount += 1
         path_exist = os.path.exists(INSTALL_COMPLETE)
+    dolog('INSTALL COMPLETE CHECKING PLAYBACK')
 
 # Check if video is still playing, wait for that to finish before closing
-    isplaying = xbmc.Player().isPlaying()
-    counter = 0
-    while isplaying:
-        sleep(1000)
-        counter += 1
-        dolog('XBMC PLAYER IS ACTIVE, %s'%counter)
-        isplaying = xbmc.Player().isPlaying()
-    
+    Sleep_If_Playback_Active()
+    dolog('NO PLAYBACK - CHECKING GUISETTINGS FOR SKIN ID')
     guisettingsbak = os.path.join(PROFILE, 'guisettings_BAK')
     skinid = Get_Skin_ID(guisettingsbak)
+    dolog('SKIN ID: %s'%skinid)
 
 # Wait for skin to be available in kodi addons
     skin_ok = False
     while not skin_ok:
         xbmc.sleep(1000)
         skin_ok = xbmc.getCondVisibility("System.HasAddon(%s)"%skinid)
+
 # Open home window, failing to do this causes problems with the yesno DIALOG for skin switching
     xbmc.executebuiltin('ActivateWindow(HOME)')
     dolog('#### NEW SKIN: %s' % skinid)

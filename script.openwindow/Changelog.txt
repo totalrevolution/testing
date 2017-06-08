@@ -1,3 +1,6 @@
+v.2.9.9.4:
+- Added better error reporting when in debug mode.
+
 v.2.9.9.3:
 - Reverted back to older way of checking if playback active during initial install
 

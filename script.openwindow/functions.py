@@ -180,15 +180,15 @@ def CPU_Check():
 def Enable_Addons(updaterepos = True):
     mylist = Addon_Genre()
     xbmc.executebuiltin('UpdateLocalAddons')
+    dolog('UPDATED LOCAL ADDONS')
     if updaterepos:
         xbmc.executebuiltin('UpdateAddonRepos')
-    try:
-        adult_list = []
-        adult_dict = Addon_Genre().items()
+    adult_list = []
+    if mylist:
+        adult_dict = mylist.items()
         for item in adult_dict:
             adult_list.append(item[1])
-    except:
-        adult_list = []
+    dolog('NO XXX CONTENT FOUND')
     Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
 #-----------------------------------------------------------------------------------------------------------------
 # Encryption function
