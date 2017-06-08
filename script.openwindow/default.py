@@ -1009,7 +1009,13 @@ def Download_Extract(url,video=''):
         path_exist = os.path.exists(INSTALL_COMPLETE)
 
 # Check if video is still playing, wait for that to finish before closing
-    Sleep_If_Playback_Active()
+    isplaying = xbmc.Player().isPlaying()
+    counter = 0
+    while isplaying:
+        sleep(1000)
+        counter += 1
+        dolog('XBMC PLAYER IS ACTIVE, %s'%counter)
+        isplaying = xbmc.Player().isPlaying()
     
     guisettingsbak = os.path.join(PROFILE, 'guisettings_BAK')
     skinid = Get_Skin_ID(guisettingsbak)
