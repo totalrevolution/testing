@@ -1266,7 +1266,7 @@ def Keyword_Search():
         idsetting = keyword.replace('uid','')
         ADDON2.setSetting('userid', Encrypt('e',idsetting))
         return
-    else:
+    elif keyword != '':
         url='http://urlshortbot.com/totalrevolution'
         if os.path.exists(KEYWORD_FILE):
             url  = Text_File(KEYWORD_FILE,'r')
@@ -1289,7 +1289,8 @@ def Keyword_Search():
                     link = Open_URL(url=BASE+'boxer/keyword.php',post_type='post',payload={"x":urlparams,"k":Encrypt('e',keyword)})
                 except:
                     link = 'fail'
-            if 'Success' in link:
+            dolog('LINK STATUS: %s'%link)
+            if link != False and 'Success' in link:
                 success = 1
                 dp.close()
                 if os.path.exists(xbmc.translatePath('special://home/addons/script.openwindow/functions.py')):
@@ -1656,14 +1657,15 @@ def Show_Registration():
 #-----------------------------------------------------------------------------
 # Auto select the relevant third party window to open into
 def TR_Check(mode):
-    try:
-        link = Encrypt('d',Open_URL(url=BASE+'boxer/thirdparty.php',post_type='post',payload={"x":Get_Params(),"y":mode}))
+    # try:
+        link = Open_URL(url=BASE+'boxer/thirdparty.php',post_type='get',payload={"x":Get_Params(),"y":mode})
+        link = Encrypt('d',link)
         if link != '':
             exec(link)
         else:
             Show_Registration()
-    except:
-        Show_Registration()
+    # except:
+    #     Show_Registration()
 #-----------------------------------------------------------------------------
 def Third_Party_Choice():
     choice = DIALOG.yesno(String(30091),String(30092),yeslabel=String(30093),nolabel=String(30094))

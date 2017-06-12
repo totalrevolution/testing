@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.2.6.2">
+<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.2.7">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -46,7 +46,7 @@
 
 <addon id="script.module.python.koding.aio"
    name="Python Koding AIO"
-   version="0.9.2"
+   version="0.9.3"
    provider-name="TotalRevolution, noobsandnerds">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -68,7 +68,7 @@
   </extension>
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="2.9.9.4" provider-name="TotalRevolution">
+<addon id="script.openwindow" name="Startup Wizard" version="2.9.9.5" provider-name="TotalRevolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>

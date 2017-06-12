@@ -423,7 +423,7 @@ os.remove(addon_db_path)
             else:
                 value = item[key]
                 column_compare_operator = default_compare_operator
-            sql_string += "%s %s \"%s\" AND" % (key, column_compare_operator, value)
+            sql_string += "%s %s \"%s\" AND " % (key, column_compare_operator, value)
         sql_string = sql_string[:-4]
         try:
             _execute_db_string(sql_string, commit=False)
@@ -436,7 +436,7 @@ os.remove(addon_db_path)
 #----------------------------------------------------------------
 # TUTORIAL #
 def Remove_Table(table):
-    """
+"""
 Use with caution, this will completely remove a database table and
 all of it's contents. The only database you can access with this command
 is your add-ons own db file called database.db
@@ -453,3 +453,6 @@ koding.Remove_Table('my_test_table')
     sql_string = "DROP TABLE IF EXISTS %s;" % table
     _execute_db_string(sql_string)
 #----------------------------------------------------------------
+def reset_db():
+    global dbcon, dbcur
+    dbcur, dbcon     = None, None

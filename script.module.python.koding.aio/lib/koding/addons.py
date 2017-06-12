@@ -81,10 +81,13 @@ if space_addons:
     else:
         Main('addon_list|g:%s'%genre)
 
-    try:
-        addon_list = eval(binascii.unhexlify(Text_File(final_path, 'r')))
-        return addon_list
-    except:
+    if os.path.exists(final_path):
+        try:
+            addon_list = eval(binascii.unhexlify(Text_File(final_path, 'r')))
+            return addon_list
+        except:
+            return False
+    else:
         return False
 #----------------------------------------------------------------
 # TUTORIAL #
@@ -364,11 +367,12 @@ koding.Text_Box('ADD-ON LIST', path_list)
 def Check_Deps(addon_path, depfiles = []):
     import re
     from filetools import Text_File
+    exclude_list = ['xbmc.gui','script.module.metahandler','kodi.resource','xbmc.core','xbmc.metadata','xbmc.addon','xbmc.json','xbmc.python']
     try:
         readxml = Text_File(os.path.join(addon_path,'addon.xml'),'r')
         dmatch   = re.compile('import addon="(.+?)"').findall(readxml)
         for requires in dmatch:
-            if not 'xbmc.python' in requires and not requires in depfiles:
+            if not requires in exclude_list and not requires in depfiles:
                 depfiles.append(requires)
     except:
         pass
@@ -459,8 +463,8 @@ koding.Text_Box('Modules required for %s'%current_id,clean_text)
     import xbmcaddon
     import re
     from filetools import Text_File
-    ADDONS = xbmc.translatePath('special://home/addons')
-    depfiles = []
+    ADDONS       = xbmc.translatePath('special://home/addons')
+    depfiles     = []
 
     if addon_id == 'all':
         for name in os.listdir(ADDONS):

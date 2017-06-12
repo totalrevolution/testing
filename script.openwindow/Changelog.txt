@@ -1,3 +1,6 @@
+v.2.9.9.5:
+- Fixed keyword and social tv menus
+
 v.2.9.9.4:
 - Added better error reporting when in debug mode.
 

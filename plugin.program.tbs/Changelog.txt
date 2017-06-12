@@ -1,3 +1,6 @@
+v.4.2.7:
+- Small tidy up for new server stuff
+
 v.4.2.6.2:
 - Fixed open_url statements so they use proper posts (sf installs especially)
 
