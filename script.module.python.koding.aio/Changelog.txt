@@ -1,3 +1,6 @@
+v.0.9.3.1:
+- Fixed indentation error in database module
+
 v.0.9.3:
 - fixed a bug with remove_from_table
 - added reset_db function to use when running into threading error with sqlite

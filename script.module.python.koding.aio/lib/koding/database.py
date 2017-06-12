@@ -436,7 +436,7 @@ os.remove(addon_db_path)
 #----------------------------------------------------------------
 # TUTORIAL #
 def Remove_Table(table):
-"""
+    """
 Use with caution, this will completely remove a database table and
 all of it's contents. The only database you can access with this command
 is your add-ons own db file called database.db
