@@ -991,6 +991,8 @@ def Get_Video():
 # Run social update command to check for any updates
 @route(mode='grab_updates', args=['url','runtype'])
 def Grab_Updates(url, runtype = ''):
+    dolog('GRAB_UPDATES - URL: %s'%url)
+    dolog('GRAB_UPDATES - RUNTYPE: %s'%runtype)
     if runtype != 'ignoreplayer':
         isplaying = xbmc.Player().isPlaying()
         while isplaying:
@@ -1018,8 +1020,8 @@ def Grab_Updates(url, runtype = ''):
         while mysuccess != 1 and failed != 1:
 
             try:
-                dolog("### URL: "+url+encryptme('e',urlparams))
-                link = Open_URL(post_type='post',url=url,payload={"x":encryptme('e',urlparams),"z":"c"})
+                dolog("### URL: "+url+'?'+encryptme('e',urlparams))
+                link = Open_URL(url=url,post_type='post',payload={"x":encryptme('e',urlparams),"z":"c"})
                 if link != '' and not 'sleep' in link:
                     link = encryptme('d',link).replace('\n',';').replace('|_|',' ').replace('|!|','\n').replace('http://venztech.com/repo_jpegs/',BASE+'repo_jpegs/')
                 try:
@@ -1186,13 +1188,18 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
         shares_contenturl   = []
         urlparams           = URL_Params()
 
+# HAD TO REVERT BACK TO OLD OPEN_URL2 METHOD FOR THIS FUNCTION, SOMETHING CURRENTLY OFF WITH PYTHON KODING REQUESTS METHOD
+
 #    try:
         for item in choices:
-            dolog(BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))))
-            sharelist_URL  = BASE+'boxer/cat_search_live.php'
-            content_list   = Open_URL(post_type='post',url=sharelist_URL,payload={"x":encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))} )
+            xbmc.log('CHOICE: %s' % item)
+            if debug == 'true':
+                xbmc.log(BASE+'boxer/cat_search_live.php?x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))))
+            sharelist_URL  = BASE+'boxer/cat_search_live.php?x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item])))
+            content_list   = Open_URL2(sharelist_URL)
             clean_link     = encryptme('d',content_list)
-            dolog('#### %s' % clean_link)
+            if debug == 'true':
+                xbmc.log('#### %s' % clean_link)
 
 # Grab all the shares which match the master sub-category
             match = re.compile('n="(.+?)"t="(.+?)"d="(.+?)"l="(.+?)"', re.DOTALL).findall(clean_link)
@@ -1204,7 +1211,7 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
 
 # If we have more than one item in the list we present them so the user can select which one they want installed
             if len(shares_contentarray) > 1:
-                choice = Select_Dialog('Select share for [COLOR=dodgerblue]%s[/COLOR]' % contentarray[item].replace('ADD ',''), shares_contentarray)
+                choice = dialog.select('Select share for [COLOR=dodgerblue]%s[/COLOR]' % contentarray[item].replace('ADD ',''), shares_contentarray)
                 install_share = shares_contenturl[choice]
 
             else:
@@ -1213,7 +1220,7 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
 # Remove any matching menu items previously installed from different boxes
             if len(shares_contentarray)>0:
                 for item in shares_contentarray:
-                    dolog('### Removing any old instances of %s' % item)
+                    xbmc.log('### Removing any old instances of %s' % item)
                     if item.startswith('Add'):
                         item         = 'Remove'+item[3:]
                     change_text  = re.compile(' to the (.+?)Menu').findall(item)[0]
@@ -1222,12 +1229,12 @@ def Install_Shares(function, menutype, menu, choices, contentarray = '', imagear
                     item         = item.replace(' to the %s' % change_text, '%'+' from the %s' % change_text)
                     if 'by box' in item:
                         change_text2 = re.compile('by box (.+?)from').findall(item)[0]
-                        dolog('by box: %s' % change_text2)
+                        xbmc.log('by box: %s' % change_text2)
                         item         = item.replace(change_text2, '%')
                     Remove_Menu('from_the_%s_menu' % change_text.lower().replace(' ', '_'), item)
 #            content_list   = Open_URL2(sharelist_URL)
 
-                Open_URL(post_type='post',url=install_share)
+                Open_URL2(install_share)
 
 # Clean the arrays so they don't show old data
             del shares_contentarray[:]
@@ -1973,6 +1980,20 @@ def Open_Message(contents={}):
                     Run_Code(url="boxer/User_Reject_Request.php",payload={"x":urlparams,"n":username,"e":email,"p":password,"f":encryptme('e',sender)} )
                 elif choice2 == 0:
                     Run_Code(url="boxer/User_Ignore_Request.php",payload={"x":urlparams,"n":username,"e":email,"p":password,"f":encryptme('e',sender)} )
+#-----------------------------------------------------------------------------------------------------------------
+## Function to open a URL, try 3 times then respond with blank
+def Open_URL2(url):
+    if debug == 'true':
+        xbmc.log(url)
+    req = urllib2.Request(url)
+    req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+    response = urllib2.urlopen(req, timeout = 10)
+    if response != '':
+        link     = response.read()
+        response.close()
+        return link.replace('\r','').replace('\n','').replace('\t','')
+    else:
+        return response
 #---------------------------------------------------------------------------------------------------
 # Check if system is OE or LE
 def OpenELEC_Check():
@@ -2205,7 +2226,7 @@ def Remove_Menu(function, menutype = ''):
     contenturl   = []
     urlparams = URL_Params()
     dolog('### OPENING URL TO GRAB DETAILS OF WHAT TO REMOVE:')
-    dolog(BASE+'boxer/cat_search_live.php?&x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))))
+    dolog(BASE+'boxer/cat_search_live.php?x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))))
     content_list   = Open_URL(post_type='post',url=BASE+'boxer/cat_search_live.php',payload={"x":encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))})
     clean_link     = encryptme('d',content_list)
     dolog('#### RETURN: %s' % clean_link)

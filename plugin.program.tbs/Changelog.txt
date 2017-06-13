@@ -1,3 +1,6 @@
+V.4.2.8:
+- Fixed install of multiple SF Social Shares, had to revert back to old Open_URL2 method.
+
 v.4.2.7:
 - Small tidy up for new server stuff
 
