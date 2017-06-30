@@ -29,14 +29,18 @@ import filetools
 
 #----------------------------------------------------------------
 # TUTORIAL #
-def Addon_Genre(genre='adult'):
+def Addon_Genre(genre='adult',custom_url=''):
     """
 [COLOR=gold]PREMIUM FEATURE FOR ADDONS EXCLUSIVELY SUPPORTED AT NOOBSANDNERDS[/COLOR]
 If you'd like to hook into this please take a look at the README.
 
+Please Note: Although this hooks into the NaN framework to pull genres you can use this without
+having to hook into their framework if you have a custom url which returns results in the same format.
+Your url must return a dictionary of items in this format: {"addon_name":"addon_id","addon_name_2":"addon_id_2"}
+
 Return a dictionary of add-ons which match a specific genre.
 
-CODE: Addon_Genre([genre])
+CODE: Addon_Genre([genre, custom_url])
 
 AVAILABLE PARAMS:
     
@@ -48,6 +52,9 @@ AVAILABLE PARAMS:
     "Dev Tools" you'll see the url shows as 'devtools' and that's what you'd
     send through to this function if you only wanted those to show.
     http://noobsandnerds.com/addons/category/genres/
+
+    custom_url  -  If you have your own custom url which returns genres
+    you can enter it here and use that rather than rely on NaN categorisation.
 
 EXAMPLE CODE:
 space_addons = koding.Addon_Genre(genre='space')
@@ -64,22 +71,42 @@ if space_addons:
     from __init__       import Main
     from filetools      import Text_File
     from systemtools    import Timestamp
+    from web            import Open_URL
     
-    xbmc.log('ADDON GENRE: %s'%genre)
-    dialog = xbmcgui.Dialog()
-    local_path = binascii.hexlify(genre)
-    final_path = xbmc.translatePath('special://profile/addon_data/script.module.python.koding.aio/cookies/%s'%local_path)
+    dialog      = xbmcgui.Dialog()
+    local_path  = binascii.hexlify(genre)
+    cookie_path = xbmc.translatePath("special://profile/addon_data/script.module.python.koding.aio/cookies/")
+    final_path  = os.path.join(cookie_path,local_path)
+    if not os.path.exists(cookie_path):
+        os.makedirs(cookie_path)
+
     if os.path.exists(final_path):
         modified = os.path.getmtime(final_path)
         old = int(modified)
         now = int(Timestamp('epoch'))
 # Add a 24hr wait so we don't kill server
         if now > (modified+86400):
-            Main('addon_list|g:%s'%genre)
+            if custom_url == '':
+                Main('addon_list|g:%s'%genre)
+            else:
+                addon_list = Open_URL(custom_url)
+                try:
+                    addon_list = eval(addon_list)
+                    Text_File(final_path,"w",binascii.hexlify(str(addon_list)) )
+                except:
+                    pass
 
 # Create new file if it doesn't exist
     else:
-        Main('addon_list|g:%s'%genre)
+        if custom_url == '':
+            Main('addon_list|g:%s'%genre)
+        else:
+            addon_list = Open_URL(custom_url)
+            try:
+                addon_list = eval(addon_list)
+                Text_File(final_path,"w",binascii.hexlify(str(addon_list)) )
+            except:
+                pass
 
     if os.path.exists(final_path):
         try:
@@ -123,82 +150,10 @@ dialog.ok('NAME AND VERSION','[COLOR=dodgerblue]Add-on Name:[/COLOR] %s' % name,
     else:
         return ADDON.getAddonInfo(id=id)
 #----------------------------------------------------------------
-# TUTORIAL #
 def Addon_Install(addon_id,confirm=True,silent=0,repo_install=1):
-    """
-[COLOR=gold]PREMIUM FEATURE FOR ADDONS EXCLUSIVELY SUPPORTED AT NOOBSANDNERDS[/COLOR]
-If you'd like to hook into this please take a look at the README.
-
-Install an add-on and all dependencies matching the version of Kodi
-you're currently running. If the add-on install takes a while to kick
-in (spinning wheel) it just means that particular add-on hasn't yet
-been cached in the db, the next time someone hits that add-on it will be instant.
-
-CODE: Addon_Install(addon_id, [confirm, silent, repo_install])
-
-AVAILABLE PARAMS:
-    
-    addon_id  -  This is the add-on id you want to install.
-    The Add-on Portal will be scanned for an add-on and all the
-    dependencies will also be scanned. A list of possible download
-    locations are then populated server side and the best ones which
-    match your needs are installed (matching dependencies with your
-    current running version of Kodi to make sure bad modules aren't
-    installed).
-
-    confirm  -  By default this is set to True which means the user
-    will get a choice of whether to install the add-on or not. Set to
-    false if you want to force this add-on without any dialogs.
-
-    silent  -  By default this is set to False which means there will
-    always be a dialog appear showing the install process. Set this to
-    True if you'd prefer to silently auto install the content.
-        
-    repo_install  -  This will allow you to automatically install the
-    relevant repo, offer to install the repo or do not install the repo.
-    See the available values below.
-    
-    The team at NaN take great care to try and make sure the relevant
-    add-ons are matched against the official developers repo and the
-    daily script which scans repositories also does a lot of clever
-    assignment processes. However due to the sheer amount of
-    "developers" re-uploading others content there's always a chance
-    an add-on may get marked up against the wrong repo. If you notice
-    an add-on is marked against the wrong repo please consider updating
-    the details via the Add-on Portal (EDIT ADDON button) or notifying
-    a member of the team at the nooobsandnerds forum and they can
-    manually get it rectified. Thank you.
-
-    AVAILABLE VALUES:
-
-        0 - This will not install the repo the add-on was found on.
-
-        1 - This will automatically install the repo the add-on is found on.
-        If you don't send through a value this will be used as the default.
-        
-        2 - This will ask user if they want to install the repo the add-on was found on.
-
-EXAMPLE CODE:
-dialog.ok('INSTALL NAN TUTORIALS','We will now attempt to install NaN Tutorials add-on.')
-if os.path.exists(xbmc.translatePath('special://home/addons/plugin.video.nantus')):
-    dialog.ok('ALREADY INSTALLED','We cannot install NaN Tutorials as it\'s already installed!')
-else:
-    koding.Addon_Install(addon_id='plugin.video.nantuts',confirm=True,silent=0,repo_install=1)
-~"""
-    from __init__ import Main
-    if silent == True:
-        silent = 1
-    elif silent == False:
-        silent = 0
-
-    if confirm == True:
-        confirm = 2
-    else:
-        confirm = 0
-
-    kodi_version = str(xbmc.getInfoLabel("System.BuildVersion")[:2])
-    Main('addoninstall|id:%s~version:%s~repo:%s~silent:%s~installtype:%s' % (addon_id, kodi_version, repo_install, silent, confirm))
-
+    xbmc.log('### DUE TO SERVER PROBLEMS AT NAN THE ADDON INSTALL FUNCTION YOU\'VE ATTEMPTED TO CALL IS CURRENTLY DISABLED. PLEASE REMOVE FROM YOUR CODE.',2)
+    xbmc.log('### AT THIS MOMENT IN TIME IT\'S UNSURE WHETHER OR NOT THIS FUNCTION WILL BE GETTING ADDED BACK TO PYTHON KODING OR NOT - SORRY FOR ANY INCONVENIENCE.',2)
+    pass
 #----------------------------------------------------------------
 # TUTORIAL #
 def Addon_List(enabled=True, inc_new=False):
@@ -295,6 +250,57 @@ else:
         return mysetting
     else:
         ADDON.setSetting(id=setting, value=value)
+#----------------------------------------------------------------
+# TUTORIAL #
+def Adult_Toggle(adult_list=[],disable=True):
+    """
+Remove/Enable a list of add-ons, these are put into a containment area until enabled again.
+
+CODE: Adult_Toggle(adult_list, [disable])
+
+AVAILABLE PARAMS:
+            
+    (*) adult_list  -  A list containing all the add-ons you want to be disabled.
+
+    disable  -  By default this is set to true so any add-ons in the list sent
+    through will be disabled. Set to False if you want to enable the hidden add-ons.
+~"""
+    from filetools   import Move_Tree
+    from systemtools import End_Path
+
+    ADDONS = xbmc.translatePath('special://home/addons')
+    adult_store = xbmc.translatePath("special://profile/addon_data/script.module.python.koding.aio/adult_store")
+    if not os.path.exists(adult_store):
+        os.makedirs(adult_store)
+    my_addons = Installed_Addons()
+    if disable:
+        for item in my_addons:
+            if item != None:
+                item = item["addonid"]
+                if item in adult_list:
+                    try:
+                        addon_path = xbmcaddon.Addon(id=item).getAddonInfo("path")
+                    except:
+                        addon_path = os.path.join(ADDONS,item)
+                    Toggle_Addons(addon=item, enable=False, safe_mode=False, refresh=True)
+                    path_id = End_Path(addon_path)
+                    if os.path.exists(addon_path):
+                        Move_Tree(addon_path,os.path.join(adult_store,path_id))
+    else:
+        KODI_VER    = int(float(xbmc.getInfoLabel("System.BuildVersion")[:2]))
+        ADDONS      = xbmc.translatePath('special://home/addons')
+        addon_vault = []
+        if os.path.exists(adult_store):
+            for item in os.listdir(adult_store):
+                store_dir = os.path.join(adult_store,item)
+                addon_dir = os.path.join(ADDONS, item)
+                if os.path.isdir(store_dir):
+                    Move_Tree(store_dir,addon_dir)
+                    addon_vault.append(item)
+        if KODI_VER >= 16:
+            Toggle_Addons(addon=addon_vault, safe_mode=True, refresh=True)
+        else:
+            Refresh(['addons','repos'])
 #----------------------------------------------------------------
 # TUTORIAL #
 def Caller(my_return='addon'):
