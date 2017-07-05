@@ -1,3 +1,62 @@
+v.4.3.6.7:
+- Reverted last change, not sure if it's that or python koding causing problem on Android
+
+v.4.3.6.6:
+- Added sleep and busy dialog to addon install
+
+v.4.3.6.5:
+- Added option to enable all disabled add-ons
+- New method of installing SF Shares added. System now downloads current
+repo add-ons are hosted on rather than what "was" the official repo. To use this
+new method old SF XML files will need re-uploading via admin panel.
+
+v.4.3.6.4:
+- Fixed url encoded strings appearing in ADD CONTENT > Favourites section
+- Fixed IP Lookup function
+- Fixed System Version function
+- Fixed Clean System sections
+- Added confirm dialog to Force Updates option
+
+v.4.3.6.3:
+- Fixed bug with doing full backup where files don't exist
+
+v.4.3.6.1:
+- New keyword system in place, requires registration
+- Added ability to install addons in the dialog popup menu on homescreen
+- Fixed up various bugs with resetting menus to defaults
+
+v.4.3.6:
+- Added option to reset all menus to factory defaults
+- Added option to reset all main menus to defaults
+- Added option to reset all submenus to defaults
+- Added option to reset individual main menu items to defaults
+- Fixed the adding of add-ons to menus
+
+v.4.3.5:
+- Added support for submenus to be SF or DIALOG
+
+v.4.3.4:
+- Fixed string for fw updates
+- Added more WIP stuff for addon installs
+
+v.4.3.3:
+- Fixed bug with custom menus not re-enabling on some units
+- Lots of WIP stuff almost complete with addon installs
+
+v.4.3.2:
+- Added correct sleep for keyword install along with busy dialog
+
+v.4.3.1:
+- Fixed adult not being disabled on startup
+
+v.4.3.0:
+- Fixed typo causing genre lookup to fail
+- Added option to force a re-check of all social update items
+
+v.4.2.9:
+- Fixed enable/disable xxx in maintenance
+- Fixed genre/adult filter so no longer relies fully on NaN
+
 V.4.2.8:
 - Fixed install of multiple SF Social Shares, had to revert back to old Open_URL2 method.
 

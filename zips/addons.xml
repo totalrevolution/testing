@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.2.8">
+<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.3.6.7">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -21,7 +21,7 @@
 		<summary lang="en">Maintenance - powered by TotalRevolution</summary>
 		<description>Your one stop add-on for everything you could possibly need.</description>
 		<platform>all</platform>
-		<news>Fixed for new server</news>
+		<news>New keyword backup system</news>
 	</extension>
 </addon>
 
@@ -46,7 +46,7 @@
 
 <addon id="script.module.python.koding.aio"
    name="Python Koding AIO"
-   version="0.9.6.3"
+   version="0.9.6.4"
    provider-name="TotalRevolution, noobsandnerds">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
