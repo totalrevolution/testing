@@ -178,7 +178,7 @@ def CPU_Check():
 #-----------------------------------------------------------------------------
 # Enable/disable the visibility of adult add-ons (use true or false)
 def Enable_Addons(updaterepos = True):
-    mylist = Addon_Genre()
+    mylist = Addon_Genre(custom_url=BASE+'boxer/masterscripts/addon_list.php&g=adult')
     xbmc.executebuiltin('UpdateLocalAddons')
     dolog('UPDATED LOCAL ADDONS')
     if updaterepos:
@@ -476,84 +476,86 @@ def Main_Run():
         local_size   = 0
 
 # If connected to the internet we do the updates
-        try:
-            link = Open_URL(url=BASE+'boxer/update.php',post_type='post',payload={"x":Get_Params(),"v":XBMC_VERSION}).replace('\r','').replace('\n','').replace('\t','')
-            link = Encrypt('d',link)
-            update_array = re.compile('p="(.+?)"').findall(link)
-            for item in update_array:
-                path, size, oem = item.split('|')
-                if path != '':
-                    root_path  = path.split('/')
-                    if root_path[-1] == '':
-                        root_path.pop()
+        # try:
+        link = Open_URL(url=BASE+'boxer/update.php',post_type='post',payload={"x":Get_Params(),"v":XBMC_VERSION}).replace('\r','').replace('\n','').replace('\t','')
+        dolog('### CHECKING UPDATE FILES: %s'%BASE+'boxer/update.php?x='+Get_Params()+'&v='+XBMC_VERSION)
+        link = Encrypt('d',link)
+        update_array = re.compile('p="(.+?)"').findall(link)
+        dolog(repr(update_array))
+        for item in update_array:
+            dolog('CHECKING: %s'%item)
+            path, size, oem = item.split('|')
+            if path != '':
+                root_path  = path.split('/')
+                if root_path[-1] == '':
                     root_path.pop()
-                    final_path = HOME
-                    for item in root_path:
-                        final_path = os.path.join(final_path,item)
-                    if not os.path.exists(final_path):
-                        os.makedirs(final_path)
-                    local_path = os.path.join(HOME, path)
+                root_path.pop()
+                final_path = HOME
+                for item in root_path:
+                    final_path = os.path.join(final_path,item)
+                if not os.path.exists(final_path):
+                    os.makedirs(final_path)
+                local_path = os.path.join(HOME, path)
+            
+                if os.path.exists(local_path) and not '~~ZIPS~~' in path:
+                    local_size = os.path.getsize(os.path.join(local_path))
                 
-                    if os.path.exists(local_path) and not '~~ZIPS~~' in path:
-                        local_size = os.path.getsize(os.path.join(local_path))
-                    
-                    if str(local_size) != str(size) and not '~~ZIPS~~' in path:
-                        dolog('## UPDATING %s' % path)
-                        if path.endswith('.xml') and 'skin.' in path:
-                            refresh_skin = True
-                        Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path],kill_time=600,show_busy=False)
+                if str(local_size) != str(size) and not '~~ZIPS~~' in path:
+                    dolog('## UPDATING %s' % path)
+                    if path.endswith('.xml') and 'skin.' in path:
+                        refresh_skin = True
+                    Sleep_If_Function_Active(function=Install_Content, args=[oem, path, local_path],kill_time=600,show_busy=False)
 
-                    elif '~~ZIPS~~' in path:
-                        dolog('### DOING ZIP CHECK')
-                        Sleep_If_Function_Active(function=Check_Zips, args=[path, size, oem, local_path],kill_time=600,show_busy=False)
+                elif '~~ZIPS~~' in path:
+                    Sleep_If_Function_Active(function=Check_Zips, args=[path, size, oem, local_path],kill_time=600,show_busy=False)
 
-            if not startup:
-                xbmc.executebuiltin("Dialog.Close(busydialog)")
-            dolog('### ALL UPDATES COMPLETE')
+        if not startup:
+            xbmc.executebuiltin("Dialog.Close(busydialog)")
+        dolog('### ALL UPDATES COMPLETE')
 
 # Loop through the APK folders and install content
-            if xbmc.getCondVisibility('System.Platform.Android'):
-                try:
-                    xbmc.log('### System is android, checking apk installs')
-                    if os.path.exists(APK_FILES):
-                        APK_Install_Loop()
-                    if os.path.exists('/sdcard/Android/data/') and os.path.exists(APK_DATA):
-                        Move_Tree(APK_DATA,'/sdcard/Android/data/')
-                except Exception as e:
-                    dolog('Error: %s' % e)
+        if xbmc.getCondVisibility('System.Platform.Android'):
+            try:
+                xbmc.log('### System is android, checking apk installs')
+                if os.path.exists(APK_FILES):
+                    APK_Install_Loop()
+                if os.path.exists('/sdcard/Android/data/') and os.path.exists(APK_DATA):
+                    Move_Tree(APK_DATA,'/sdcard/Android/data/')
+            except Exception as e:
+                dolog('Error: %s' % e)
 
 # Loop through the addons folder enabling all that aren't adult
-            # if not os.path.exists(RUN_WIZARD):
-            Enable_Addons()
-            
+        # if not os.path.exists(RUN_WIZARD):
+        Enable_Addons()
+        
 # If custom code exists we run it
-            custom_code = xbmc.translatePath('special://home/userdata/custom_code.py')
-            if os.path.exists(custom_code):
-                dolog('#### CUSTOM CODE RUNNING: %s'%custom_code)
-                runcode = Text_File(custom_code,'r')
-                try:
-                    exec(runcode)
-                except Exception as e:
-                    dolog('Error running custom code: %s' % e)
-                os.remove(custom_code)
+        custom_code = xbmc.translatePath('special://home/userdata/custom_code.py')
+        if os.path.exists(custom_code):
+            dolog('#### CUSTOM CODE RUNNING: %s'%custom_code)
+            runcode = Text_File(custom_code,'r')
+            try:
+                exec(runcode)
+            except Exception as e:
+                dolog('Error running custom code: %s' % e)
+            os.remove(custom_code)
 
 # Create the install_complete directory, the main install process will wait for this until continuing.
-            if os.path.exists(RUN_WIZARD):
-                try:
-                    os.makedirs(INSTALL_COMPLETE)
-                    dolog('### Created install_complete folder')
-                except:
-                    dolog('### Failed to create install_complete folder')
+        if os.path.exists(RUN_WIZARD):
+            try:
+                os.makedirs(INSTALL_COMPLETE)
+                dolog('### Created install_complete folder')
+            except:
+                dolog('### Failed to create install_complete folder')
 
-            if dpmode:
-                try:
-                    os.makedirs(KEYWORD_TEMP)
-                except Exception as e:
-                    dolog('### Error: %s' % e)
+        if dpmode:
+            try:
+                os.makedirs(KEYWORD_TEMP)
+            except Exception as e:
+                dolog('### Error: %s' % e)
 
 # If it failed with update commands print error to log
-        except:
-            dolog(Last_Error())
+        # except:
+        #     dolog(Last_Error())
 #-----------------------------------------------------------------------------
 # Return the ethernet mac if it exists, if not return the wifi mac
 def My_Mac():
@@ -574,14 +576,20 @@ def Set_New_Settings():
             Set_Setting(setting, 'kodi_setting', value)
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
-    xbmcgui.Window(10000).setProperty('TBS_Running', 'true')
-    Main_Run()
+    xbmc.log('LEN SYS.ARGV: %s'%len(sys.argv),2)
+    if len(sys.argv) == 2:
+        if sys.argv[1] == 'check_license':
+            dolog('### RUNNING LICENSE CHECK')
+            Check_License()
+    else:
+        xbmcgui.Window(10000).setProperty('TBS_Running', 'true')
+        Sleep_If_Function_Active(function=Main_Run,kill_time=600)
 
-# Re-run the update check if addons have been downloaded so custom files can be reinstalled.
-    if rerun_main:
-        Main_Run()
-    current_window = System(command='Window.Property(xmlfile)',function='info')
-    if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')) and current_window == 'Home.xml' and refresh_skin:
-        xbmc.log('refreshing skin',2)
-        Refresh(r_mode='skin')
-    xbmcgui.Window(10000).clearProperty('TBS_Running')
+    # Re-run the update check if addons have been downloaded so custom files can be reinstalled.
+        if rerun_main:
+            Main_Run()
+        current_window = System(command='Window.Property(xmlfile)',function='info')
+        if not os.path.exists(os.path.join(ADDONS,'packages','target.zip')) and current_window == 'Home.xml' and refresh_skin:
+            xbmc.log('refreshing skin',2)
+            Refresh(r_mode='skin')
+        xbmcgui.Window(10000).clearProperty('TBS_Running')

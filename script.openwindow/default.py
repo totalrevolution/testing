@@ -46,6 +46,8 @@ ADDONS                     = os.path.join(HOME,'addons')
 PACKAGES                   = os.path.join(ADDONS,'packages')
 ADDON_DATA                 = xbmc.translatePath('special://profile/addon_data')
 ADDON_PATH                 = xbmcaddon.Addon(ADDONID).getAddonInfo("path")
+AUTOEXEC                   = xbmc.translatePath('special://home/userdata/autoexec.py')
+AUTOEXEC_PATH              = os.path.join(ADDON_PATH,'resources','autoexec.py')
 LANGUAGE_PATH              = os.path.join(ADDON_PATH,'resources','language')
 OPENWINDOW_DATA            = os.path.join(ADDON_DATA,ADDONID)
 RUN_WIZARD                 = os.path.join(OPENWINDOW_DATA,'RUN_WIZARD')
@@ -153,7 +155,7 @@ def show(xmlfile,exec_file):
             url_return = Encrypt('d', url_return)
             exec(url_return)            
 #-----------------------------------------------------------------------------
-# Show the keyword install menu
+# Show the Android audio menu
 def Select_Audio_Android():
     backpage    = Pages('back','Select_Audio_Android()')
     nextpage    = Pages('next','Select_Audio_Android()')
@@ -1247,103 +1249,7 @@ def Installed_Addons(types='unknown', content ='unknown', properties = ''):
 #-----------------------------------------------------------------------------
 # Search for an item on urlshortbot and install it, can switch oems and call the keyword.php file for restoring backups (WIP)
 def Keyword_Search():
-    if not os.path.exists(PACKAGES):
-        os.makedirs(PACKAGES)
-    counter = 0
-    success = 0
-    downloadurl = ''
-    keyword     =  Keyboard(String(30031))
-    if keyword == 'masteron':
-        ADDON2.setSetting('master','true')
-        return
-    if keyword == 'masteroff':
-        ADDON2.setSetting('master','false')
-        return
-    if keyword == 'uidoff':
-        ADDON2.setSetting('userid','')
-        return
-    if keyword.startswith('uid'):
-        idsetting = keyword.replace('uid','')
-        ADDON2.setSetting('userid', Encrypt('e',idsetting))
-        return
-    elif keyword != '':
-        url='http://urlshortbot.com/totalrevolution'
-        if os.path.exists(KEYWORD_FILE):
-            url  = Text_File(KEYWORD_FILE,'r')
-        downloadurl = url+keyword
-        lib         = os.path.join(PACKAGES, keyword+'.zip')
-        urlparams   = Get_Params()
-        if urlparams != 'Unknown':
-            dp.create('Contacting Server','Attempt: 1', '', 'Please wait...')
-            while counter <3 and success == 0:
-                counter += 1
-                dp.update(0,'Attempt: '+str(counter), '', 'Please wait...')
-            if keyword.startswith('switchme'):
-                keywordoem = keyword.replace('switchme','')
-                try:
-                    link = Open_URL(url=BASE+'boxer/addtooem.php',post_type='post',payload={"x":urlparams,"o":Encrypt('e',keywordoem)})
-                except:
-                    link = 'fail'
-            else:
-                try:
-                    link = Open_URL(url=BASE+'boxer/keyword.php',post_type='post',payload={"x":urlparams,"k":Encrypt('e',keyword)})
-                except:
-                    link = 'fail'
-            dolog('LINK STATUS: %s'%link)
-            if link != False and 'Success' in link:
-                success = 1
-                dp.close()
-                if os.path.exists(xbmc.translatePath('special://home/addons/script.openwindow/functions.py')):
-                    xbmc.executebuiltin('RunScript(special://home/addons/script.openwindow/functions.py)')
-                elif os.path.exists(xbmc.translatePath('special://xbmc/addons/script.openwindow/functions.py')):
-                    xbmc.executebuiltin('RunScript(special://xbmc/addons/script.openwindow/functions.py)')
-                DIALOG.ok(String(30023),String(30086))
-            if success == 0 and keyword !='':
-                try:
-                    dolog("Attempting download "+downloadurl+" to "+lib)
-                    dp.create('KEYWORD INSTALLER', 'Downloading', '', '')
-                    Download(downloadurl,lib,dp)
-                    dolog("### Keyword "+keyword+" Successfully downloaded")
-                    dp.update(0,"", "Extracting Zip Please Wait")
-                
-                    if zipfile.is_zipfile(lib):
-                    
-                        try:
-                            Sleep_If_Function_Active(function=Extract, args=[lib, HOME, dp])
-                            dolog('## %s EXTRACTED SUCCESSFULLY' % keyword)
-                            
-                            xbmc.executebuiltin('RunScript(special://home/addons/script.openwindow/functions.py,dp)')
-                            kw_temp = xbmc.translatePath('special://profile/addon_data/script.openwindow/keyword_installed')
-                            keyword_installed = os.path.exists(kw_temp)
-                            while not keyword_installed:
-                                xbmc.sleep(1000)
-                                keyword_installed = os.path.exists(kw_temp)
-                            dialog.ok("KEYWORD INSTALLER", "","Congratulations your content has now been installed")
-                            shutil.rmtree(kw_temp)
-                            dp.close()
-                        except Exception as e:
-                            dolog("### Unable to install keyword (%s): %s" % (keyword, e))
-
-                    else:
-                        try:
-                            if os.path.getsize(KEYWORD_ZIP) > 100000:
-                                dp.create(String(30038),String(30039),'',String(30034))
-                                os.rename(KEYWORD_ZIP,restore_dir+'20150815123607.tar')
-                                dp.update(0,"",String(30040))
-                                dp.close()
-                                xbmc.executebuiltin('reboot')
-# If file downloaded is neither a zip or a tar then remove and give error message
-                            else:
-                                DIALOG.ok(String(30041),String(30042),String(30043))
-                        except:
-                            DIALOG.ok(String(30041),String(30042),String(30043))
-                    
-                except:
-                    DIALOG.ok(String(30041),String(30042),String(30043))
-
-            if os.path.exists(lib):
-                os.remove(lib)
-            dp.close()
+    xbmc.executebuiltin('RunPlugin(plugin://plugin.program.tbs/?mode=keywords)')
 #-----------------------------------------------------------------------------
 # Reload the current running profile
 def Load_Profile():
@@ -1750,6 +1656,8 @@ def WiFi_Check():
             Load_Profile()
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
+    if not os.path.exists(AUTOEXEC):
+        shutil.copyfile(AUTOEXEC_PATH,AUTOEXEC)
 # Create the initial folders required for add-on to work
     if not os.path.exists(PACKAGES):
         os.makedirs(PACKAGES)

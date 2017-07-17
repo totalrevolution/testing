@@ -1,3 +1,13 @@
+v.2.9.9.8:
+- Added reload of skin to autoexec.py
+
+v.2.9.9.7:
+- Auto creation of autoexec.py
+- Integration of new keyword system
+
+v.2.9.9.6:
+- Fixed adult/genre filter
+
 v.2.9.9.5:
 - Fixed keyword and social tv menus
 
