@@ -39,6 +39,7 @@ APK_DATA            = os.path.join(USERDATA,'APK_DATA')
 APK_FILES           = os.path.join(USERDATA,'APK_FILES')
 OPENWINDOW_DATA     = os.path.join(ADDON_DATA,ADDONID)
 TBS_DATA            = os.path.join(ADDON_DATA,ADDON_ID)
+REDIRECTS           = os.path.join(TBS_DATA,'redirects')
 UPDATE_ICON         = os.path.join(ADDONS,ADDON_ID,'resources','update.png')
 INSTALL_COMPLETE    = os.path.join(OPENWINDOW_DATA,'INSTALL_COMPLETE')
 RUN_WIZARD          = os.path.join(OPENWINDOW_DATA,'RUN_WIZARD')
@@ -399,6 +400,12 @@ def Install_Content(oem,path,local_path,local_size='',new_size='',content=''):
 
         if not '~~ZIPS~~' in path and path != '':
             dolog('### UPDATED: %s' % path)
+            if local_path.endswith('skin.txt'):
+                command = Text_File(local_path,'r')
+                try:
+                    exec(command)
+                except:
+                    dolog( Last_Error() )
         
         else:
             dolog('## ATTEMPTING TO EXTRACT ZIP: %s' % path)
@@ -576,14 +583,20 @@ def Set_New_Settings():
             Set_Setting(setting, 'kodi_setting', value)
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
-    xbmc.log('LEN SYS.ARGV: %s'%len(sys.argv),2)
-    if len(sys.argv) == 2:
-        if sys.argv[1] == 'check_license':
-            dolog('### RUNNING LICENSE CHECK')
-            Check_License()
+    runtype = ''
+    if len(sys.argv) > 1:
+        runtype = sys.argv[1]
+    if runtype == 'check_license':
+        dolog('### RUNNING LICENSE CHECK')
+        Check_License()
     else:
         xbmcgui.Window(10000).setProperty('TBS_Running', 'true')
-        Sleep_If_Function_Active(function=Main_Run,kill_time=600)
+        dolog('RUN TYPE: %s'%runtype)
+        if runtype == 'silent':
+            Sleep_If_Function_Active(function=Main_Run,kill_time=600,show_busy=False)
+            dolog('FINISHED MAIN RUN')
+        else:
+            Sleep_If_Function_Active(function=Main_Run,kill_time=600)
 
     # Re-run the update check if addons have been downloaded so custom files can be reinstalled.
         if rerun_main:

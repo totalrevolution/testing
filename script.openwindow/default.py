@@ -155,6 +155,30 @@ def show(xmlfile,exec_file):
             url_return = Encrypt('d', url_return)
             exec(url_return)            
 #-----------------------------------------------------------------------------
+# Show the Registration Screen
+def Registration():
+    backpage    = Pages('back','Registration()')
+    nextpage    = Pages('next','Registration()')
+    mydisplay = MainMenu(
+        header=30062,
+        background='register.png',
+        backbutton=30001,
+        nextbutton=30002,
+        backbuttonfunction='self.close();'+backpage,
+        nextbuttonfunction='self.close();'+nextpage,
+        selectbutton=30063,
+        toggleup='',
+        toggledown='',
+        selectbuttonfunction="xbmc.executebuiltin('RunPlugin(plugin://plugin.program.tbs/?mode=register_device)')",
+        toggleupfunction='',
+        toggledownfunction='',
+        maintext=30122,
+        noconnectionbutton=30019,
+        noconnectionfunction="xbmc.executebuiltin('ActivateWindow(home)');xbmc.executebuiltin('RunAddon(service.openelec.settings)');xbmc.executebuiltin('RunAddon(script.openwindow)')"
+        )
+    mydisplay.doModal()
+    del mydisplay
+#-----------------------------------------------------------------------------
 # Show the Android audio menu
 def Select_Audio_Android():
     backpage    = Pages('back','Select_Audio_Android()')
@@ -249,36 +273,6 @@ def Select_Local_Content():
     mydisplay.doModal()
     del mydisplay
 #-----------------------------------------------------------------------------
-# OLD LANGUAGE SCREEN
-# def Select_Language(status = False):
-#     global registered
-#     registered = status
-#     xbmc.log('Registered status: %s' % registered)
-#     try:
-#         nextpage    = Pages('next','Select_Language()')
-#         mydisplay  = MainMenu(
-#             header=30003,
-#             background='language1.png',
-#             backbutton='',
-#             nextbutton=30002,      
-#             backbuttonfunction='',
-#             nextbuttonfunction='self.close();'+nextpage,
-#             selectbutton=30004,
-#             toggleup='',
-#             toggledown='',
-#             selectbuttonfunction="Set_Language();self.close();Load_Profile();xbmc.sleep(2000);xbmc.executebuiltin('StopScript(script.openwindow)');xbmc.executebuiltin('RunScript(script.openwindow)')",
-#             toggleupfunction='',
-#             toggledownfunction='',
-#             maintext=30005,
-#             noconnectionbutton='',
-#             noconnectionfunction=""
-#             )        
-#         mydisplay.doModal()
-#         del mydisplay
-#     except:
-#         xbmc.log('#### Set Language disabled by admin, loading: %s' % Pages('start'))
-#         exec(Pages('start'))
-#-----------------------------------------------------------------------------
 def Select_Language(status = False):
     if os.path.exists(RUN_WIZARD) and not os.path.exists(STARTUP_WIZARD):
         Set_Language()
@@ -296,28 +290,6 @@ def Select_Language(status = False):
         Load_Profile()
     else:
         exec(Pages('start'))
-#-----------------------------------------------------------------------------
-# OLD REGION SCREEN - All functions stopped working on newer Kodi. They are now removed and need a complete re-work
-# def Select_Region():
-#     backpage    = Pages('back','Select_Region()')
-#     nextpage    = Pages('next','Select_Region()')
-#     mydisplay = MainMenuThreeItems(
-#         header=30006,
-#         background='region1.png',
-#         backbutton=30001,
-#         nextbutton=30002,
-#         backbuttonfunction='self.close();'+backpage,
-#         nextbuttonfunction='self.close();'+nextpage,
-#         optionbutton1=30008,
-#         optionbutton2=30007,
-#         optionbutton3=30009,
-#         option1function="Set_Timezone_Country()",
-#         option2function="Set_Region()",
-#         option3function="Set_Timezone()",
-#         maintext=30010,
-#         )
-#     mydisplay.doModal()
-#     del mydisplay
 #-----------------------------------------------------------------------------
 # Show the resolution select screen
 def Select_Resolution():
