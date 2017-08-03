@@ -2237,3 +2237,15 @@ msgstr ""
 msgctxt "#30556"
 msgid "Keyword names must be a minimum of 5 characters.\nPlease try again and enter a valid name."
 msgstr ""
+
+msgctxt "#30557"
+msgid "ADD-ON INSTALL STATUS"
+msgstr ""
+
+msgctxt "#30558"
+msgid "Display a list of any failed any add-on installs when restoring keyword backup."
+msgstr ""
+
+msgctxt "#30559"
+msgid "System"
+msgstr ""

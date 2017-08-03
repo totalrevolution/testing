@@ -36,7 +36,7 @@ settings_clean   = sys.argv[1].replace('_DIALOG_PLUS_USER','').replace('_DIALOG_
 
 # If it's a home menu convert addon setting into redirect file
 if sys.argv[1].startswith('HOME_'):
-    redirect_setting = Addon_Setting(settings_clean)
+    redirect_setting = Addon_Setting(setting=settings_clean,addon_id='plugin.program.tbs')
     if redirect_setting == 'dialog_plus':
         redirect_setting = sys.argv[1]+'_DIALOG_PLUS'
     elif redirect_setting == 'dialog':
@@ -57,7 +57,7 @@ if sys.argv[1].startswith('HOME_'):
 # If it's a submenu and not a main home menu we use the args
 else:
     redirect_setting = sys.argv[1]
-
+dolog('REDIRECT SETTING: %s'%redirect_setting)
 # Set the main redirect file
 redirect_file = os.path.join(redirects, redirect_setting)
 
