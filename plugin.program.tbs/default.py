@@ -1347,7 +1347,6 @@ def Install_Addons(url):
     repo_list    = {}
     xbmc_gui     = Requirements('xbmc.gui')
     xbmc_python  = Requirements('xbmc.python')
-    show_results = Addon_Setting('show_addon_results')
     gui_min      = encryptme('e',xbmc_gui['min'])
     gui_max      = encryptme('e',xbmc_gui['max'])
     python_min   = encryptme('e',xbmc_python['min'])
@@ -1401,16 +1400,6 @@ def Install_Addons(url):
                         failed_array.append(key)
                 if os.path.exists(temp_zip) and zipfile.is_zipfile(temp_zip):
                     Sleep_If_Function_Active(function=Extract,args=[temp_zip,ADDONS],show_busy=False,kill_time=180)
-        if len(failed_array)>0:
-            failed_list = 'FAILED: '
-            counter = 1
-            for item in failed_array:
-                failed_list += item
-                if counter != len(failed_list):
-                    failed_list += ','
-                counter += 1
-
-            OK_Dialog('FAILED TO INSTALL %s ITEMS'%len(failed_array), failed_list)
         
         dolog('### ENABLING ADDONS')
         # Sleep_If_Function_Active(function=Toggle_Addons,show_busy=False)
@@ -1418,12 +1407,11 @@ def Install_Addons(url):
         Show_Busy(False)
         # Adult_Toggle(adult_list=adult_addons,disable=True)
     else:
-        if show_results == 'true':
-            OK_Dialog(String(30513),String(30514)%encryptme('d',url))
+        OK_Dialog(String(30513),String(30514)%encryptme('d',url))
     if len(failed_array) == 0:
-        return True
+        return 'success'
     else:
-        return False
+        return failed_array
 #---------------------------------------------------------------------------------------------------
 # Menu to install content via the TR add-on
 @route(mode='install_content')
@@ -1473,7 +1461,7 @@ def Install_Keyword():
     
     username = encryptme('e',username)
     if keyword_name != '':
-        url            = BASE+'boxer/Install_Keyword.php'
+        url            = BASE+'boxer/Install_Keyword_new.php'
         params         = {"x":encryptme('e',URL_Params()),"n":username,"p":password,"c":encryptme('e',keyword_name),"e":email}
         response       = Open_URL(url=url,payload=params,post_type='post')
         try:
