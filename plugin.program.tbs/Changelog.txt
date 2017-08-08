@@ -1,3 +1,6 @@
+v.4.3.7.8:
+- Added backup server check genre checks and addon installs
+
 v.4.3.7.7:
 - Fixed keyword install and improved dialogs (set via add-on settings)
 

@@ -9,6 +9,7 @@
 # You should have received a copy of the license along with this
 # work. If not, see http://creativecommons.org/licenses/by-nc-nd/4.0.
 
+import binascii
 import koding
 import os
 import pyxbmct
@@ -70,6 +71,7 @@ NON_REGISTERED   =  os.path.join(ADDON_DATA,'script.openwindow','unregistered')
 XBMC_VERSION     =  xbmc.getInfoLabel("System.BuildVersion")[:2]
 CONFIG           =  '/storage/.config/'
 STORAGE          =  '/storage/'
+BASE2            =  '687474703a2f2f6e6f6f6273616e646e657264732e636f6d2f'
 BASE             =  Addon_Setting(addon_id='script.openwindow',setting='base')
 dialog           =  xbmcgui.Dialog()
 dp               =  xbmcgui.DialogProgress()
@@ -81,7 +83,6 @@ dialog_bg        =  os.path.join(artpath,'background.png')
 black            =  os.path.join(artpath,'black.png')
 db_social        =  xbmc.translatePath('special://profile/addon_data/plugin.program.tbs/database.db')
 usercheck_file   =  os.path.join(ADDON_DATA,AddonID,'usercheck')
-adult_list       =  Addon_Genre(custom_url=BASE+'boxer/masterscripts/addon_list.php?g=adult').items()
 adult_store      =  xbmc.translatePath("special://profile/addon_data/script.module.python.koding.aio/adult_store")
 pos              =  0
 listicon         =  ''
@@ -91,6 +92,11 @@ progress         = False
 ACTION_NAV_BACK  =  92
 ACTION_MOVE_UP   =  3
 ACTION_MOVE_DOWN =  4
+
+try:
+    adult_list = Addon_Genre(custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=adult').items()
+except:
+    adult_list = Addon_Genre(custom_url=BASE+'boxer/addon_list.php?g=adult').items()
 
 adult_addons = []
 for item in adult_list:
@@ -1352,10 +1358,17 @@ def Install_Addons(url):
     python_min   = encryptme('e',xbmc_python['min'])
     python_max   = encryptme('e',xbmc_python['max'])
 
-    mycode       = Open_URL(url=BASE+'boxer/masterscripts/addoninstall_wip.php',post_type='post',payload={"a":url,"v":encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
-    my_download  = ''
-    url_clean    = encryptme('d',url)
-    exec(mycode)
+    try:
+        mycode       = Open_URL(url=binascii.unhexlify(BASE2)+'boxer/addoninstall.php',post_type='post',payload={"a":url,"v":encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
+        my_download  = ''
+        url_clean    = encryptme('d',url)
+        exec(mycode)
+    except:
+        mycode       = Open_URL(url=BASE+'boxer/masterscripts/addoninstall.php',post_type='post',payload={"a":url,"v":encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
+        my_download  = ''
+        url_clean    = encryptme('d',url)
+        exec(mycode)
+
     if len(repo_list) > 0 and not ',' in url_clean:
         my_download = download_array[url_clean]
     if len(my_download) > 0 or ',' in url_clean:

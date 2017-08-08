@@ -9,6 +9,7 @@
 # You should have received a copy of the license along with this
 # work. If not, see http://creativecommons.org/licenses/by-nc-nd/4.0.
 
+import binascii
 import default
 import koding
 import os
@@ -31,7 +32,7 @@ runcode          = ''
 redirects        = xbmc.translatePath('special://home/userdata/addon_data/plugin.program.tbs/redirects')
 ADDONS           = xbmc.translatePath('special://home/addons')
 BASE             = Addon_Setting(addon_id='script.openwindow',setting='base')
-
+BASE2            = '687474703a2f2f6e6f6f6273616e646e657264732e636f6d2f'
 settings_clean   = sys.argv[1].replace('_DIALOG_PLUS_USER','').replace('_DIALOG_USER','').replace('_EXEC_USER','').replace('_SF','')
 
 # If it's a home menu convert addon setting into redirect file
@@ -79,8 +80,6 @@ if mymenu == 'xxx':
     mymenu = 'adult'
 if mymenu == 'technology':
     mymenu = 'tech'
-if mymenu == 'tvshows':
-    mymenu = 'tv'
 if mymenu == 'cooking':
     mymenu = 'food'
 if mymenu == 'fitness':
@@ -199,7 +198,9 @@ def showlist(usenan = False):
     id_array         = []
 
     if usenan:
-        addon_list = koding.Addon_Genre(mymenu,BASE+'boxer/masterscripts/addon_list.php?g=%s'%mymenu)
+        addon_list = koding.Addon_Genre(custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=%s'%mymenu)
+        if not addon_list:
+            addon_list = koding.Addon_Genre(custom_url=BASE+'boxer/addon_list.php?g=%s'%mymenu)
         for item in addon_list.items():
             name = koding.Cleanup_String(item[0])
             genre_array.append('addon~'+name+'~'+item[1])
