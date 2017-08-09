@@ -258,18 +258,14 @@ def Main_Menu_Check():
     if mode == 'std':
         folders = Folder_Check()
         if sys.argv[1] == "live_tv" and folders == 0 and not tvgskip:
-            choice = dialog.select(sys.argv[1].replace('_',' ').upper()+' Menu',['[COLOR=gold]Add[/COLOR] to Live TV','[COLOR=gold]Add / Remove[/COLOR] Sub-menus','','[COLOR=lightsteelblue][TUTORIAL][/COLOR] Add/Remove Live TV Content'])
+            choice = dialog.select(sys.argv[1].replace('_',' ').upper()+' Menu',['[COLOR=gold]Add[/COLOR] to Live TV','[COLOR=gold]Add / Remove[/COLOR] Sub-menus'])
             if choice == 0:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url=live_tv",return)')
             if choice == 1:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url=live_tv_submenu",return)')
-            if choice == 2:
-                xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.tbs/epg.py,'+sys.argv[1]+')')
-            if choice == 3:
-                 koding.Play_Video('-taD-9lqjaw')
 
         elif sys.argv[1] == "live_tv" and folders > 0 and not tvgskip:
-            choice = dialog.select(sys.argv[1].replace('_',' ').upper()+' Menu',['[COLOR=gold]Add[/COLOR] to Live TV','[COLOR=gold]Remove[/COLOR] from Live TV','[COLOR=gold]Add / Remove[/COLOR] Sub-menus','[COLOR=gold]Share[/COLOR] Live TV Item','','[COLOR=lightsteelblue][TUTORIAL][/COLOR] Add/Remove Live TV Content'])
+            choice = dialog.select(sys.argv[1].replace('_',' ').upper()+' Menu',['[COLOR=gold]Add[/COLOR] to Live TV','[COLOR=gold]Remove[/COLOR] from Live TV','[COLOR=gold]Add / Remove[/COLOR] Sub-menus','[COLOR=gold]Share[/COLOR] Live TV Item'])
             if choice == 0:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url=live_tv",return)')
             if choice == 1:
@@ -278,10 +274,6 @@ def Main_Menu_Check():
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url=live_tv_submenu",return)')
             if choice == 3:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=HOME_LIVE_TV",return)')
-            if choice == 4:
-                xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.tbs/epg.py,'+sys.argv[1]+')')
-            if choice == 5:
-                 koding.Play_Video('-taD-9lqjaw')
 
 # EDIT Menu
         elif sys.argv[1] == "mainmenu":
@@ -307,7 +299,7 @@ def Main_Menu_Check():
 # SOCIAL SHARES - If content exists add menu for adding, removing and sharing
         elif (sys.argv[1] != "mainmenu") and (folders > 0) and (not sys.argv[1].endswith('_SF')):
             cleanname = sys.argv[1].replace('_',' ')        
-            choice = dialog.select(String(30283),[String(30284)%sys.argv[1].replace('_',' '),String(30285)%sys.argv[1].replace('_',' '),String(30286),String(30287)%cleanname,'',String(30288),String(30289),String(30290)])
+            choice = dialog.select(String(30283),[String(30284)%sys.argv[1].replace('_',' '),String(30285)%sys.argv[1].replace('_',' '),String(30286),String(30287)%cleanname])
             if choice == 0:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url='+sys.argv[1]+'",return)')
             if choice == 1:
@@ -316,32 +308,15 @@ def Main_Menu_Check():
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url='+sys.argv[1]+'_submenu",return)')
             if choice == 3:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=HOME_'+sys.argv[1].replace(' ','_').upper()+'",return)')
-            if choice == 4:
-                xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.tbs/epg.py,'+sys.argv[1]+')')
-            if choice == 5:
-                 koding.Play_Video('eDK20XkyGXE')
-            if choice == 6:
-                 koding.Play_Video('IkRZJgup4gk')
-            if choice == 7:
-               koding.Play_Video('FSOOED9v1RE')
 
 # SOCIAL SHARES - If no content exists add menu for adding and sharing only
         elif (sys.argv[1] != "mainmenu") and (folders == 0) and (not sys.argv[1].endswith('_SF')):
             cleanname = sys.argv[1].replace('_',' ')        
-            choice = dialog.select(String(30283),[String(30284)%sys.argv[1].replace('_',' '),String(30291),'',String(30288),String(30289),String(30290)])
+            choice = dialog.select(String(30283),[String(30284)%sys.argv[1].replace('_',' '),String(30291)])
             if choice == 0:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url='+sys.argv[1]+'",return)')
             if choice == 1:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.tbs/?description&mode=search_content_main&url='+sys.argv[1]+'_submenu",return)')
-            if choice == 2:
-                xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.tbs/epg.py,'+sys.argv[1]+')')
-            if choice == 3:
-                 koding.Play_Video('eDK20XkyGXE')
-            if choice == 4:
-                 koding.Play_Video('IkRZJgup4gk')
-            if choice == 5:
-               koding.Play_Video('FSOOED9v1RE')
-        
         else:
             xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=HOME_'+sys.argv[1].replace(' ','_').upper()+'",return)')
 

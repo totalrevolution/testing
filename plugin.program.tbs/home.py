@@ -91,6 +91,7 @@ folderpath = xbmc.translatePath(os.path.join('special://profile/addon_data/plugi
 def Add_Content(id_array):
     from default import encryptme, Addon_Browser, Install_Addons, Sleep_If_Function_Active, Toggle_Addons
 
+    dolog('id_array: %s'%id_array)
     choice = dialog.select(String(30314),[String(30170),String(30313),String(30323)])
     if choice >= 0:
         my_text = Text_File(redirect_file,'r')
@@ -198,9 +199,9 @@ def showlist(usenan = False):
     id_array         = []
 
     if usenan:
-        addon_list = koding.Addon_Genre(custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=%s'%mymenu)
+        addon_list = koding.Addon_Genre(genre=mymenu,custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=%s'%mymenu)
         if not addon_list:
-            addon_list = koding.Addon_Genre(custom_url=BASE+'boxer/addon_list.php?g=%s'%mymenu)
+            addon_list = koding.Addon_Genre(genre=mymenu,custom_url=BASE+'boxer/addon_list.php?g=%s'%mymenu)
         for item in addon_list.items():
             name = koding.Cleanup_String(item[0])
             genre_array.append('addon~'+name+'~'+item[1])

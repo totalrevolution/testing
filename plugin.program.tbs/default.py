@@ -1747,6 +1747,7 @@ def Main_Menu_Install(url):
     if os.path.exists(MAIN_MENUS):
         main_menu_list = encryptme('d',Text_File(MAIN_MENUS,'r'))
         main_list = eval(main_menu_list)
+        dolog(main_menu_list)
         for item in menu_list:
             try:
                 exec( '%s = "%s"' % (item[1],main_list[item[1]]) )

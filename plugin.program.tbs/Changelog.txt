@@ -1,3 +1,6 @@
+v.4.3.7.9:
+- Fixed bug with dialog selects only working with the adult genre
+
 v.4.3.7.8:
 - Added backup server check genre checks and addon installs
 
