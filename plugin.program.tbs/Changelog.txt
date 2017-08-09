@@ -1,3 +1,6 @@
+v.4.3.8.0:
+- Fixed bug with removal of custom menu items
+
 v.4.3.7.9:
 - Fixed bug with dialog selects only working with the adult genre
 

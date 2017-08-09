@@ -1815,37 +1815,37 @@ def Main_Menu_Install(url):
 
     if url == 'remove':
         listcount = Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,'',False])
-        if not xbmc.getCondVisibility('Skin.String(Custom6HomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(Custom6HomeItem.Disable)') and 'comedy' in menu_options:
             Add_Dir('%s %s'%(String(30076),comedy),'Skin.SetString(Custom6HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_COMEDY/HOME_COMEDY_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom3HomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(Custom3HomeItem.Disable)') and 'cooking' in menu_options:
             Add_Dir('%s %s'%(String(30076),cooking),'Skin.SetString(Custom3HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_COOKING/HOME_COOKING_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom4HomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(Custom4HomeItem.Disable)') and 'fitness' in menu_options:
             Add_Dir('%s %s'%(String(30076),fitness),'Skin.SetString(Custom4HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_FITNESS/HOME_FITNESS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom5HomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(Custom5HomeItem.Disable)') and 'gaming' in menu_options:
             Add_Dir('%s %s'%(String(30076),gaming),'Skin.SetString(Custom5HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_GAMING/HOME_GAMING_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(FavoritesHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(FavoritesHomeItem.Disable)') and 'kids' in menu_options:
             Add_Dir('%s %s'%(String(30076),kids),'Skin.SetString(FavoritesHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_KIDS/HOME_KIDS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(LiveTVHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(LiveTVHomeItem.Disable)') and 'livetv' in menu_options:
             Add_Dir('%s %s'%(String(30076),livetv),'Skin.SetString(LiveTVHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_LIVE_TV/HOME_LIVE_TV_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(MovieHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(MovieHomeItem.Disable)') and 'movies' in menu_options:
             Add_Dir('%s %s'%(String(30076),movies),'Skin.SetString(MovieHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_MOVIES/HOME_MOVIES_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(MusicHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(MusicHomeItem.Disable)') and 'music' in menu_options:
             Add_Dir('%s %s'%(String(30076),music),'Skin.SetString(MusicHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_MUSIC/HOME_MUSIC_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(ProgramsHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(ProgramsHomeItem.Disable)') and 'news' in menu_options:
             Add_Dir('%s %s'%(String(30076),news),'Skin.SetString(ProgramsHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_NEWS/HOME_NEWS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(VideosHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(VideosHomeItem.Disable)') and 'sports' in menu_options:
             Add_Dir('%s %s'%(String(30076),sports),'Skin.SetString(VideosHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_SPORTS/HOME_SPORTS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom2HomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(Custom2HomeItem.Disable)') and 'technology' in menu_options:
             Add_Dir('%s %s'%(String(30076),technology),'Skin.SetString(Custom2HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TECHNOLOGY/HOME_TECHNOLOGY_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(WeatherHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(WeatherHomeItem.Disable)') and 'travel' in menu_options:
             Add_Dir('%s %s'%(String(30076),travel),'Skin.SetString(WeatherHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TRAVEL/HOME_TRAVEL_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(TVShowHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(TVShowHomeItem.Disable)') and 'tvshows' in menu_options:
             Add_Dir('%s %s'%(String(30076),tvshows),'Skin.SetString(TVShowHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TV_SHOWS/HOME_TV_SHOWS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(PicturesHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(PicturesHomeItem.Disable)') and 'world' in menu_options:
             Add_Dir('%s %s'%(String(30076),world),'Skin.SetString(PicturesHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_WORLD/HOME_WORLD_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(ShutdownHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(ShutdownHomeItem.Disable)') and 'youtube' in menu_options:
             Add_Dir('%s %s'%(String(30076),youtube),'Skin.SetString(ShutdownHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_YOUTUBE/HOME_YOUTUBE_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(MusicVideoHomeItem.Disable)'):
+        if not xbmc.getCondVisibility('Skin.String(MusicVideoHomeItem.Disable)') and 'xxx' in menu_options:
             Add_Dir('%s %s'%(String(30076),xxx),'Skin.SetString(MusicVideoHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_XXX/HOME_XXX_001.jpg','','')
         if listcount > 0:
             OK_Dialog(String(30079),String(30311))
