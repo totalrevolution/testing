@@ -1,3 +1,7 @@
+v.4.3.8.1:
+- Main Menu defaults fixed so all default items are reset
+- Fixed the sync of main menus functions when custom ones are already set
+
 v.4.3.8.0:
 - Fixed bug with removal of custom menu items
 

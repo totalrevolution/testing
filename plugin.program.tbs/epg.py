@@ -76,7 +76,7 @@ def Configure_Menus(menutype='HOME_'):
                 if choice == 0:
                     my_shortcut = my_setting+'_SF'
                     if menutype == 'HOME_':
-                        Addon_Setting(setting=my_setting, value='super_faves')
+                        Addon_Setting(setting=my_setting, value='super_faves_user')
                         for item in delete_array:
                             if not my_shortcut in item and os.path.exists(item):
                                 os.remove(item)
@@ -89,6 +89,7 @@ def Configure_Menus(menutype='HOME_'):
                 if choice == 1:
                     my_shortcut = my_setting+'_DIALOG_PLUS_USER'
                     if menutype == 'HOME_':
+                        dolog( 'Setting %s to: dialog_plus_user' % (my_setting) )
                         Addon_Setting(setting=my_setting, value='dialog_plus_user')
                         for item in delete_array:
                             if not my_shortcut in item and os.path.exists(item):
@@ -102,6 +103,7 @@ def Configure_Menus(menutype='HOME_'):
                 if choice == 2:
                     my_shortcut = my_setting+'_DIALOG_USER'
                     if menutype == 'HOME_':
+                        dolog( 'Setting %s to: dialog_user' % (my_setting) )
                         Addon_Setting(setting=my_setting, value='dialog_user')
                         for item in delete_array:
                             if not my_shortcut in item and os.path.exists(item):
@@ -115,6 +117,7 @@ def Configure_Menus(menutype='HOME_'):
                 if choice == 3:
                     my_shortcut = my_setting+'_EXEC_USER'
                     if menutype == 'HOME_':
+                        dolog( 'Setting %s to: executable_user' % (my_setting) )
                         Addon_Setting(setting=my_setting, value='executable_user')
                         for item in delete_array:
                             if not my_shortcut in item and os.path.exists(item):
@@ -130,6 +133,7 @@ def Configure_Menus(menutype='HOME_'):
                 
                 if choice == 4:
                     if menutype == 'HOME_':
+                        dolog( 'Setting %s to defaults' % (my_setting) )
                         Default_Setting(setting=my_setting, reset=True)
 
 # Find the relevant home menu and clear the contents
@@ -275,7 +279,7 @@ def Main_Menu_Check():
             if choice == 3:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=HOME_LIVE_TV",return)')
 
-# EDIT Menu
+    # EDIT Menu
         elif sys.argv[1] == "mainmenu":
             choice = dialog.select(String(30280),[String(30281),String(30282),String(30292),String(30300),String(30506)])
             if choice >= 0:
@@ -296,7 +300,7 @@ def Main_Menu_Check():
                 if choice == 4:
                     Reset_Factory('ALL')
 
-# SOCIAL SHARES - If content exists add menu for adding, removing and sharing
+    # SOCIAL SHARES - If content exists add menu for adding, removing and sharing
         elif (sys.argv[1] != "mainmenu") and (folders > 0) and (not sys.argv[1].endswith('_SF')):
             cleanname = sys.argv[1].replace('_',' ')        
             choice = dialog.select(String(30283),[String(30284)%sys.argv[1].replace('_',' '),String(30285)%sys.argv[1].replace('_',' '),String(30286),String(30287)%cleanname])
@@ -309,7 +313,7 @@ def Main_Menu_Check():
             if choice == 3:
                 xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=HOME_'+sys.argv[1].replace(' ','_').upper()+'",return)')
 
-# SOCIAL SHARES - If no content exists add menu for adding and sharing only
+    # SOCIAL SHARES - If no content exists add menu for adding and sharing only
         elif (sys.argv[1] != "mainmenu") and (folders == 0) and (not sys.argv[1].endswith('_SF')):
             cleanname = sys.argv[1].replace('_',' ')        
             choice = dialog.select(String(30283),[String(30284)%sys.argv[1].replace('_',' '),String(30291)])
@@ -357,7 +361,7 @@ def Main_Menu_Check():
                 final_list.append('[COLOR=dodgerblue]%s:[/COLOR] %s' % (country, name))
                 my_list.append([name,url,country,offset])
 
-# Select main provider
+        # Select main provider
             dialog.ok(String(30264).upper(),String(30265))
             choice  = dialog.select(String(30264),final_list)
             counter = 1
@@ -374,7 +378,7 @@ def Main_Menu_Check():
                 del my_list[choice]
                 counter += 1
 
-# If still items in list offer to add more providers
+            # If still items in list offer to add more providers
                 my_choice = 1
                 while my_choice:
                     if len(final_list) > 1:

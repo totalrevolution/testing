@@ -538,6 +538,11 @@ def Clear_Cache():
         Wipe_Cache()
         Remove_Textures_Dialog()
 #---------------------------------------------------------------------------------------------------
+@route(mode='clear_commands')
+def Clear_Commands():
+    urlparams = encryptme('e',URL_Params())
+    Run_Code( url='boxer/Clear_Commands.php',payload={"x":urlparams} )
+#---------------------------------------------------------------------------------------------------
 # Function to clear online cookie for user_info page
 def Clear_User_Cookie():
     urlparams = encryptme('e',URL_Params())
@@ -1183,8 +1188,8 @@ def Grab_Updates(url, runtype = ''):
             Notify(String(30059),String(30007),'1000',os.path.join(ADDONS,'script.openwindow','resources','images','update_software.png'))
             url=url.replace('update&','')
         url,params = url.split('?')
+        dolog('### MAIN MENU DEFAULTS RUN MOVING ON')
         while mysuccess != 1 and failed != 1:
-            dolog('### MAIN MENU DEFAULTS RUN MOVING ON')
 
             # try:
             dolog("### URL: "+url+'?'+encryptme('e',urlparams))
@@ -2978,7 +2983,8 @@ def Sync_Settings():
                 if setting != None:
                     if plugin == 'plugin.program.tbs':
                         cur_set = Addon_Setting(setting=setting,addon_id=plugin)
-                        if cur_set.startswith('HOME') and not cur_set.endswith('USER'):
+                        if not cur_set.endswith('user') and setting.startswith('HOME_'):
+                            dolog( 'No custom user setting for %s, setting to: %s' % (setting,value) )
                             Addon_Setting(setting=setting,value=value,addon_id=plugin)
                     counter = 0
                     for res_line in res_lines:

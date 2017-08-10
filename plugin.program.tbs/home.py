@@ -38,13 +38,15 @@ settings_clean   = sys.argv[1].replace('_DIALOG_PLUS_USER','').replace('_DIALOG_
 # If it's a home menu convert addon setting into redirect file
 if sys.argv[1].startswith('HOME_'):
     redirect_setting = Addon_Setting(setting=settings_clean,addon_id='plugin.program.tbs')
-    if redirect_setting == 'dialog_plus':
+    if redirect_setting == 'tvg_dialog_plus':
+        redirect_setting = sys.argv[1]+'_TVG_DIALOG_PLUS'
+    elif redirect_setting == 'dialog_plus':
         redirect_setting = sys.argv[1]+'_DIALOG_PLUS'
     elif redirect_setting == 'dialog':
         redirect_setting = sys.argv[1]+'_DIALOG'
     elif redirect_setting == 'executable':
         redirect_setting = sys.argv[1]+'_EXEC'
-    elif redirect_setting == 'super_faves':
+    elif redirect_setting.startswith('super_faves'):
         redirect_setting = sys.argv[1]+'_SF'
     elif redirect_setting == 'dialog_plus_user':
         redirect_setting = sys.argv[1]+'_DIALOG_PLUS_USER'
@@ -73,7 +75,7 @@ elif os.path.exists(legacy_path):
     runcode = Text_File(legacy_path,'r').replace('\r','')
 
 cleanname = sys.argv[1].replace("HOME_",'').replace('SUBMENU_','').replace('_DIALOG_USER','').replace('_DIALOG_PLUS_USER','').replace('_EXEC_USER','')
-cleanname = cleanname.replace('DIALOG','')
+cleanname = cleanname.replace('DIALOG','').replace('_TVG','')
 cleanname = cleanname.lower()
 mymenu    = cleanname.replace('_','').replace(' ','')
 if mymenu == 'xxx':
@@ -209,7 +211,7 @@ def showlist(usenan = False):
 # Add genre list to our custom list    
     runcode_array += genre_array
 
-    if 'HOME_LIVE_TV_DIALOG_PLUS' in redirect_setting:
+    if 'HOME_LIVE_TV_TVG_DIALOG_PLUS' in redirect_setting:
         final_array.append(['-exec',String(code=30993,source='script.trtv'),"xbmc.executebuiltin('RunScript(special://home/addons/script.trtv/addon.py)')"])
 
     for line in runcode_array:
