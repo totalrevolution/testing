@@ -1,3 +1,6 @@
+v.3.0.2:
+- Added compatibility for new genre method
+
 v.3.0.1:
 - Added back old reboot method after build install (if android)
 

@@ -181,9 +181,14 @@ def CPU_Check():
 # Enable/disable the visibility of adult add-ons (use true or false)
 def Enable_Addons(updaterepos = True):
     import binascii
-    mylist = Addon_Genre(custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=adult')
-    if not mylist:
-        mylist = Addon_Genre(custom_url=BASE+'boxer/addon_list.php?g=adult')
+    try:
+        mylist = Addon_Genre(custom_url='http://totalrevolution.xyz/addons/addon_list.txt')
+    except:
+        try:
+            mylist = Addon_Genre()
+        except:
+            mylist = {}
+
     xbmc.executebuiltin('UpdateLocalAddons')
     dolog('UPDATED LOCAL ADDONS')
     if updaterepos:
@@ -193,7 +198,8 @@ def Enable_Addons(updaterepos = True):
         adult_dict = mylist.items()
         for item in adult_dict:
             adult_list.append(item[1])
-    dolog('NO XXX CONTENT FOUND')
+    else:
+        dolog('NO XXX CONTENT FOUND')
     Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
 #-----------------------------------------------------------------------------------------------------------------
 # Encryption function
