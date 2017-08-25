@@ -1,3 +1,6 @@
+v.4.3.8.2:
+- Edited to work with new genre system
+
 v.4.3.8.1:
 - Main Menu defaults fixed so all default items are reset
 - Fixed the sync of main menus functions when custom ones are already set

@@ -94,9 +94,12 @@ ACTION_MOVE_UP   =  3
 ACTION_MOVE_DOWN =  4
 
 try:
-    adult_list = Addon_Genre(custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=adult').items()
+    adult_list = Addon_Genre(custom_url='http://totalrevolution.xyz/addons/addon_list.txt').items()
 except:
-    adult_list = Addon_Genre(custom_url=BASE+'boxer/addon_list.php?g=adult').items()
+    try:
+        adult_list = Addon_Genre().items()
+    except:
+        adult_list = []
 
 adult_addons = []
 for item in adult_list:
