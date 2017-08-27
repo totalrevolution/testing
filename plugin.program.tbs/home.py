@@ -201,9 +201,13 @@ def showlist(usenan = False):
     id_array         = []
 
     if usenan:
-        addon_list = koding.Addon_Genre(genre=mymenu,custom_url=binascii.unhexlify(BASE2)+'boxer/addon_list.php?g=%s'%mymenu)
-        if not addon_list:
-            addon_list = koding.Addon_Genre(genre=mymenu,custom_url=BASE+'boxer/addon_list.php?g=%s'%mymenu)
+        try:
+            addon_list = Addon_Genre(genre=mymenu, custom_url='http://totalrevolution.xyz/addons/addon_list.txt')
+        except:
+            try:
+                addon_list = Addon_Genre(genre=mymenu)
+            except:
+                addon_list = {}
         for item in addon_list.items():
             name = koding.Cleanup_String(item[0])
             genre_array.append('addon~'+name+'~'+item[1])

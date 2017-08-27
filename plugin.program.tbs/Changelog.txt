@@ -1,3 +1,6 @@
+v.4.3.8.4:
+- Fixed bug with genre in home.py
+
 v.4.3.8.3:
 - Bump to version number to try and get it updating
 
