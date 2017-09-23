@@ -18,7 +18,6 @@ import sys
 import time
 import urllib
 import urllib2
-import urlparse
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -64,7 +63,6 @@ PROGRESS_TEMP    =  os.path.join(TBSDATA,   'progresstemp')
 SLEEPER          =  os.path.join(ADDON_PATH,'resources','tmr')
 KEYWORD_CREATE   =  os.path.join(TBSDATA,   'keyword_create.txt')
 MY_HOME_MENUS    =  os.path.join(TBSDATA,   'my_home_menus')
-MAIN_MENUS       =  os.path.join(TBSDATA,   'main_menu_names')
 REDIRECTS        =  os.path.join(TBSDATA,   'redirects')
 SF_ROOT          =  os.path.join(ADDON_DATA,'plugin.program.super.favourites', 'Super Favourites')
 NON_REGISTERED   =  os.path.join(ADDON_DATA,'script.openwindow','unregistered')
@@ -82,6 +80,7 @@ unknown_icon     =  os.path.join(artpath,'update.png')
 dialog_bg        =  os.path.join(artpath,'background.png')
 black            =  os.path.join(artpath,'black.png')
 db_social        =  xbmc.translatePath('special://profile/addon_data/plugin.program.tbs/database.db')
+zip_path         =  xbmc.translatePath('special://home/addons/packages/~~ZIPS~~')
 usercheck_file   =  os.path.join(ADDON_DATA,AddonID,'usercheck')
 adult_store      =  xbmc.translatePath("special://profile/addon_data/script.module.python.koding.aio/adult_store")
 pos              =  0
@@ -115,7 +114,7 @@ if thirdparty == 'true':
 else:
     social_shares = 0
 #---------------------------------------------------------------------------------------------------
-# Popup class - thanks to whoever codes the help popup in TVAddons Maintenance for this section. Unfortunately there doesn't appear to be any author details in that code so unable to credit by name.
+# Popup class
 class SPLASH(xbmcgui.WindowXMLDialog):
     
     def __init__(self,*args,**kwargs):
@@ -155,7 +154,6 @@ def Addon_Removal_Menu(removal_types='all'):
     my_addons = []
 
     currently_installed = Get_Contents(ADDONS,['packages','temp'])
-    dolog(repr(currently_installed))
     if removal_types == 'all' or 'video' in removal_types:
         my_addons = Installed_Addons(content='video', properties='name,path,description,thumbnail')
     if removal_types == 'all' or 'audio' in removal_types:
@@ -281,7 +279,6 @@ def Adult_Filter(value, loadtype = ''):
             xbmc.executebuiltin('HOME')
         else:
             success = 1
-    dolog('ADULT ADDONS: %s'%adult_addons)
     if value == 'false':
         filter_type = 'disabled'
         Adult_Toggle(adult_list=adult_addons,disable=True)
@@ -395,16 +392,17 @@ def Build_Info():
 # Main category list
 @route(mode='start')
 def Categories():
-    if debug == 'true':
-        Add_Dir('Koding','', "tutorials", True,'','','')
+    # if debug == 'true':
+    #     Add_Dir('Koding','', "tutorials", True,'','','')
     Add_Dir(String(30032),'', 'my_details', False,'','','')
     Add_Dir(String(30033),'','install_content',True,'Search_Addons.png','','')
     Add_Dir(String(30034),'','startup_wizard',False,'Startup_Wizard.png','','')
     Add_Dir(String(30035),'none', 'tools',True,'Additional_Tools.png','','')
+    # Add_Dir('SF REPO CHECK','', 'sf_repo_check',False,'Additional_Tools.png','','')
     # Add_Dir('Video Check','none', 'get_video',False,'Additional_Tools.png','','')
     # Add_Dir('folder','Android Apps','', 'android_apps', 'Additional_Tools.png','','','')
 #---------------------------------------------------------------------------------------------------
-# Main category list
+# Change registered email address
 def Change_Email():
     username  = encryptme( 'e',Addon_Setting('username') )
     email     = encryptme( 'e',Addon_Setting('email') )
@@ -413,16 +411,6 @@ def Change_Email():
 
     if email != '' and username != '' and password != '':
         Run_Code( url='boxer/User_Change_Email.php',payload={"x":urlparams,"n":username,"e":email,"p":password,"a":"2"})
-#---------------------------------------------------------------------------------------------------
-@route(mode='change_id')
-def Change_ID():
-    if os.path.exists( os.path.join(TBSDATA,'admin') ):
-        newid = Keyboard(String(30036))
-        if newid != '':
-            ADDON.setSetting('userid', encryptme('e',newid))
-        else:
-            Check_License()
-        Refresh('container')
 #---------------------------------------------------------------------------------------------------
 def Change_XXX_Password():
     password = Addon_Setting('password')
@@ -445,34 +433,10 @@ def Check_Download_Path():
         OK_Dialog(String(30037),String(30038)) 
         Open_Settings()
 #---------------------------------------------------------------------------------------------------
-def Check_File_Date(url, datefile, localdate, dst):
-    try:
-        req = urllib2.Request(url)
-        req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        conn = urllib2.urlopen(req)
-        last_modified = conn.info().getdate('last-modified')
-        last_modified = time.strftime('%Y%m%d%H%M%S', last_modified)
-        if int(last_modified) > int(localdate):
-            urllib.urlretrieve(url,dst)
-            if dst==epgdst:
-                Extract(dst,ADDON_DATA)         
-            else:
-                Extract(dst,STORAGE)
-            Text_File(last_modified,'w')
-        try:
-            if os.path.exists(dst):
-                os.remove(dst)
-        except:
-            pass
-    except:
-        dolog("Failed with update: %s" % str(url))
-        dolog( Last_Error() )
-    Remove_Files()
-#---------------------------------------------------------------------------------------------------
 # Update registration status
-def Check_License(r_mode='3'):
+def Check_License():
     try:
-        Run_Code( url='boxer/Check_License.php', payload={'x':encryptme('e',URL_Params()),'v':XBMC_VERSION,'r':r_mode} )
+        Run_Code( url='boxer/Check_License_new.php', payload={'x':encryptme('e',URL_Params()),'r':'5'} )
     except:
         dolog( Last_Error() )
 #---------------------------------------------------------------------------------------------------
@@ -483,55 +447,49 @@ def Check_My_Shares(url = ''):
     results = koding.Get_All_From_Table("shares")
     for item in results:
         path        = item["path"]
-        oldmd5      = item["stamp"]
+        oldmd5      = item["timestamp"]
         cleanpath   = urllib.unquote(path).upper()
         try:
-            dolog('CLEAN PATH: %s'%cleanpath)
             section,share = cleanpath.split('/')
         except:
             section = False
-        dolog('Path: %s'%path)
-        dolog('md5: %s'%oldmd5)
         local_path = os.path.join(SF_ROOT, 'HOME_'+urllib.unquote(path), 'favourites.xml')
         if os.path.exists(local_path):
-            dolog('LOCAL PATH: %s'%local_path)
             localcheck = md5_check(local_path)
-            dolog('new: %s'%localcheck)
             if oldmd5 != localcheck:
                 message     = 1
                 if YesNo_Dialog(String(30247), String(30248) % cleanpath):
-                    success = Update_Share(os.path.join(SF_ROOT, 'HOME_'+path))
-                    if success:
-                        DB_Query(db_path=db_social, query='UPDATE shares SET stamp=? WHERE `path`=?', values=[localcheck,path])
+                    Upload_Share(fullpath=os.path.join(SF_ROOT, 'HOME_'+path),item=share)
         elif section:
-            dolog('String1: %s'%String(30351))
-            dolog('String2: %s'%String(30352))
             if YesNo_Dialog(String(30351),String(30352)%cleanpath):
-                Sleep_If_Function_Active( Run_Code, ['boxer/Remove_Share.php', {"x":encryptme('e',URL_Params()),"y":encryptme('e',section),"z":encryptme('e',share)}] )
+                Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e','HOME_'+cleanpath)} )
     if url == 'manual' and message == 0:
         OK_Dialog(String(30249), String(30249))
 #---------------------------------------------------------------------------------------------------
-def Check_Updates(url, datefile, dst):
-    if os.path.exists(datefile):
-        localdate = Text_File(datefile,'r')
-    else:
-        localdate = 0
-    Check_File_Date(url, datefile, int(localdate), dst)
-#---------------------------------------------------------------------------------------------------
-# Function to clean HTML into plain text. Not perfect but it's better than raw html code!
-def Clean_HTML(data):        
-    data = data.replace('</p><p>','[CR][CR]').replace('&ndash;','-').replace('&mdash;','-').replace("\n", " ").replace("\r", " ").replace("&rsquo;", "'").replace("&rdquo;", '"').replace("</a>", " ").replace("&hellip;", '...').replace("&lsquo;", "'").replace("&ldquo;", '"')
-    data = " ".join(data.split())   
-    p    = re.compile(r'< script[^<>]*?>.*?< / script >')
-    data = p.sub('', data)
-    p    = re.compile(r'< style[^<>]*?>.*?< / style >')
-    data = p.sub('', data)
-    p    = re.compile(r'')
-    data = p.sub('', data)
-    p    = re.compile(r'<[^<]*?>')
-    data = p.sub('', data)
-    data = data.replace('&nbsp;',' ')
-    return data
+# Remove any old repos not currently in use
+def Clean_Old_Repos(repo_list):
+    skip_array   = ['repository.q','repository.spartacus']
+    id_disable   = []
+    path_disable = []
+    try:
+        repo_list = encryptme( 'd', repo_list ).split(',')
+    except:
+        repo_list = []
+    installed_repos = Installed_Addons(types='xbmc.addon.repository',properties='path')
+    for item in installed_repos:
+        path    = item["path"].encode('utf-8')
+        addonid = item["addonid"].encode('utf-8')
+        if not addonid in repo_list and not addonid in skip_array:
+            if ADDONS in path and 'repo' in addonid.lower():
+                # id_disable.append(addonid)
+                path_disable.append(path)
+    # Toggle_Addons(addon=id_disable,enable=False)
+    for item in path_disable:
+        try:
+            shutil.rmtree(item)
+        except:
+            pass
+    Refresh()
 #---------------------------------------------------------------------------------------------------
 # Function to clear all known cache files
 @route(mode='clear_cache')
@@ -750,12 +708,6 @@ def Delete_Userdata():
     if os.path.exists(zipcheck):
         os.remove(zipcheck)
 #---------------------------------------------------------------------------------------------------
-# Disable the master mode
-@route(mode='disable_master')
-def Disable_Master():
-    ADDON.setSetting('master','false')
-    xbmc.executebuiltin('Container.Refresh')
-#---------------------------------------------------------------------------------------------------
 # Function to pull commands and update
 def DLE(command,repo_link,repo_id):
     check1='DLE'
@@ -894,8 +846,6 @@ def File_Contents(paths=['special://profile/guisettings.xml']):
         if xml_raw:
             for line in xml_raw.splitlines():
                 xml_data += '\n'+line.rstrip()
-            # if xml_data.startswith('\n'):
-            #     xml_data = xml_data[1:]
         settings_array.append( [item,xml_data] )
     return settings_array
 #---------------------------------------------------------------------------------------------------
@@ -913,13 +863,20 @@ def Firmware_Update(url):
 def Force_Update():
     dolog('FORCE UPDATE')
     if YesNo_Dialog('[COLOR=gold]%s[/COLOR]'%String(30501),String(30544)):
-        zip_path = os.path.join(TBSDATA,'zipcheck')
-        dolog('zip_path: %s'%zip_path)
-        if os.path.exists(zip_path):
-            os.remove(zip_path)
-        Get_Updates()
+        username = Addon_Setting('username')
+        password = Addon_Setting('password')
+        email    = Addon_Setting('email')
+        userid   = Addon_Setting('userid')
+        shutil.rmtree(TBSDATA)
+        shutil.rmtree(SF_ROOT)
+        shutil.rmtree(MEDIA)
+        Get_Updates('full')
+        Addon_Setting('username',username)
+        Addon_Setting('password',password)
+        Addon_Setting('email',email)
+        Addon_Setting('userid',userid)
 #---------------------------------------------------------------------------------------------------
-# Clean up all known cache files
+# Show friends
 def Friend_Options(my_array=[]):
     username  = encryptme("e",Addon_Setting("username"))
     email     = encryptme("e",Addon_Setting("email"))
@@ -1000,7 +957,7 @@ def Full_Clean():
             pass
         choice = YesNo_Dialog(String(30055),String(30056),yes=String(30057),no=String(30058))
         if choice == 1:
-            Remove_Textures()
+            Cleanup_Textures(frequency=1,use_count=100)
             Delete_Folders(THUMBNAILS)
             Force_Close()
         else:
@@ -1102,12 +1059,22 @@ def Get_Mac(protocol):
 #---------------------------------------------------------------------------------------------------
 # Run the social update command and optionally show a busy working symbol until finished
 @route(mode='get_updates', args=['url'])
-def Get_Updates(url=True):
-    if url:
-        Show_Busy(True)
-    Sleep_If_Function_Active( Grab_Updates, [BASE+'boxer/comm_live.php?multi&z=c&x=','ignoreplayer'], kill_time=600)
-    # if url:
-    #     Show_Busy(False)
+def Get_Updates(url='update'):
+    Grab_Updates(url)
+    Sync_Settings()
+    dolog('### TBS_RUNNING: %s'%xbmcgui.Window(10000).getProperty('TBS_Running'))
+    Notify(String(30059),String(30007),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','tick.png'))
+    Show_Busy(True)
+    counter = 2
+    updates_running = 'true'
+    while updates_running == 'true':
+        xbmc.sleep(2000)
+        updates_running = xbmcgui.Window(10000).getProperty('TBS_Running')
+        dolog('### TBS_RUNNING: %ss'%counter)
+        counter += 2
+    SF_Repo_Check()
+    Show_Busy(False)
+    Notify(String(30330),String(30331),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','tick.png'))
 #---------------------------------------------------------------------------------------------------
 # Grab current playing video details
 @route(mode='get_video')
@@ -1163,176 +1130,13 @@ def Get_Video():
         OK_Dialog('FAILED','Playback was unsuccessful')
 #---------------------------------------------------------------------------------------------------
 # Run social update command to check for any updates
-@route(mode='grab_updates', args=['url','runtype'])
-def Grab_Updates(url, runtype = ''):
-    dolog('GRAB_UPDATES - URL: %s'%url)
-    dolog('GRAB_UPDATES - RUNTYPE: %s'%runtype)
-    if runtype != 'ignoreplayer':
-        isplaying = xbmc.Player().isPlaying()
-        while isplaying:
-            xbmc.sleep(1000)
-            isplaying = xbmc.Player().isPlaying()
-
-    urlparams   = URL_Params()
-    mysuccess   = 0
-    failed      = 0
-    counter     = 0
-    changetimer = 0
-    multi       = 0
-    previous    = ''
-
-    if urlparams != 'Unknown':
-        dolog('### CHECKING MAIN MENU DEFAULTS')
-        Main_Menu_Defaults()
-        if url == BASE+'boxer/comm_live.php?multi&z=c&x=':
-            multi = 1
-            url=url.replace('multi&','')
-        if url == BASE+'boxer/comm_live.php?update&z=c&x=':
-            Notify(String(30059),String(30007),'1000',os.path.join(ADDONS,'script.openwindow','resources','images','update_software.png'))
-            url=url.replace('update&','')
-        url,params = url.split('?')
-        dolog('### MAIN MENU DEFAULTS RUN MOVING ON')
-        while mysuccess != 1 and failed != 1:
-
-            # try:
-            dolog("### URL: "+url+'?'+encryptme('e',urlparams))
-            link = Open_URL(url=url,post_type='post',payload={"x":encryptme('e',urlparams),"z":"c"})
-            if link != '' and not 'sleep' in link:
-                link = encryptme('d',link).replace('\n',';').replace('|_|',' ').replace('|!|','\n').replace('http://venztech.com/repo_jpegs/',BASE+'repo_jpegs/')
-            try:
-                dolog("### Return: "+link)
-            except:
-                pass
-
-            if link == '':
-                dolog("### Blank page returned")
-                counter += 1
-                if counter == 3:
-                    failed = 1
-
-# Check that no body tag exists, if it does then we know TLBB is offline
-            if not '<body' in link and link != '':
-                linematch  = re.compile('com(.+?)="').findall(link)
-                commline   = linematch[0] if (len(linematch) > 0) else ''
-                commatch   = re.compile('="(.+?)endcom"').findall(link)
-                command    = commatch[0] if (len(commatch) > 0) else 'End'
-            
-                SF_match   = re.compile('<favourite[\s\S]*?</favourite>').findall(command)
-                SF_command = SF_match[0] if (len(SF_match) > 0) else 'None'
-
-# Create array of commands so we can check if the install video needs to be played
-                previous += command
-                dolog("### command: "+command)
-                dolog("### SF_command: "+SF_command)
-
-                Open_URL( post_type='post',url=BASE+'boxer/comm_live.php',payload={"x":encryptme('e',urlparams),"y":commline} )
-                dolog("### COMMAND *CLEANED: "+command.replace('|#|',';'))
-                dolog("### LINK *ORIG: "+link)
-                if SF_command!='None':
-                    Text_File(PROGRESS_TEMP, 'w', SF_command)
-
-                elif command!='End' and not 'sleep' in link:
-                    if ';' in command:
-                        dolog(command)
-                        newcommands = command.split(';')
-                        for item in newcommands:
-                            if 'branding/install.mp4' in item:
-                                item = ''
-
-                            if 'extract.all' in item:
-                                try:
-                                    item = item.replace('extract.all','Extract')
-                                    exec item
-                                    if os.path.exists(os.path.join(PACKAGES,'updates.zip')):
-                                        os.remove(os.path.join(PACKAGES,'updates.zip'))
-                                except:
-                                    dolog(Last_Error())
-                            else:
-                                try:
-                                    if 'Dialog().ok(' in item:
-                                        xbmc.sleep(1000)
-                                        while xbmc.Player().isPlaying():
-                                            xbmc.sleep(500)
-                                    exec item.replace('|#|',';') # Change to semicolon for user agent otherwise it splits into a new command
-                                    dolog("### RUNNING ITEM: "+item.replace('|#|',';'))
-                                except:
-                                    dolog("### Failed with item: "+item.replace('|#|',';'))
-                                    dolog(Last_Error())
-                    else:
-                        try:
-                            if 'Dialog().ok(' in command:
-                                if not multi:
-                                    xbmc.sleep(1000)
-                                    dolog("### OK_Dialog in this command, checking if xbmc is playing....")
-                                    while xbmc.Player().isPlaying():
-                                        xbmc.sleep(500)
-                                else: command = ''
-
-                            if 'extract.all' in command:
-                                try:
-                                    command = command.replace('extract.all','Extract')
-                                    exec command
-                                    if os.path.exists(os.path.join(PACKAGES,'updates.zip')):
-                                        os.remove(os.path.join(PACKAGES,'updates.zip'))
-                                except:
-                                    dolog("### Failed with command: "+command.replace('|#|',';'))
-                                    dolog(Last_Error())
-
-                            if 'branding/install.mp4' in command:
-                                command = ''
-
-                            else:
-                                exec command.replace('|#|',';') # Change to semicolon for user agent otherwise it splits into a new command
-                                dolog("### RUNNING COMMAND: "+item.replace('|#|',';'))
-                        except:
-                            dolog("### Failed with command: "+command.replace('|#|',';'))
-                    previous = ''
-                    if os.path.exists(PROGRESS_TEMP):
-                        os.remove(PROGRESS_TEMP)
-                    
-                elif command=='End':
-                    if 'sleep' in link:
-                        content=Text_File(SLEEPER, 'r')
-                        if content != "sleep=STOPALL":
-                            sleep = str(link[6:])
-                        else:
-                            sleep = "23:59:59"
-                            dolog("### SLEEP MODE - SERVER MAINTENANCE")
-                        if str(sleep) != str(content):
-                            Text_File(SLEEPER, 'w',sleep)
-                            dolog("### Changed timer to "+sleep)
-                            changetimer = 1
-                        else:
-                            dolog("### Timer same, no changes required")
-                    if sleep != '23:59:59':
-                        Refresh(['addons','repos'])
-                        mysuccess = 1
-            # except:
-            #     dolog("### Failed with update command: "+Last_Error())
-            #     failed = 1
-
-        if changetimer == 1:
-            dolog('### TBS GRAB UPDATES - TIMER CHANGED, STOPPING/RUNNING SERVICE')
-            xbmc.executebuiltin('StopScript(special://home/addons/plugin.program.tbs/service.py)')
-            xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.tbs/service.py)')
-
+@route(mode='grab_updates', args=['url'])
+def Grab_Updates(url='update'):
     dolog('### TBS GRAB UPDATES - RUNNING FUNCTIONS')
-    if os.path.exists( xbmc.translatePath('special://home/addons/script.openwindow/functions.py') ):
-        xbmc.executebuiltin('RunScript(special://home/addons/script.openwindow/functions.py,%s)'%runtype)
-    elif os.path.exists( xbmc.translatePath('special://xbmc/addons/script.openwindow/functions.py') ):
-        xbmc.executebuiltin('RunScript(special://xbmc/addons/script.openwindow/functions.py,%s)'%runtype)
-    Sync_Settings()
-    Remove_Files()
-    dolog('### TBS_RUNNING: %s'%xbmcgui.Window(10000).getProperty('TBS_Running'))
-    if runtype != 'silent':
-        counter = 2
-        updates_running = 'true'
-        while updates_running == 'true':
-            xbmc.sleep(2000)
-            updates_running = xbmcgui.Window(10000).getProperty('TBS_Running')
-            dolog('### TBS_RUNNING: %ss'%counter)
-            counter += 2
-        Notify(String(30330),String(30331),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','tick.png'))
+    if os.path.exists( xbmc.translatePath('special://home/addons/script.openwindow/default.py') ):
+        xbmc.executebuiltin('RunScript(special://home/addons/script.openwindow/default.py,%s)'%url)
+    elif os.path.exists( xbmc.translatePath('special://xbmc/addons/script.openwindow/default.py') ):
+        xbmc.executebuiltin('RunScript(special://xbmc/addons/script.openwindow/default.py,%s)'%url)
 #---------------------------------------------------------------------------------------------------
 # Hide passwords in addon settings
 @route(mode='hide_passwords')
@@ -1355,50 +1159,40 @@ def Hide_Passwords():
                                     pass
         OK_Dialog(String(30096), String(30097)) 
 #---------------------------------------------------------------------------------------------------
-# Loop through a list of add-ons and install them
 def Install_Addons(url):
-    failed_array = []
-    repo_list    = {}
-    xbmc_gui     = Requirements('xbmc.gui')
-    xbmc_python  = Requirements('xbmc.python')
-    gui_min      = encryptme('e',xbmc_gui['min'])
-    gui_max      = encryptme('e',xbmc_gui['max'])
-    python_min   = encryptme('e',xbmc_python['min'])
-    python_max   = encryptme('e',xbmc_python['max'])
-
+    repo_list   = {}
+    xbmc_gui    = Requirements('xbmc.gui')
+    xbmc_python = Requirements('xbmc.python')
+    gui_min     = encryptme('e',xbmc_gui['min'])
+    gui_max     = encryptme('e',xbmc_gui['max'])
+    python_min  = encryptme('e',xbmc_python['min'])
+    python_max  = encryptme('e',xbmc_python['max'])
+    my_download = ''
     try:
-        mycode       = Open_URL(url=binascii.unhexlify(BASE2)+'boxer/addoninstall.php',post_type='post',payload={"a":url,"v":encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
-        my_download  = ''
-        url_clean    = encryptme('d',url)
+        mycode    = Open_URL(url=BASE+'boxer/Addon_Install.php',post_type='post',payload={'a':url,'v':encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
+        url_clean = encryptme('d',url)
         exec(mycode)
     except:
-        mycode       = Open_URL(url=BASE+'boxer/masterscripts/addoninstall.php',post_type='post',payload={"a":url,"v":encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
-        my_download  = ''
-        url_clean    = encryptme('d',url)
+        mycode    = Open_URL(url=binascii.unhexlify(BASE2)+'boxer/addoninstall.php',post_type='post',payload={'a':url,'v':encryptme('e',XBMC_VERSION),'guimin':gui_min,'guimax':gui_max,'pymin':python_min,'pymax':python_max,'ignore':'false'})
+        url_clean = encryptme('d',url)
         exec(mycode)
-
-    if len(repo_list) > 0 and not ',' in url_clean:
-        my_download = download_array[url_clean]
+    if len(repo_list)>0 and not ',' in url_clean:
+        my_download=download_array[url_clean]
     if len(my_download) > 0 or ',' in url_clean:
-        Show_Busy()
         for key in repo_list:
-
-# If the addon does not already exist on system or is in adult_store then try to install
             if not (xbmc.getCondVisibility('System.HasAddon(%s)'%key)) and (not os.path.exists(os.path.join(adult_store,key))):
                 dolog('INSTALLING ADDON: %s'%key)
-                temp_zip = os.path.join(PACKAGES,key+'.zip')
+                temp_zip      = os.path.join(zip_path,key+'.zip')
                 official_repo = repo_list[key]
                 downloads     = download_array[key]
+                off_check     = ''
                 try:
-                    Sleep_If_Function_Active(function=Download,args=[downloads[official_repo],temp_zip],show_busy=False,kill_time=180)
-                    repoexists = True
+                    off_check = downloads[official_repo]
+                    Sleep_If_Function_Active(function=Download, args=[downloads[official_repo],temp_zip], show_busy=False,kill_time=120)
                 except:
                     dolog('Failed to download from official repo')
-                    repoexists = False
-                if os.path.exists(temp_zip) and zipfile.is_zipfile(temp_zip) and repoexists:
+                if os.path.exists(temp_zip) and zipfile.is_zipfile(temp_zip) and off_check!='':
                     dolog('%s Download Complete: %s'%(key,downloads[official_repo]))
-
-# If download from official repo failed we try alternative sources (highest versions first)
                 else:
                     success  = False
                     backup   = downloads.items()
@@ -1406,42 +1200,53 @@ def Install_Addons(url):
                     for item in backup:
                         new_list.append(item[1])
                     while not success and len(new_list) != 0:
-                        highest_repo = Highest_Version(new_list,'-','.zip')
+                        highest_repo=Highest_Version(new_list,'-','.zip')
                         if highest_repo != '':
                             try:
-                                Sleep_If_Function_Active(function=Download,args=[highest_repo,temp_zip],show_busy=False,kill_time=180)
+                                Sleep_If_Function_Active(function=Download, args=[highest_repo,temp_zip], show_busy=False,kill_time=120)
                             except:
                                 dolog('Failed to download from: %s'%highest_repo)
                             if os.path.exists(temp_zip) and zipfile.is_zipfile(temp_zip):
                                 dolog('%s Download Complete: %s'%(key,highest_repo))
-                                success = True
+                                success=True
                             else:
                                 new_list.remove(highest_repo)
+                                dolog('Failed to download from: %s'%highest_repo)
                     if not success and len(new_list) == 0:
-                        failed_array.append(key)
+                        try:
+                            Download(converthex('687474703a2f2f746f74616c7265766f6c7574696f6e2e78797a2f6164646f6e732f7a6970732f25732e7a6970')%key,temp_zip)
+                        except:
+                            try:
+                                Download(converthex('687474703a2f2f746f74616c7265766f6c7574696f6e2e78797a2f6164646f6e732f6261636b7570732f25732e7a6970')%key,temp_zip)
+                            except:
+                                dolog('NO LINKS FOUND FOR: %s'%key)
                 if os.path.exists(temp_zip) and zipfile.is_zipfile(temp_zip):
                     Sleep_If_Function_Active(function=Extract,args=[temp_zip,ADDONS],show_busy=False,kill_time=180)
-        
-        dolog('### ENABLING ADDONS')
-        # Sleep_If_Function_Active(function=Toggle_Addons,show_busy=False)
-        Toggle_Addons()
-        Show_Busy(False)
-        # Adult_Toggle(adult_list=adult_addons,disable=True)
+    dolog('### ENABLING ADDONS')
+    try:
+        mylist = Addon_Genre(custom_url=BASE+'addons/addon_list.txt')
+    except:
+        try:
+            mylist = Addon_Genre()
+        except:
+            mylist = {}
+    adult_list = []
+    if mylist:
+        adult_dict = mylist.items()
+        for item in adult_dict:
+            adult_list.append(item[1])
     else:
-        OK_Dialog(String(30513),String(30514)%encryptme('d',url))
-    if len(failed_array) == 0:
-        return 'success'
-    else:
-        return failed_array
+        dolog('NO XXX CONTENT FOUND')
+    Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
+    dolog('ADDON ENABLE COMPLETE, DISABLING ADULT')
+    Adult_Toggle(adult_list=adult_list,disable=True)
 #---------------------------------------------------------------------------------------------------
 # Menu to install content via the TR add-on
 @route(mode='install_content')
 def Install_Content():
-    if Addon_Setting('master') == 'true':
-        Add_Dir(String(30098),'','disable_master',False,'','','')
     if Addon_Setting('userid') != '':
-        Add_Dir(String(30099) % encryptme('d',userid),'','change_id',False,'','','')
-    Add_Dir(String(30100),'', 'get_updates',False,'','','')
+        Add_Dir(String(30099) % encryptme('d',userid),'','',False,'','','')
+    Add_Dir(String(30100),'update', 'get_updates',False,'','','')
     Add_Dir(String(30101),'','keywords',False,'Keywords.png','','')
     Add_Dir(String(30102),'','install_from_zip',False,'','','')
     Add_Dir(String(30103),'','browse_repos',False,'','','')
@@ -1491,148 +1296,30 @@ def Install_Keyword():
             dolog(Last_Error())
             OK_Dialog(String(30131),String(30132))
 #---------------------------------------------------------------------------------------------------
-# Show final results for installing (if multiple shares of same name order by popularity)
-def Install_Repos(to_install):
+# Send through a list of add-ons and install the relevant "official" repos for those
+def Install_Repos(addon_list=[],install_all=True):
     email       = encryptme( 'e',Addon_Setting('email') )
     username    = encryptme( 'e',Addon_Setting('username') )
     password    = Addon_Setting('password')
-    addon_list  = ''
-
+    processed   = []
+    final_list  = ''
 # Check addons 
-    for item in to_install:
-        addon_installed = xbmc.getCondVisibility('System.HasAddon(%s)'%item)
-        adult_exists    = os.path.exists( os.path.join(adult_store,item) )
-        path_exists     = os.path.exists( os.path.join(ADDONS,item) )
-        if not addon_installed and not path_exists and not adult_exists:
-            addon_list += item+','
-    if addon_list != '':
-        url       = BASE+'boxer/Install_Repos.php'
-        params    = {"x":encryptme('e',URL_Params()),"n":username,"p":password,"c":encryptme('e',addon_list),"e":email}
-        response  = Open_URL(url=url,payload=params,post_type='post')
-        try:
-            exec( encryptme('d',response) )
-        except:
-            dolog(Last_Error())
-            OK_Dialog(String(30131),String(30132))
-#---------------------------------------------------------------------------------------------------
-# Show final results for installing (if multiple shares of same name order by popularity)
-def Install_Shares(function, menutype, menu, choices, contentarray = '', imagearray = '', descarray = ''):
-        shares_contentarray = []
-        shares_imagearray   = []
-        shares_descarray    = []
-        shares_contenturl   = []
-        urlparams           = URL_Params()
-
-# HAD TO REVERT BACK TO OLD OPEN_URL2 METHOD FOR THIS FUNCTION, SOMETHING CURRENTLY OFF WITH PYTHON KODING REQUESTS METHOD
-
-#    try:
-        for item in choices:
-            xbmc.log('CHOICE: %s' % item)
-            if debug == 'true':
-                xbmc.log(BASE+'boxer/cat_search_live.php?x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item]))))
-            sharelist_URL  = BASE+'boxer/cat_search_live.php?x=%s' % (encryptme('e','%s&%s&1&%s&%s' % (urlparams, function, social_shares, contentarray[item])))
-            content_list   = Open_URL2(sharelist_URL)
-            clean_link     = encryptme('d',content_list)
-            if debug == 'true':
-                xbmc.log('#### %s' % clean_link)
-
-# Grab all the shares which match the master sub-category
-            match = re.compile('n="(.+?)"t="(.+?)"d="(.+?)"l="(.+?)"', re.DOTALL).findall(clean_link)
-            for name, thumb, desc, link in match:
-                shares_contentarray.append(name)
-                shares_imagearray.append(thumb)
-                shares_descarray.append(desc)
-                shares_contenturl.append(link)
-
-# If we have more than one item in the list we present them so the user can select which one they want installed
-            if len(shares_contentarray) > 1:
-                choice = dialog.select('Select share for [COLOR=dodgerblue]%s[/COLOR]' % contentarray[item].replace('ADD ',''), shares_contentarray)
-                install_share = shares_contenturl[choice]
-
-            else:
-                install_share = shares_contenturl[0]
-
-# Remove any matching menu items previously installed from different boxes
-            if len(shares_contentarray)>0:
-                for item in shares_contentarray:
-                    xbmc.log('### Removing any old instances of %s' % item)
-                    if item.startswith('Add'):
-                        item         = 'Remove'+item[3:]
-                    change_text  = re.compile(' to the (.+?)Menu').findall(item)[0]
-                    if change_text.endswith(' '):
-                        change_text = change_text[:-1]
-                    item         = item.replace(' to the %s' % change_text, '%'+' from the %s' % change_text)
-                    if 'by box' in item:
-                        change_text2 = re.compile('by box (.+?)from').findall(item)[0]
-                        xbmc.log('by box: %s' % change_text2)
-                        item         = item.replace(change_text2, '%')
-                    Remove_Menu('from_the_%s_menu' % change_text.lower().replace(' ', '_'), item)
-#            content_list   = Open_URL2(sharelist_URL)
-
-                Open_URL2(install_share)
-
-# Clean the arrays so they don't show old data
-            del shares_contentarray[:]
-            del shares_imagearray[:]
-            del shares_descarray[:]
-            del shares_contenturl[:]
-            del match[:]
-        xbmc.executebuiltin('ActivateWindow(HOME)')
-        Get_Updates()
-#---------------------------------------------------------------------------------------------------
-# Function to grab the main sub-categories 
-@route(mode='install_venz_menu', args=['url'])
-def Install_Venz_Menu(url):
-    menutype    = ''
-    menu        = ''
-    if '||' in url:
-        url,menutype,menu = url.split('||')
-    menu = menu.replace('_',' ').lower()
-
-    urlparams  = URL_Params()
-    if urlparams != 'Unknown':
-        try:
-
-# Inititalise the arrays for sending to multi-select window
-            contentarray = []
-            imagearray   = []
-            descarray    = []
-            contenturl   = []
-
-# Add an item to one of the main menu categories or add a sub-menu item
-            if menutype == 'add_main' or menutype == 'add_sub' or url.startswith('manualsearch'):
-                categoryURL  = BASE+'boxer/cat_search_live.php'
-                dolog(categoryURL)
-                link_orig  = Open_URL(url=categoryURL,post_type='post',payload={"x":encryptme('e','%s&%s&0&%s' % (urlparams, url, social_shares))})
-                link       = encryptme('d',link_orig)
-                dolog('#### '+encryptme('d',link_orig))
-            
-                match  = re.compile('n="(.+?)"t="(.+?)"d="(.+?)"', re.DOTALL).findall(link)
-                for name, thumb, desc in match:
-                    contentarray.append(name)
-                    imagearray.append(thumb)
-                    descarray.append(desc)
-
-                if len(contentarray)>0:
-                    choices = multiselect(String(30078), contentarray, imagearray, descarray)
-                    xbmc.executebuiltin('ActivateWindow(HOME)')
-                    dolog('Choices: %s' % choices)
-                    if len(choices) > 0:
-                        Install_Shares(url, menutype, menu, choices, contentarray, imagearray, descarray)
-                else:
-                    if thirdparty == 'true':
-                        OK_Dialog(String(30079),String(30080))
-                    else:
-                        OK_Dialog(String(30079),String(30081))
-
-
-# If this is a remove item
-            else:
-                Remove_Menu(url)
-        except:
-            Notify(String(30082),String(30083),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','cross.png'))
-    else:
-        OK_Dialog(String(30084), String(30085))    
+    for item in addon_list:
+    # If only installing repos for add-ons which aren't yet installed
+        if not install_all:
+            addon_installed = xbmc.getCondVisibility('System.HasAddon(%s)'%item)
+            adult_exists    = os.path.exists( os.path.join(adult_store,item) )
+            path_exists     = os.path.exists( os.path.join(ADDONS,item) )
+            if not addon_installed and not path_exists and not adult_exists and item not in processed:
+                final_list += item+','
+                processed.append(item)
+    # Otherwise install all repos
+        elif not item in processed:
+            final_list += item+','
+            processed.append(item)
+    if final_list != '':
+        params    = {"x":encryptme('e',URL_Params()),"n":username,"p":password,"c":encryptme('e',final_list),"e":email}
+        Run_Code(url='boxer/Install_Repos.php',payload=params)
 #---------------------------------------------------------------------------------------------------
 # Return details about the IP address lookup       
 @route(mode='ip_check')
@@ -1670,22 +1357,10 @@ def IP_Check():
 # Return details of a full keyword backup (addons,addon_data,faves,sources,guisettings)
 @route(mode='kw_full')
 def Keyword_Full_Backup():
-    id_array       = []
-    my_addons      = []
-    skiparray      = ['plugin.program.super.favourites','plugin.program.tbs','script.openwindow','script.trtv','script.qlickplay','plugin.video.metalliq']
-    content_list   = ['special://profile/guisettings.xml','special://profile/favourites.xml','special://profile/sources.xml','special://profile/addon_data/plugin.video.addons.ini.creator/.storage/folders']
+    id_array       = My_Installed_Addons()
     redirect_list  = Get_Contents(path=REDIRECTS,folders=False,full_path=False)
+    content_list   = ['special://profile/guisettings.xml','special://profile/favourites.xml','special://profile/sources.xml','special://profile/addon_data/plugin.video.addons.ini.creator/.storage/folders']
     content_list  += ['special://profile/addon_data/plugin.program.tbs/redirects/' + s for s in redirect_list]
-
-    my_addons =  Installed_Addons(content='video')
-    my_addons += Installed_Addons(content='audio')
-    my_addons += Installed_Addons(content='image')
-    my_addons += Installed_Addons(content='executable')
-
-    for item in my_addons:
-        item = item["addonid"].encode('utf-8')
-        if not item in skiparray and not item in id_array:
-            id_array.append(item)
 
     my_addons      = 'my_addons=%s\n'%id_array
     my_addons     += '\nmy_settings=%s'%Create_Keyword_Addon_Data()
@@ -1740,158 +1415,77 @@ def Main_Menu_Defaults():
     urlparams = URL_Params()
     Run_Code(url='boxer/main_menus.php', payload={"x":encryptme('e', urlparams)} )
 #---------------------------------------------------------------------------------------------------
-# Function to enable/disable the main menu items - added due to glitch on server
+# Function to enable/disable the main menu items
 @route(mode='main_menu_install', args=['url'])
 def Main_Menu_Install(url):
-    menu_list = (['Custom6HomeItem.Disable','comedy'],['Custom3HomeItem.Disable','cooking'],['Custom4HomeItem.Disable','fitness'],
-    ['Custom5HomeItem.Disable','gaming'],['FavoritesHomeItem.Disable','kids'],['LiveTVHomeItem.Disable','livetv'],
-    ['MovieHomeItem.Disable','movies'],['MusicHomeItem.Disable','music'],['ProgramsHomeItem.Disable','news'],
-    ['VideosHomeItem.Disable','sports'],['Custom2HomeItem.Disable','technology'],['WeatherHomeItem.Disable','travel'],
-    ['TVShowHomeItem.Disable','tvshows'],['PicturesHomeItem.Disable','world'],['ShutdownHomeItem.Disable','youtube'],
-    ['MusicVideoHomeItem.Disable','xxx'])
-
-    menu_options = []
-
-    if os.path.exists(MAIN_MENUS):
-        main_menu_list = encryptme('d',Text_File(MAIN_MENUS,'r'))
-        main_list = eval(main_menu_list)
-        dolog(main_menu_list)
-        for item in menu_list:
-            try:
-                exec( '%s = "%s"' % (item[1],main_list[item[1]]) )
-                menu_options.append(item[1])
-            except:
-                dolog(Last_Error())
-    else:
-        urlparams       = URL_Params()
-        menu_options    = Open_URL( post_type='post', url=BASE+'boxer/my_details_live.php', payload={"x":encryptme('e', urlparams),"m":"1"} )
-        menu_options    = encryptme('d', menu_options)
-        comedy          = String(30061)
-        cooking         = String(30077)
-        fitness         = String(30062)
-        gaming          = String(30063)
-        kids            = String(30064)
-        livetv          = String(30065)
-        movies          = String(30066)
-        music           = String(30067)
-        news            = String(30068)
-        sports          = String(30069)
-        system          = String(30550)
-        technology      = String(30070)
-        travel          = String(30071)
-        tvshows         = String(30072)
-        world           = String(30073)
-        youtube         = String(30074)
-
     if url == 'add':
-        listcount = Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,menu_options,True])
-        if xbmc.getCondVisibility('Skin.String(Custom6HomeItem.Disable)') and 'comedy' in menu_options:
-            Add_Dir('%s %s'%(String(30060),comedy),'Skin.SetString(Custom6HomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_COMEDY/HOME_COMEDY_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(Custom3HomeItem.Disable)') and 'cooking' in menu_options:
-            Add_Dir('%s %s'%(String(30060),cooking),'Skin.SetString(Custom3HomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_COOKING/HOME_COOKING_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(Custom4HomeItem.Disable)') and 'fitness' in menu_options:
-            Add_Dir('%s %s'%(String(30060),fitness),'Skin.SetString(Custom4HomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_FITNESS/HOME_FITNESS_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(Custom5HomeItem.Disable)') and 'gaming' in menu_options:
-            Add_Dir('%s %s'%(String(30060),gaming),'Skin.SetString(Custom5HomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_GAMING/HOME_GAMING_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(FavoritesHomeItem.Disable)') and 'kids' in menu_options:
-            Add_Dir('%s %s'%(String(30060),kids),'Skin.SetString(FavoritesHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_KIDS/HOME_KIDS_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(LiveTVHomeItem.Disable)') and 'livetv' in menu_options:
-            Add_Dir('%s %s'%(String(30060),livetv),'Skin.SetString(LiveTVHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_LIVE_TV/HOME_LIVE_TV_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(MovieHomeItem.Disable)') and 'movies' in menu_options:
-            Add_Dir('%s %s'%(String(30060),movies),'Skin.SetString(MovieHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_MOVIES/HOME_MOVIES_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(MusicHomeItem.Disable)') and 'music' in menu_options:
-            Add_Dir('%s %s'%(String(30060),music),'Skin.SetString(MusicHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_MUSIC/HOME_MUSIC_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(ProgramsHomeItem.Disable)') and 'news' in menu_options:
-            Add_Dir('%s %s'%(String(30060),news),'Skin.SetString(ProgramsHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_NEWS/HOME_NEWS_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(VideosHomeItem.Disable)') and 'sports' in menu_options:
-            Add_Dir('%s %s'%(String(30060),sports),'Skin.SetString(VideosHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_SPORTS/HOME_SPORTS_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(Custom2HomeItem.Disable)') and 'technology' in menu_options:
-            Add_Dir('%s %s'%(String(30060),technology),'Skin.SetString(Custom2HomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TECHNOLOGY/HOME_TECHNOLOGY_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(WeatherHomeItem.Disable)') and 'travel' in menu_options:
-            Add_Dir('%s %s'%(String(30060),travel),'Skin.SetString(WeatherHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TRAVEL/HOME_TRAVEL_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(TVShowHomeItem.Disable)') and 'tvshows' in menu_options:
-            Add_Dir('%s %s'%(String(30060),tvshows),'Skin.SetString(TVShowHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TV_SHOWS/HOME_TV_SHOWS_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(PicturesHomeItem.Disable)') and 'world' in menu_options:
-            Add_Dir('%s %s'%(String(30060),world),'Skin.SetString(PicturesHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_WORLD/HOME_WORLD_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(ShutdownHomeItem.Disable)') and 'youtube' in menu_options:
-            Add_Dir('%s %s'%(String(30060),youtube),'Skin.SetString(ShutdownHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_YOUTUBE/HOME_YOUTUBE_001.jpg','','')
-        if xbmc.getCondVisibility('Skin.String(MusicVideoHomeItem.Disable)') and 'xxx' in menu_options:
-            Add_Dir('%s %s'%(String(30060),xxx),'Skin.SetString(MusicVideoHomeItem.Disable,)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_XXX/HOME_XXX_001.jpg','','')
-        if listcount > 0:
-            OK_Dialog(String(30079),String(30310))
-            xbmc.executebuiltin('ActivateWindow(home)')
-
-    if url == 'remove':
-        listcount = Sleep_If_Function_Active(function=Main_Menu_Visibility,args=[menu_list,'',False])
-        if not xbmc.getCondVisibility('Skin.String(Custom6HomeItem.Disable)') and 'comedy' in menu_options:
-            Add_Dir('%s %s'%(String(30076),comedy),'Skin.SetString(Custom6HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_COMEDY/HOME_COMEDY_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom3HomeItem.Disable)') and 'cooking' in menu_options:
-            Add_Dir('%s %s'%(String(30076),cooking),'Skin.SetString(Custom3HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_COOKING/HOME_COOKING_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom4HomeItem.Disable)') and 'fitness' in menu_options:
-            Add_Dir('%s %s'%(String(30076),fitness),'Skin.SetString(Custom4HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_FITNESS/HOME_FITNESS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom5HomeItem.Disable)') and 'gaming' in menu_options:
-            Add_Dir('%s %s'%(String(30076),gaming),'Skin.SetString(Custom5HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_GAMING/HOME_GAMING_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(FavoritesHomeItem.Disable)') and 'kids' in menu_options:
-            Add_Dir('%s %s'%(String(30076),kids),'Skin.SetString(FavoritesHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_KIDS/HOME_KIDS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(LiveTVHomeItem.Disable)') and 'livetv' in menu_options:
-            Add_Dir('%s %s'%(String(30076),livetv),'Skin.SetString(LiveTVHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_LIVE_TV/HOME_LIVE_TV_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(MovieHomeItem.Disable)') and 'movies' in menu_options:
-            Add_Dir('%s %s'%(String(30076),movies),'Skin.SetString(MovieHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_MOVIES/HOME_MOVIES_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(MusicHomeItem.Disable)') and 'music' in menu_options:
-            Add_Dir('%s %s'%(String(30076),music),'Skin.SetString(MusicHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_MUSIC/HOME_MUSIC_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(ProgramsHomeItem.Disable)') and 'news' in menu_options:
-            Add_Dir('%s %s'%(String(30076),news),'Skin.SetString(ProgramsHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_NEWS/HOME_NEWS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(VideosHomeItem.Disable)') and 'sports' in menu_options:
-            Add_Dir('%s %s'%(String(30076),sports),'Skin.SetString(VideosHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_SPORTS/HOME_SPORTS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(Custom2HomeItem.Disable)') and 'technology' in menu_options:
-            Add_Dir('%s %s'%(String(30076),technology),'Skin.SetString(Custom2HomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TECHNOLOGY/HOME_TECHNOLOGY_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(WeatherHomeItem.Disable)') and 'travel' in menu_options:
-            Add_Dir('%s %s'%(String(30076),travel),'Skin.SetString(WeatherHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TRAVEL/HOME_TRAVEL_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(TVShowHomeItem.Disable)') and 'tvshows' in menu_options:
-            Add_Dir('%s %s'%(String(30076),tvshows),'Skin.SetString(TVShowHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_TV_SHOWS/HOME_TV_SHOWS_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(PicturesHomeItem.Disable)') and 'world' in menu_options:
-            Add_Dir('%s %s'%(String(30076),world),'Skin.SetString(PicturesHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_WORLD/HOME_WORLD_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(ShutdownHomeItem.Disable)') and 'youtube' in menu_options:
-            Add_Dir('%s %s'%(String(30076),youtube),'Skin.SetString(ShutdownHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_YOUTUBE/HOME_YOUTUBE_001.jpg','','')
-        if not xbmc.getCondVisibility('Skin.String(MusicVideoHomeItem.Disable)') and 'xxx' in menu_options:
-            Add_Dir('%s %s'%(String(30076),xxx),'Skin.SetString(MusicVideoHomeItem.Disable,True)','set_home_menu',False,'special://home/media/branding/backgrounds/HOME_XXX/HOME_XXX_001.jpg','','')
-        if listcount > 0:
-            OK_Dialog(String(30079),String(30311))
-            xbmc.executebuiltin('ActivateWindow(home)')
-#---------------------------------------------------------------------------------------------------
-def Main_Menu_Visibility(menu_list='',menu_options='',enabled=True):
-    listcount = 0
-    if enabled:
-        for item in menu_list:
-            if item[1] in menu_options and xbmc.getCondVisibility('Skin.String(%s)'%item[0]):
-                listcount += 1
+        main_menus = Main_Menu_Visibility('add')
     else:
-        for item in menu_list:
-            if not xbmc.getCondVisibility('Skin.String(%s)'%item[0]):
-                listcount += 1
-    return listcount
+        main_menus = Main_Menu_Visibility('remove')
+    for item in main_menus:
+        eval(item)
+    if len(main_menus) == 0:
+        OK_Dialog(String(30079),String(30310))
+        xbmc.executebuiltin('ActivateWindow(home)')
 #---------------------------------------------------------------------------------------------------
-# Function to move a directory to another location, use 1 for clean paramater if you want to remove original source.
-def Move_Tree(src,dst,clean):
-    dolog('SOURCE TO MOVE: %s'%src)
-    for src_dir, dirs, files in os.walk(src):
-        dst_dir = src_dir.replace(src, dst, 1)
-        if not os.path.exists(dst_dir):
-            dolog('Creating path: %s'% dst_dir)
-            os.makedirs(dst_dir)
-        for file_ in files:
-            src_file = os.path.join(src_dir, file_)
-            dst_file = os.path.join(dst_dir, file_)
-            if os.path.exists(dst_file):
-                os.remove(dst_file)
-            shutil.move(src_file, dst_dir)
-            dolog('moved: %s to %s'% (src_file, dst_dir))
-    if clean:
-        try:
-            shutil.rmtree(src)
-            dolog('Successfully removed %s'% src)
-        except:
-            dolog('Failed to remove %s'% src)
+def Main_Menu_Visibility(url='add'):
+    main_menus = []
+    main_list  = eval(Addon_Setting('home_menus'))
+    for item in main_list.items():
+        if item[1][2] == '1':
+            dolog('default item needs enabling, check user customisations')
+        if item[1][3] != '--':
+            if item[1][0].startswith('String('):
+                name = eval(item[1][0])
+            else:
+                name  = item[1][0]
+            function  = item[1][1]
+            menu_name = Menu_Name(item[0])
+            if url == 'add':
+                setlabel  = 'Skin.SetString(%s%s)'%(function.replace('Disable','Label'),name)
+                if not xbmc.getCondVisibility('Skin.String(%s)'%function):
+                    main_menus.append("Add_Dir('%s %s','Skin.SetString(%s)~%s','set_home_menu',False,'special://home/media/branding/backgrounds/%s/%s_001.jpg','','')"%(String(30060),name,function,setlabel,menu_name,menu_name))
+            if url == 'remove':
+                setlabel  = 'Skin.Reset(%s)'%(function.replace('Disable','Label'))
+                if xbmc.getCondVisibility('Skin.String(%s)'%function):
+                    main_menus.append("Add_Dir('%s %s','Skin.SetString(%sTrue)~%s','set_home_menu',False,'special://home/media/branding/backgrounds/%s/%s_001.jpg','','')"%(String(30076),name,function,setlabel,menu_name,menu_name))
+    return sorted(main_menus)
+#---------------------------------------------------------------------------------------------------
+def Menu_Name(url):
+    if url == 'tvshows': url = 'tv_shows'
+    if url == 'livetv' : url = 'live_tv'
+    name = 'HOME_'+url.upper()
+    return name
+#---------------------------------------------------------------------------------------------------
+def Main_Menu_Sync():
+    xbmcgui.Window(10000).setProperty('Menu_Running', 'true')
+    xbmc.log('MAIN MENU SYNC INITIATED',2)
+    my_defaults = []
+    my_menus    = []
+    main_list   = eval(Addon_Setting(setting='home_menus',addon_id='plugin.program.tbs'))
+    if os.path.exists(MY_HOME_MENUS):
+        my_menus    = Text_File(MY_HOME_MENUS,'r')
+        my_defaults = my_menus.splitlines()
+    for line in my_defaults:
+        xbmc.executebuiltin(line.strip())
+    for item in main_list.items():
+        if item[1][0].startswith('String('):
+            name = eval(item[1][0])
+        else:
+            name  = item[1][0]
+        function = item[1][1]
+        if not function in my_menus:
+            if item[1][2] == '1':
+                    dolog('ENABLING: %s'%name)
+                    setlabel  = 'Skin.SetString(%s%s)'%(function.replace('Disable','Label'),name)
+                    xbmc.executebuiltin("Skin.SetString(%s)"%function)
+                    xbmc.executebuiltin("%s"%setlabel)
+            if item[1][2] == '0':
+                    dolog('DISABLING: %s'%name)
+                    setlabel  = 'Skin.Reset(%s)'%function.replace('Disable','Label')
+                    xbmc.executebuiltin("Skin.SetString(%sTrue)"%function)
+                    xbmc.executebuiltin("%s"%setlabel)
+    xbmcgui.Window(10000).clearProperty('Menu_Running')
 #---------------------------------------------------------------------------------------------------
 # Multiselect Dialog - try the built-in multiselect or fallback to pre-jarvis workaround
 def multidialog(title, mylist, images, description):
@@ -2010,7 +1604,6 @@ def My_Details():
         if choice >= 0:
             if choice == 0:
                 Get_Updates()
-                # Grab_Updates(BASE+'boxer/comm_live.php?z=c&x=')
             if choice == 1 and username == String(30348):
                 Run_Code(url="boxer/User_Registration.php")
             elif choice == 1:
@@ -2021,7 +1614,7 @@ def My_Details():
                 Keyword_Options()
     else:
         OK_Dialog(String(30380),String(30381))
-        xbmc.executebuiltin('RunAddon(script.openwindow)')
+        Register_Device()
 #---------------------------------------------------------------------------------------------------
 # List all the users shared menus
 def My_Friends():
@@ -2047,6 +1640,24 @@ def My_Friends():
         Friend_Options(final_array[choice-1])
     else:
         My_Profile()
+#---------------------------------------------------------------------------------------------------
+# Return a list of clean ids matching installed content types on system
+def My_Installed_Addons(types=['video','audio','image','executable'],\
+
+                        skip_array=['plugin.program.super.favourites','plugin.program.tbs',\
+                        'script.openwindow','script.trtv','script.qlickplay','plugin.video.metalliq',\
+                        'repository.q','repostitory.spartacus']):
+    id_array       = []
+    my_addons      = []
+
+    for item in types:
+        my_addons += Installed_Addons(content=item)
+
+    for item in my_addons:
+        item = item["addonid"].encode('utf-8')
+        if not item in skip_array and not item in id_array:
+            id_array.append(item)
+    return id_array
 #---------------------------------------------------------------------------------------------------
 # List messages
 def My_Messages(show_dialog=True):
@@ -2162,43 +1773,34 @@ def Open_SF():
         category    = final_list[choice]
         SF_Path     = os.path.join(SF_ROOT,category)
         My_Folders  = Get_Contents(path=SF_Path,full_path=False)
-        final_array = []
+        final_array = [String(30567)]
+        clean_array = [String(30567)]
         for item in My_Folders:
             item = item.replace(os.sep,'')
             xml_path = os.path.join(SF_Path,item,'favourites.xml')
             if os.path.exists(xml_path):
-                final_array.append(item)
-        dolog(repr(final_array))
-        if len(final_array) == 0:
-            OK_Dialog(String(30079),String(30080))
-            Open_SF()
-        else:
-            choice = Select_Dialog(String(30359)%menu_array[choice],final_array)
-            if choice >= 0:
-                share    = final_array[choice]
-                my_array = [String(30360),String(30361)]
-                share_choice = Select_Dialog(String(30359)%final_array[choice],my_array)
-                if share_choice >= 0:
-                    if share_choice == 0:
-                        Upload_Share( fullpath=xml_path.replace('favourites.xml',''), item=share )
-                    if share_choice == 1:
-                        xbmc.executebuiltin( 'ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)' % (category,share) )
-                else:
-                    Social_Shares()
+                final_array.append([xml_path.replace('favourites.xml',''),item])
+                clean_array.append(item.replace('_',' '))
+        choice = Select_Dialog(String(30359)%menu_array[choice],clean_array)
+        if choice == 0:
+            xbmc.executebuiltin( 'ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s",return)' % (category) )
+            return
+        elif choice > 0:
+            share    = final_array[choice][1]
+            xml_path = final_array[choice][0]
+            my_array = [String(30360),String(30361)]
+            share_choice = Select_Dialog(String(30359)%clean_array[choice],my_array)
+            if share_choice >= 0:
+                if share_choice == 0:
+                    Upload_Share( fullpath=xml_path, item=share )
+                if share_choice == 1:
+                    xbmc.executebuiltin( 'ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)' % (category,share) )
             else:
                 Social_Shares()
+        else:
+            Social_Shares()
     else:
         Social_Shares()
-#---------------------------------------------------------------------------------------------------
-# Function to install venz pack
-def Open_Link(url):
-    response = Open_URL(post_type='post',url=url)
-    dolog("### "+response)
-    if "record" in response:
-        Get_Updates()
-        xbmc.executebuiltin('Container.Refresh')
-    else:
-        OK_Dialog(String(30131),String(30132))
 #---------------------------------------------------------------------------------------------------
 # Open the relevant message type
 def Open_Message(contents={}):
@@ -2445,65 +2047,6 @@ def Remove_Crash_Logs():
     if YesNo_Dialog(String(30153),String(30154),no=String(30041),yes=String(30042)):
         Delete_Crashlogs()
         OK_Dialog(String(30155),String(30156))
-#-----------------------------------------------------------------------------
-# Remove a path, whether folder or file it will be deleted
-def Remove_Files():
-    remlist = os.path.join(TBSDATA,'remlist')
-    dolog('### Attempting to Remove Files')
-    if os.path.exists(remlist):
-        readfile = open(remlist,'r')
-        content  = readfile.read().splitlines()
-        readfile.close()
-        for item in content:
-            rempath = xbmc.translatePath('special://home')+item
-            if os.path.exists(rempath):
-                try:
-                    os.remove(rempath)
-                    dolog('### Successfully removed file: %s' % rempath)
-                except:
-                    try:
-                        shutil.rmtree(rempath)
-                        dolog('### Successfully removed folder: %s' % rempath)
-                    except:
-                        dolog("### Failed to remove: %s" %rempath)
-#---------------------------------------------------------------------------------------------------
-# Remove an item from the system
-def Remove_Menu(function, menutype = ''):
-    contentarray = []
-    imagearray   = []
-    descarray    = []
-    contenturl   = []
-    urlparams = URL_Params()
-    dolog('### OPENING URL TO GRAB DETAILS OF WHAT TO REMOVE:')
-    dolog(BASE+'boxer/cat_search_live.php?x=%s' % (encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))))
-    content_list   = Open_URL(post_type='post',url=BASE+'boxer/cat_search_live.php',payload={"x":encryptme('e','%s&%s&0&%s&%s' % (urlparams, function, social_shares, menutype))})
-    clean_link     = encryptme('d',content_list)
-    dolog('#### RETURN: %s' % clean_link)
-# Grab all the shares which match the master sub-category
-    match = re.compile('n="(.+?)"t="(.+?)"d="(.+?)"l="(.+?)"', re.DOTALL).findall(clean_link)
-    for name, thumb, desc, link in match:
-        contentarray.append(name)
-        imagearray.append(thumb)
-        descarray.append(desc)
-        contenturl.append(link)
-
-# Return the results and update
-    if len(contentarray) > 0:
-        if menutype == '':
-            choices = multiselect(String(30088),contentarray,imagearray,descarray)
-            if len(choices) > 0:
-                Notify(String(30086),String(30087),'5000',os.path.join(ADDONS,'plugin.program.tbs','resources','update.png'))
-                xbmc.executebuiltin('ActivateWindow(HOME)')
-                for item in choices:
-                    Open_URL(post_type='post',url=contenturl[item])
-        else:
-            for item in contenturl:
-                dolog('### URL TO REMOVE: %s' % item)
-                Open_URL(post_type='post',url=item)
-
-        Get_Updates()
-    elif menutype == '':
-        OK_Dialog(String(30089),String(30090))
 #---------------------------------------------------------------------------------------------------
 # Function to clear the packages folder
 @route(mode='remove_packages', args=['url'])
@@ -2517,36 +2060,11 @@ def Remove_Packages(url=''):
 @route(mode='remove_textures_dialog')
 def Remove_Textures_Dialog():
     if YesNo_Dialog(String(30160),String(30161)):
-        Remove_Textures()
+        Cleanup_Textures(frequency=1,use_count=100)
         Delete_Folders(THUMBNAILS)
     
         if YesNo_Dialog(String(30162), String(30163), no=String(30164),yes=String(30165)):
             System('quit')
-#---------------------------------------------------------------------------------------------------
-# Function to remove textures13.db
-@route(mode='remove_textures')
-def Remove_Textures():
-    textures   =  xbmc.translatePath('special://home/userdata/Database/Textures13.db')
-    try:
-        dbcon = database.connect(textures)
-        dbcur = dbcon.cursor()
-        dbcur.execute("DROP TABLE IF EXISTS path")
-        dbcur.execute("VACUUM")
-        dbcon.commit()
-        dbcur.execute("DROP TABLE IF EXISTS sizes")
-        dbcur.execute("VACUUM")
-        dbcon.commit()
-        dbcur.execute("DROP TABLE IF EXISTS texture")
-        dbcur.execute("VACUUM")
-        dbcon.commit()
-        dbcur.execute("""CREATE TABLE path (id integer, url text, type text, texture text, primary key(id))""")
-        dbcon.commit()
-        dbcur.execute("""CREATE TABLE sizes (idtexture integer,size integer, width integer, height integer, usecount integer, lastusetime text)""")
-        dbcon.commit()
-        dbcur.execute("""CREATE TABLE texture (id integer, url text, cachedurl text, imagehash text, lasthashcheck text, PRIMARY KEY(id))""")
-        dbcon.commit()
-    except:
-        pass
 #---------------------------------------------------------------------------------------------------
 # Function to restore a backup xml file (guisettings, sources, RSS)
 @route(mode='restore_backup', args=['name','url','description'])
@@ -2663,7 +2181,7 @@ def Restore_Zip_File(url):
 #---------------------------------------------------------------------------------------------------
 # Function to pull commands and update
 def RMT():
-    Remove_Textures()
+    Cleanup_Textures(frequency=1,use_count=100)
     Wipe_Cache()
 #---------------------------------------------------------------------------------------------------
 # Run command
@@ -2723,32 +2241,6 @@ def Scan_APKs(showdialogs = True):
 
     return True
 #---------------------------------------------------------------------------------------------------
-# Main search menu for Venz content
-@route(mode='search_content_main', args=['url'])
-def Search_Content_Main(url):
-    dolog(type)
-    if 'from_the' in url and '_menu' in url:
-        Install_Venz_Menu(url+'||remove_main||'+url.replace('from_the_','').replace('_menu',''))
-    elif url == 'main_menu':
-        Install_Venz_Menu(url)
-    elif not 'from_the' in url and url != 'main_menu' and not "submenu" in url:
-        Add_Dir(String(30182) % url.replace('_',' '),'to_the_'+url+'_menu||add_main||'+url,'install_venz_menu',True,'','')
-        Add_Dir(String(30183) % url.replace('_',' '),'to_the_'+url+'_menu||add_main||'+url,'search_content',True,'Manual_Search.png','','')
-    elif "submenu" in url:
-        Add_Dir(String(30184) % url.replace('_submenu','').replace('_',' ').title()+' Sub-menu','to_the_'+url+'||add_sub||'+url.replace('_submenu',''),'install_venz_menu',True,'','','')
-        Add_Dir(String(30185) % url.replace('_submenu','').replace('_',' ').title()+' Sub-menu','from_the_'+url+'||remove_sub||'+url.replace('_submenu',''),'install_venz_menu',True,'','')   
-#---------------------------------------------------------------------------------------------------
-# Search for Venz content
-@route(mode='search_content', args=['menutype'])
-def Search_Content(menutype):
-    vq = Keyboard(String(30186))
-# if blank or the user cancelled the keyboard, return
-    if ( not vq ): return False, 0
-
-# we need to set the title to our query
-    title = urllib.quote_plus(vq)
-    Install_Venz_Menu('manualsearch'+title+'>>#'+menutype)
-#---------------------------------------------------------------------------------------------------
 @route(mode='search_qp')
 def Search_QP():
     options = [String(13280,'system'),String(559,'system'),String(19029,'system')]
@@ -2799,95 +2291,106 @@ def Send_To_Friend(friend):
     else:
         My_Profile()
 #---------------------------------------------------------------------------------------------------
-def SetNone():
-    urlparams = URL_Params()
-    link = Open_URL(post_type='post',url=encryptme('d','6773736f392e2e736b61612d6c642e7264736d6e6d642d6f676f3e773c011510030A')+encryptme('e',urlparams))
-#---------------------------------------------------------------------------------------------------
 # Function to execute a command
 @route(mode='set_home_menu', args=['url'])
 def Set_Home_Menu(url):
-    my_menus = []
-    added    = False
-    xbmc.executebuiltin(url)
+    my_menus      = []
+    enable_array  = []
+    disable_array = []
+    url = url.split('~')
+    xbmc.executebuiltin(url[0])
+    xbmc.executebuiltin(url[1])
     xbmc.executebuiltin('Container.Refresh')
     if os.path.exists(MY_HOME_MENUS):
         my_menus  = Text_File(MY_HOME_MENUS,'r').splitlines()
-    clean_cmd = url.replace('True','')
+    clean_cmd = url[0].replace('True','')
     final_txt = ''
+
+# Re-create list making sure no duplicates exist
     for line in my_menus:
-        if not clean_cmd in line:
-            final_txt += line+'\n'
+        clean = line.replace('True','')
+        if clean not in enable_array and clean not in disable_array:
+            if ',True' in line and clean != clean_cmd:
+                disable_array.append(clean)
+            elif clean != clean_cmd:
+                enable_array.append(clean)
+    if not clean_cmd in enable_array and not clean_cmd in disable_array:
+        if ',True' in url[0]:
+            disable_array.append(url[0])
         else:
-            final_txt += url+'\n'
-            added = True
-    if not added:
-        final_txt += url+'\n'
+            enable_array.append(url[0])
+    for item in disable_array:
+        final_txt += item.replace(',)',',True)')+'\n'
+    for item in enable_array:
+        final_txt += item+'\n'
     Text_File(MY_HOME_MENUS,'w',final_txt)
 #---------------------------------------------------------------------------------------------------
-# Function to pull commands and update
-def SF(command,SF_folder,SF_link):
-    check4='SF'
-# Check if folder exists, if not create folder and favourites.xml file
-    folder = xbmc.translatePath(os.path.join(ADDON_DATA,'plugin.program.super.favourites','Super Favourites',SF_folder))
-    SF_favs   = os.path.join(folder,'favourites.xml')
-    
-    if command=='add':
+# Check repos required for each SF
+def SF_Addon_Check(paths=[]):
+    finallist = []
+    if len(paths)==0:
+        paths = Get_Contents(SF_ROOT,folders=False,subfolders=True,full_path=True,filter='favourites.xml')
+    for xml in paths:
+        content = Text_File(xml,'r').replace('\t','').replace('\r','').replace('\n','')
+        plugins = re.compile('plugin://(.+?)/').findall(content)
+        scripts = re.compile('RunScript\(&quot;(.+?)/').findall(content)
+        addons  = re.compile('RunAddon\(&quot;(.+?)&quot;').findall(content)
+        plugins = plugins if (len(plugins) > 0) else []
+        scripts = scripts if (len(scripts) > 0) else []
+        addons = addons if (len(addons) > 0) else []
+        plugins.extend(scripts)
+        plugins.extend(addons)
+        for item in plugins:
+            if '?' in item:
+                item = item.split('?')[0]
+            if not item in finallist:
+                finallist.append(item)
+    return finallist
+#---------------------------------------------------------------------------------------------------
+# Check required repos and install/delete where necessary
+@route(mode='sf_repo_check')
+def SF_Repo_Check():
+    addons = []
+    if Addon_Setting(addon_id='plugin.program.tbs', setting='shares_use_repos') == 'true':
+        addons.extend( SF_Addon_Check() )
+    if Addon_Setting(addon_id='plugin.program.tbs', setting='addons_use_repos') == 'true':
+        addons.extend( My_Installed_Addons() )
+    for item in Installed_Addons(types='xbmc.python.module'):
+        addons.append( item["addonid"].encode('utf-8') )
 
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-            localfile = open(SF_favs, mode='w+')
-            localfile.write('<favourites>\n</favourites>')
-            localfile.close()
-        
-# Grab content between favourites tags, we'll replace this later
-        localfile2 = open(SF_favs, mode='r')
-        content2 = localfile2.read()
-        localfile2.close()
-
-        favcontent    = re.compile('<favourite name="[\s\S]*?\/favourites>').findall(content2)
-        faves_content = favcontent[0] if (len(favcontent) > 0) else '\n</favourites>'
-        
-# Copy clean contents of online SF command into memory - if we grab and pass through as paramater the /r /t /n etc. tags fail to translate correctly
-        localfile = open(PROGRESS_TEMP, mode='r')
-        newcontent = localfile.read()
-        localfile.close()
-        
-#Write new favourites file
-        if not newcontent in content2:
-            localfile = open(SF_favs, mode='w+')
-            if faves_content == '\n</favourites>':
-                newfile = localfile.write('<favourites>\n\t'+newcontent+faves_content)
-            else:
-                newfile = localfile.write('<favourites>\n\t'+newcontent+'\n\t'+faves_content)
-            localfile.close()
-        
-    if command=='delete':
-
-# Grab content between favourites tags, we'll replace this later
-        try:
-            localfile2 = open(SF_favs, mode='r')
-            content2 = localfile2.read()
-            localfile2.close()
-
-# Copy clean contents of online SF command into memory - if we grab and pass through as paramater the /r /t /n etc. tags fail to translate correctly
-            localfile = open(PROGRESS_TEMP, mode='r')
-            newcontent = localfile.read()
-            localfile.close()
-        
-#Write new favourites file
-            localfile = open(SF_favs, mode='w+')
-            newfile = localfile.write(content2.replace('\n\t'+newcontent,''))
-            localfile.close()
-        except:
-            pass
-
-# Attempt to delete the SF folder
-    if command=='delfolder':
-
-        try:
-            shutil.rmtree(folder)
-        except:
-            pass
+    if len(addons)>0:
+        Install_Repos(addons)
+    if Addon_Setting(addon_id='plugin.program.tbs', setting='clean_repos') == 'true':
+        repo_list = Addon_Setting(addon_id='plugin.program.tbs', setting='repolist')
+        xbmc.sleep(300)
+        Clean_Old_Repos(repo_list)
+#---------------------------------------------------------------------------------------------------
+# Install Social Shares
+def Share_Install(share='all'):
+    fullarray    = []
+    contentarray = []
+    imagearray   = []
+    descarray    = []
+    share_list = eval( encryptme('d', Open_URL( url=BASE+'boxer/SF_Install_Shares.php', payload={"x":encryptme('e', URL_Params() )} )))
+    try:
+        share_list = share_list[share]
+    except:
+        OK_Dialog('[COLOR gold]%s[/COLOR]'%String(30079),String(30081))
+        return
+    for item in share_list:
+        if item[3]=='0':
+            contentarray.append(item[0]+' - [COLOR=cyan]%s[/COLOR]'%item[5])
+        else:
+            contentarray.append(item[0]+' - [COLOR=gold]%s[/COLOR]'%item[5])
+        imagearray.append(item[4])
+        descarray.append(item[1])
+    choices = multiselect(String(30088),contentarray,imagearray,descarray)
+    if choices:
+        payload = ''
+        for item in choices:
+            payload += str(share_list[item][6])+','
+        payload = payload[:-1]
+        Run_Code( url='boxer/Install_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e',payload)} )
 #---------------------------------------------------------------------------------------------------
 # List all the users shared menus
 def Share_Options(share):
@@ -2898,13 +2401,24 @@ def Share_Options(share):
         if choice == 0:
             if YesNo_Dialog( String(30044),String(30358) ):
                 shutil.rmtree(local_path,ignore_errors=True)
-                remove_share = urllib.quote(share, safe='')
-                Remove_From_Table('shares',{"path":remove_share})
         if choice == 1:
-            section,share = share.split('/')
-            Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e',section),"z":encryptme('e',share)} )
+            Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e','HOME_'+urllib.unquote(share).upper()),"z":"1"} )
         if choice == 2:
             Upload_Share(fullpath=local_path,item=share)
+#---------------------------------------------------------------------------------------------------
+# Remove Social Shares
+def Share_Removal(share='all'):
+    remove_list = []
+    path_list   = []
+    sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/%s'%share)
+    for item in os.listdir(sf_path):
+        fullpath = os.path.join(sf_path,item)
+        if os.path.isdir(fullpath):
+            remove_list.append( item.replace('_',' ') )
+            path_list.append(item)
+    choice = Select_Dialog(String(30566),remove_list)
+    if choice >=0:
+        Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e',share+'/'+path_list[choice])} )
 #---------------------------------------------------------------------------------------------------
 def Show_Log():
     choice = YesNo_Dialog(String(30447),String(30448),String(30449),String(30450))
@@ -2965,7 +2479,6 @@ def Sync_Settings():
     from koding import End_Path, Find_In_Text
     path = os.path.join(ADDON_DATA,AddonID,'settings')
     contents = Get_Contents(path=path,folders=False, subfolders=True, filter='.xml')
-    dolog('Settings files found: '+repr(contents))
     for item in contents:
         temp_path    = item.replace(End_Path(item),'')
         plugin       = End_Path(temp_path)
@@ -2981,13 +2494,10 @@ def Sync_Settings():
                 setting = setting[0] if (setting != None) else setting
                 value   = Find_In_Text(content=line,start='value="',end='"',show_errors=False)
                 value   = value[0] if (value != None) else value
-                dolog('SETTING:%s~'%setting)
-                dolog('VALUE:%s~'%value)
                 if setting != None:
                     if plugin == 'plugin.program.tbs':
                         cur_set = Addon_Setting(setting=setting,addon_id=plugin)
                         if not cur_set.endswith('user') and setting.startswith('HOME_'):
-                            dolog( 'No custom user setting for %s, setting to: %s' % (setting,value) )
                             Addon_Setting(setting=setting,value=value,addon_id=plugin)
                     counter = 0
                     for res_line in res_lines:
@@ -3001,8 +2511,6 @@ def Sync_Settings():
                                     new_line = res_line.replace('default="%s"'%current_value, 'default="%s"'%value)
                                 else:
                                     new_line = res_line.replace(r'/>',' default="%s"'%value+r'/>')
-                                dolog('ORIG: %s'%res_line)  
-                                dolog('NEW: %s'%new_line)  
                                 res_contents = res_contents.replace(res_line,new_line)
                                 break
             Text_File(resources,'w',res_contents)
@@ -3051,8 +2559,6 @@ def Tools_Clean():
 def Tools_Misc():
     Add_Dir(String(30213), 'none','ip_check',False,'','','')
     Add_Dir(String(30214),'none','xbmcversion',False,'','','')
-    # Add_Dir(String(30215),HOME,'fix_special',False,'','','')
-    # Add_Dir(String(30216),'','ASCII_Check',False,'','','')
     Add_Dir(String(30218),'','kill_xbmc','','','','')
     Add_Dir(String(30219),'none','log',False,'','','')
     Add_Dir(String(30217),'{"value":"false","loadtype":""}','adult_filter',False,'','','')
@@ -3079,6 +2585,13 @@ def Unhide_Passwords():
                                 except:
                                     pass
         OK_Dialog(String(30223), String(30224)) 
+#---------------------------------------------------------------------------------------------------
+# Sync the default add-on settings and install/remove any repos required (or not)
+def Update_Cleanup():
+    xbmcgui.Window(10000).setProperty('Clean_Running', 'true')
+    Sync_Settings()
+    Sleep_If_Function_Active(function=SF_Repo_Check)
+    xbmcgui.Window(10000).clearProperty('Clean_Running')
 #---------------------------------------------------------------------------------------------------
 # Run the update command for checking new messages
 def Update_Messages(show_dialog=True):
@@ -3126,51 +2639,6 @@ def Update_Repo():
     Refresh(['addons','repos'])  
     OK_Dialog(String(30166), String(30227))
 #---------------------------------------------------------------------------------------------------
-# Update a social share
-def Update_Share(fullpath):
-    urlparams = URL_Params()
-    if urlparams != 'Unknown':
-# Grab contents of the config file
-        try:
-            cfgfile=open(os.path.join(fullpath,'folder.cfg'),'r')
-            cfg = cfgfile.read()
-            cfg = cfg.replace('\r','').replace('\n','').replace('\t','')
-            cfgfile.close()
-        except:
-            cfg=''
-
-# Grab contents of the favourites.xml
-        if os.path.exists(os.path.join(fullpath,'favourites.xml')):
-            xmlfile  = open(os.path.join(fullpath,'favourites.xml'),'r')
-            xml = xmlfile.read()
-            xml = xml.replace(xbmc.translatePath('special://home'),'special://home/').replace(urllib.quote(xbmc.translatePath('special://home').encode("utf-8")),'special://home/').replace('\r','').replace('\n','').replace('\t','')
-            xmlfile.close()
-        else:
-            xml="not a SF"
-
-# Grab the clean part of the folder name to send
-        itemname  = fullpath.split('/')
-        last_item = len(itemname)-1
-        fullpath  = os.path.join(itemname[last_item-1], itemname[last_item])
-        dolog('### Clean Full Path: %s' % fullpath)
-
-# Attempt to send the share to system
-        try:
-            sendfaves = Open_URL(timeout=30,post_type='post',url=BASE+'boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
-            dolog(BASE+'boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',fullpath)))
-            if 'success' in sendfaves:
-                itemname  = itemname[last_item]
-                OK_Dialog(String(30251), String(30252) % fullpath.split('/')[1])
-                return True
-            else:
-                OK_Dialog(String(30253), String(30254))
-                return False
-        except:
-            OK_Dialog(String(30253), String(30256))
-            return False
-    else:
-        OK_Dialog(String(30084), String(30257))
-#---------------------------------------------------------------------------------------------------
 # Upload current and old log to the server
 def Upload_Log():
     success = False
@@ -3204,13 +2672,11 @@ def Upload_Log():
 #---------------------------------------------------------------------------------------------------
 # Upload social share
 def Upload_Share(fullpath='',item=''):
-    userid         = Addon_Setting('userid')
-    master         = Addon_Setting('master')
     choice         = 0
-    master_share   = 0
     plugin_check   = True
     urlparams      = URL_Params()
-
+    SF_fanart      = ''
+    desc           = ''
     if fullpath != '':
         plugin_check = False
     if item == '':
@@ -3220,37 +2686,29 @@ def Upload_Share(fullpath='',item=''):
         path       = xbmc.getInfoLabel('ListItem.FolderPath')
         path       = urllib.unquote(path)
 
-    if master == 'true':
-        master_share = 1
-
     if urlparams != 'Unknown':
         if fullpath == '':
             try:
                 scrap,fullpath = path.split('path=')
                 fullpath       = xbmc.translatePath(fullpath)
-                dolog('### FULL PATH ORIG: %s' % fullpath)
             except:
                 fullpath = "not a SF"
-        dolog('### FULL PATH FINAL: %s' % fullpath)
         
         if fullpath != "not a SF":
             if fullpath.endswith(os.sep):
                 fullpath = fullpath[:-1]
             localcheck = md5_check(os.path.join(fullpath,'favourites.xml'))
             mylistpath = urllib.quote(fullpath.split("HOME_",1)[1], safe='')
-            dolog('### md5: '+localcheck)
-            dolog('clean path: '+mylistpath)
-            data = DB_Query(db_path=db_social, query='SELECT COUNT(*) from shares WHERE `path` = ?', values=[mylistpath])
-            if int(data[0]['COUNT(*)']) > 0:
+            data = DB_Query(db_path=db_social, query='SELECT COUNT(*) as mycount from shares WHERE `path` = ?', values=[mylistpath])
+            if int(data[0]['mycount']) > 0:
                 dolog('### Updating Share in db: %s' % mylistpath)
-                DB_Query(db_path=db_social, query="UPDATE shares SET stamp = ? WHERE `path` = ?", values=[localcheck, mylistpath])
+                DB_Query(db_path=db_social, query="UPDATE shares SET `timestamp` = ? WHERE `path` = ?", values=[localcheck, mylistpath])
             else:
                 dolog('### Adding Share to db: %s' % mylistpath)
-                add_specs = {"path":mylistpath,"stamp":localcheck}
+                add_specs = {"path":mylistpath,"timestamp":localcheck}
                 Add_To_Table("shares", add_specs)
         else:
             OK_Dialog(String(30258) % item.capitalize(), String(30259))
-
 
         try:
             scrap,newpath  = fullpath.split('Super Favourites'+os.sep)
@@ -3265,28 +2723,22 @@ def Upload_Share(fullpath='',item=''):
             xml="not a SF"
 
         try:
-            cfgfile=open(os.path.join(fullpath,'folder.cfg'),'r')
-            cfg = cfgfile.read()
-            cfg = cfg.replace('\r','').replace('\n','').replace('\t','')
+            cfgfile  = open(os.path.join(fullpath,'folder.cfg'),'r')
+            cfg_file = cfgfile.read()
+            cfg_raw  = cfg_file.splitlines()
             cfgfile.close()
         except:
-            cfg=''
+            cfg_raw  = ''
+            cfg_file = ''
 
-
-        try:
-            cfgfile=open(os.path.join(fullpath,'folder.cfg'),'r')
-            cfg_raw = cfgfile.read().splitlines()
-            cfgfile.close()
-        except:
-            cfg_raw = ''
-
-        dolog('### RAW CONFIG: %s'%cfg_raw)
         SF_fanart = encryptme('e','None')
         for line in cfg_raw:
             if line.startswith('FANART='):
                 SF_fanart = line.replace('FANART=','').replace('\n','').replace('\t','').replace('\r','')
                 SF_fanart = encryptme('e',SF_fanart)
-        dolog('### SF Fanart: %s' % SF_fanart)
+            if line.startswith('DESC='):
+                desc = line.replace('DESC=','').replace('\n','').replace('\t','').replace('\r','')
+                desc = encryptme('e',desc)
 
         try:
             pluginname=xbmc.getInfoLabel('Container.PluginName')
@@ -3294,24 +2746,15 @@ def Upload_Share(fullpath='',item=''):
         except:
             pluginname='none'
 
-        quit = 0
         if (pluginname == 'plugin.program.super.favourites' and plugin_check) or (not plugin_check):
-# Enable once we have private share options
-#        choice = Select_Dialog('Choose Share Type',['Share publicly','Add to my private share'])
             if xml == "not a SF" or newpath  == "not a SF":
-                OK_Dialog(String(30260), String(30261))
-                quit = 1
-            elif quit != 1:
-                try:
-                    if userid == '':
-                        userid = encryptme('e','None')
-                    sendfaves = Open_URL(timeout=30,post_type='post',url=BASE+'boxer/share_box_live.php?x=%s&z=gs&k=%s&c=%s&p=%s&m=%s&i=%s&f=%s' % (encryptme('e',urlparams), encryptme('e',xml), encryptme('e',cfg), encryptme('e',newpath), master_share, userid, SF_fanart))
-                    if 'success' in sendfaves:
-                        OK_Dialog(String(30262), String(30263) % item)
-                    else:
-                        OK_Dialog(String(30258) % item.capitalize(), String(30259))
-                except:
-                    OK_Dialog(String(30258) % item.capitalize(), String(30256))
+                OK_Dialog(String(30258) % item, String(30254))
+            else:
+                Run_Code(url='boxer/Upload_SF_Share.php', payload={"x":encryptme('e',urlparams),\
+                    "k":encryptme('e',xml),"c":encryptme('e',cfg_file),"p":encryptme('e',newpath),\
+                    "f":SF_fanart,"d":desc})
+                return True
+
         elif pluginname != 'plugin.program.super.favourites' and quit != 1:
             xbmc.executebuiltin('RunScript(special://home/addons/plugin.program.super.favourites/capture.py)')
     else:
@@ -3343,10 +2786,8 @@ def URL_Params():
 
     if ethmac != 'Unknown' and wifimac != 'Unknown':
         return (wifimac+'&'+cpu+'&'+build+'&'+ethmac).replace(' ','%20')
-        dolog('### maintenance: '+(wifimac+'&'+cpu+'&'+build+'&'+ethmac).replace(' ','%20'))
     else:
         return 'Unknown'
-        dolog("### BUILD:"+build)
 #---------------------------------------------------------------------------------------------------
 # Wipe known cache locations
 def Wipe_Cache():
@@ -3463,8 +2904,17 @@ def XBMC_Version():
     OK_Dialog(String(30243), '%s\n%s\n%s'%(String(30244)%kodi_type,String(30245)%compiled,String(30246)%version))
 #---------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    Run(default='start')
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    runmain = True
+    if len(sys.argv)>0:
+        if sys.argv[len(sys.argv)-1] == 'update_clean':
+            Update_Cleanup()
+            runmain = False
+        if sys.argv[len(sys.argv)-1] == 'update_menus':
+            Main_Menu_Sync()
+            runmain = False
+    if runmain:
+        Run(default='start')
+        xbmcplugin.endOfDirectory(int(sys.argv[1]))
     
 if not os.path.exists(TBSDATA):
     os.makedirs(TBSDATA)

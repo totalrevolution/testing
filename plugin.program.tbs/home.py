@@ -19,7 +19,10 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from koding import dolog, converthex, Addon_Setting, Keyboard, String, Text_File
+from default import encryptme, Addon_Browser, Install_Addons, Share_Install,\
+                    Share_Removal, Sleep_If_Function_Active, Toggle_Addons
+
+from koding import dolog, converthex, Addon_Genre, Addon_Setting, Keyboard, String, System, Text_File
 
 if os.path.exists(xbmc.translatePath('special://home/userdata/addon_data/script.trtv/skip.txt')):
     tvgskip = 1
@@ -86,15 +89,12 @@ if mymenu == 'cooking':
     mymenu = 'food'
 if mymenu == 'fitness':
     mymenu = 'health'
-
 # Set the folder path to check
 folderpath = xbmc.translatePath(os.path.join('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/', settings_clean.replace('SUBMENU_','HOME_')))
 #---------------------------------------------------------------------------------------------------
 def Add_Content(id_array):
-    from default import encryptme, Addon_Browser, Install_Addons, Sleep_If_Function_Active, Toggle_Addons
-
     dolog('id_array: %s'%id_array)
-    choice = dialog.select(String(30314),[String(30170),String(30313),String(30323)])
+    choice = dialog.select(String(30314),[String(30170),String(30323),String(30313),String(30354)])
     if choice >= 0:
         my_text = Text_File(redirect_file,'r')
         if choice == 0:
@@ -114,6 +114,8 @@ def Add_Content(id_array):
                         my_text += '\n'
                     my_text += 'addon~%s~%s\n'%(item[0],item[1])
         elif choice == 1:
+            my_text += Favourite_Select(my_text)
+        elif choice == 2:
 # List of QP modes
             full_array = [String(30318),String(30315),String(30319),String(30316),String(30320),String(30321),String(30317),String(30322)]
             qp_dict    = {
@@ -138,9 +140,9 @@ def Add_Content(id_array):
             choice = dialog.select(String(30314),my_array)
             if choice >= 0:
                 my_text += '-exec~%s~%s\n'%(my_array[choice],qp_dict[my_array[choice]])
-        elif choice == 2:
-            my_text += Favourite_Select(my_text)
-
+        elif choice == 3:
+            dolog('%s - running share_install'%settings_clean)
+            Share_Install(settings_clean)
     Text_File(redirect_file,'w',my_text)
 #---------------------------------------------------------------------------------------------------
 def Favourite_Select(installed_content=''):
@@ -170,8 +172,13 @@ def Favourite_Select(installed_content=''):
 #---------------------------------------------------------------------------------------------------
 def Remove_Content(id_array=[]):
     remove_list = []
-    my_text     = Text_File(redirect_file,'r')
 
+# If Super Favourites exist add option to remove a social share
+    sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/%s'%settings_clean)
+    if len(os.listdir(sf_path))>0:
+        remove_list.append(String(30354))
+
+    my_text     = Text_File(redirect_file,'r')
     for item in id_array:
         if item[0] == 'apk':
             remove_list.append(String(30304) % item[1])
@@ -181,12 +188,16 @@ def Remove_Content(id_array=[]):
             remove_list.append(item[1])
     choice = dialog.select(String(30307), remove_list)
     if choice >= 0:
-        remove_line  = '%s~%s~%s\n'%(id_array[choice][0], id_array[choice][1], id_array[choice][2])
-        if remove_line in my_text:
-            replace_file = my_text.replace(remove_line,'')
-            Text_File(redirect_file,'w',replace_file)
+        if remove_list[choice]!=String(30354):
+            remove_line  = '%s~%s~%s\n'%(id_array[choice][0], id_array[choice][1], id_array[choice][2])
+            if remove_line in my_text:
+                replace_file = my_text.replace(remove_line,'')
+                Text_File(redirect_file,'w',replace_file)
+            else:
+                dialog.ok('DEFAULT ITEM','It\'s only possible to delete items you\'ve added, you cannot delete default items. If you want to create your own custom list set this menu as a custom list via the main +- button')
+    # Social share removal
         else:
-            dialog.ok('DEFAULT ITEM','It\'s only possible to delete items you\'ve added, you cannot delete default items. If you want to create your own custom list set this menu as a custom list via the main +- button')
+            default.Share_Removal(settings_clean)
 #---------------------------------------------------------------------------------------------------
 def execute(command):
     xbmc.executebuiltin(command)
@@ -200,14 +211,22 @@ def showlist(usenan = False):
     genre_array      = []
     id_array         = []
 
+    sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/%s'%settings_clean)
+    for item in os.listdir(sf_path):
+        fullpath = os.path.join(sf_path,item)
+        if os.path.isdir(fullpath):
+            genre_array.append('share~'+item.replace('_',' ')+'~'+item)
+
     if usenan:
+        dolog('mymenu: %s'%mymenu)
         try:
-            addon_list = Addon_Genre(genre=mymenu, custom_url='http://totalrevolution.xyz/addons/addon_list.txt')
+            addon_list = Addon_Genre(genre=mymenu, custom_url=BASE+'addons/addon_list.txt')
         except:
             try:
                 addon_list = Addon_Genre(genre=mymenu)
             except:
                 addon_list = {}
+        dolog('addon_list: %s'%addon_list)
         for item in addon_list.items():
             name = koding.Cleanup_String(item[0])
             genre_array.append('addon~'+name+'~'+item[1])
@@ -230,12 +249,13 @@ def showlist(usenan = False):
             app_id = ''
             for item in raw_split:
                 app_id += item
-            dolog(app_id,2)
-
 
             if app_type == '-exec':
                 final_array.append([app_type, clean_name, app_id])
                 delete_array.append([app_type, clean_name, app_id])
+
+            if app_type == 'share':
+                final_array.append([app_type, clean_name, app_id])
 
             if app_type == '-fav':
                 final_array.append([app_type, clean_name, app_id])
@@ -262,6 +282,8 @@ def showlist(usenan = False):
         for item in final_array:
             if item[0] == 'apk':
                 app_array.append(String(30304) % item[1])
+            elif item[0] == 'share':
+                app_array.append(String(30565) % item[1])
             elif item[0] == 'addon':
                 app_array.append(String(30305) % item[1])
             elif item[0] == '-exec' or item[0] == '-fav':
@@ -282,11 +304,82 @@ def showlist(usenan = False):
             xbmc.executebuiltin('StartAndroidActivity(%s)' % run_app[2])
         elif run_app[0] == 'addon':
             xbmc.executebuiltin('RunAddon(%s)' % run_app[2])
+        elif run_app[0] == 'share':
+            xbmc.executebuiltin('ActivateWindow(10001,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)'%(settings_clean,run_app[2]))
+            SF_Single_Entry()
         else:
             try:
                 exec(run_app[2])
             except:
                 xbmc.executebuiltin(run_app[2])
+#---------------------------------------------------------------------------------------------------
+def showlist_sf():
+    from operator import itemgetter
+    runcode_array = runcode.splitlines()
+    genre_array   = []    
+    final_array   = []    
+    sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/%s'%settings_clean)
+    for item in os.listdir(sf_path):
+        fullpath = os.path.join(sf_path,item)
+        if os.path.isdir(fullpath):
+            genre_array.append('share~'+item.replace('_',' ')+'~'+item)
+
+# Add genre list to our custom list    
+    runcode_array += genre_array
+
+    if 'HOME_LIVE_TV_TVG_DIALOG_PLUS' in redirect_setting:
+        final_array.append(['-exec',String(code=30993,source='script.trtv'),"xbmc.executebuiltin('RunScript(special://home/addons/script.trtv/addon.py)')"])
+
+    for line in runcode_array:
+        if '~' in line:
+            raw_split = line.split('~')
+            app_type   = raw_split[0]
+            clean_name = raw_split[1]
+
+        # Make an exception for paths which contain tilda
+            raw_split.pop(0)
+            raw_split.pop(0)
+            app_id = ''
+            for item in raw_split:
+                app_id += item
+
+            final_array.append([app_type, clean_name, app_id])
+
+    app_array   = []
+    if len(final_array) > 0:
+        final_array = sorted(final_array, key=itemgetter(0,1))
+        for item in final_array:
+            app_array.append(String(30565) % item[1])
+        app_array.append('------------------------------')
+        final_array.append(['blank','------------------------------',''])
+    app_array.append(String(30301))
+    final_array.append(['add',String(30301),'Share_Install("%s")'%settings_clean])
+    app_array.append(String(30302))
+    final_array.append(['remove',String(30302),'Share_Removal("%s")'%settings_clean])
+
+    choice  = dialog.select(cleanname.upper().replace('_', ' '), app_array)
+    if choice < 0:
+        return
+    else:
+        run_app = final_array[choice]
+        if run_app[0] == 'share':
+            xbmc.executebuiltin('ActivateWindow(10001,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)'%(settings_clean,run_app[2]))
+            SF_Single_Entry()
+        else:
+            exec(run_app[2])
+#---------------------------------------------------------------------------------------------------
+def SF_Single_Entry():
+    window = 'Home.xml'
+    counter = 0
+    while window != 'MyPrograms.xml' and counter < 10:
+        window = xbmc.getInfoLabel('Window.Property(xmlfile)')
+        xbmc.sleep(200)
+        counter += 1
+    xbmc.sleep(250)
+    list_count = System('numitems')
+    if list_count == '1':
+        xbmc.executebuiltin('Action(PageDown)')
+        xbmc.executebuiltin('Action(Select)')
 #---------------------------------------------------------------------------------------------------
 def foldercheck(path):
     directories = 0
@@ -365,30 +458,7 @@ if success:
 
 # If it's opening into the SF social sharing menu
     elif redirect_setting.endswith('_SF') or not os.path.exists(redirect_file):
-
-# If SF folder only contains one folder we open direct into the content folder
-        if folders == 1 and sys.argv[1] != "HOME_LIVE_TV":
-            for dirs in os.listdir(folderpath):
-                if os.path.isdir(os.path.join(folderpath, dirs)) and sys.argv[1].replace('SUBMENU_','HOME_').replace('_SF','') == 'HOME_MUSIC':
-                    xbmc.executebuiltin('ActivateWindow(10501,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)' % (settings_clean.replace('SUBMENU_','HOME_').replace('_SF',''), dirs))
-                if os.path.isdir(os.path.join(folderpath, dirs)):
-                    xbmc.executebuiltin('ActivateWindow(10025,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)' % (settings_clean.replace('SUBMENU_','HOME_').replace('_SF',''), dirs))
-
-# If no SF items are present we bring up the nocontent menu and open the +/- options
-        elif (sys.argv[1] == "HOME_LIVE_TV" and tvgskip and folders == 0) or (folders == 0 and not os.path.exists(os.path.join(folderpath,'favourites.xml'))):
-            if sys.argv[1].endswith('_SF'):
-                xbmc.executebuiltin('ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s",return)'%settings_clean.replace('SUBMENU_','HOME_').replace('_SF',''))
-            else:
-                default.pop('nocontent.xml')
-                xbmc.executebuiltin("RunScript(special://home/addons/plugin.program.tbs/epg.py,%s)"%cleanname)
-
-# Otherwise we open the relevant root SF folder
-        else:
-            if sys.argv[1] == 'HOME_MUSIC':
-                xbmc.executebuiltin('ActivateWindow(10501,"plugin://plugin.program.super.favourites/?folder=%s",return)'%settings_clean.replace('SUBMENU_','HOME_').replace('_SF',''))
-            else:
-                xbmc.executebuiltin('ActivateWindow(10025,"plugin://plugin.program.super.favourites/?folder=%s",return)'%settings_clean.replace('SUBMENU_','HOME_').replace('_SF',''))
-
+        showlist_sf()
 # If it's a custom dialog using NaN filtered addons
     elif redirect_setting.endswith('_DIALOG_PLUS') or redirect_setting.endswith('_DIALOG_PLUS_USER'):
         showlist(True)
@@ -406,7 +476,6 @@ if success:
                 xbmc.executebuiltin('%s'%runcode)
             except:
                 pass
-
     else:
         try:
             exec(runcode)

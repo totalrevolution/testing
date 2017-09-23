@@ -335,7 +335,7 @@ msgid "You currently have no content in this section."
 msgstr ""
 
 msgctxt "#30081"
-msgid "Sorry there\'s currently no new content available for this category. If you\'re looking for community social shares you need to enable that feature first via Maintenance>Setup Wizard>Social Shares."
+msgid "Sorry there\'s currently no new content available for this category."
 msgstr ""
 
 msgctxt "#30082"
@@ -1063,7 +1063,7 @@ msgid "CONTENT SUBMITTED"
 msgstr ""
 
 msgctxt "#30263"
-msgid "Thank you for sharing with the community. [COLOR=dodgerblue]%s[/COLOR] has now been shared and is publicly available."
+msgid "Thank you for sharing with the community.\n[COLOR=dodgerblue]%s[/COLOR] has now been shared and is publicly available."
 msgstr ""
 
 msgctxt "#30264"
@@ -1331,7 +1331,7 @@ msgid "Enable debugging mode"
 msgstr ""
 
 msgctxt "#30330"
-msgid "Updates Complete"
+msgid "UPDATES COMPLETE"
 msgstr ""
 
 msgctxt "#30331"
@@ -2268,4 +2268,16 @@ msgstr ""
 
 msgctxt "#30564"
 msgid "Our servers do not host any add-ons and the details are pulled from a number of public websites (very similar to using a search engine in your web browser) but unfortunately no download details could be found for the add-ons listed below.\n\nIf you absolutely need these on your system then please have a search online to see if you can find them and then install from zip. If you do find the content please consider updating the team at noobsandnerds.com of where you found the content and they can update their Add-on Portal library accordingly. Anything indexed on their system can be installed so long as the download links are still valid and the original developer hasn't deleted the add-on.\n\n[COLOR gold]ADD-ONS:\n[/COLOR]%s"
+msgstr ""
+
+msgctxt "#30565"
+msgid "[COLOR=steelblue][SHARE][/COLOR] %s"
+msgstr ""
+
+msgctxt "#30566"
+msgid "[COLOR=gold]REMOVE SOCIAL SHARE[/COLOR]"
+msgstr ""
+
+msgctxt "#30567"
+msgid "[COLOR=gold]Open into root folder[/COLOR]"
 msgstr ""
