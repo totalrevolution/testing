@@ -728,9 +728,9 @@ def Add_Videos():
 def Check_Status(extension, email=''):
     params     = Get_Params()
     if email != '':
-        status = Open_URL(url=BASE+'boxer/Check_License_new.php',post_type='post',payload={"x":params,"v":XBMC_VERSION,"r":extension,"e":Encrypt(message=email)})
+        status = Open_URL(url=BASE+'boxer/Update.php',post_type='post',payload={"x":params,"v":XBMC_VERSION,"r":extension,"e":Encrypt(message=email)})
     else:
-        status = Open_URL(url=BASE+'boxer/Check_License_new.php',post_type='post',payload={"x":params,"v":XBMC_VERSION,"r":extension})
+        status = Open_URL(url=BASE+'boxer/Update.php',post_type='post',payload={"x":params,"v":XBMC_VERSION,"r":extension})
     if status:
         try:
             status = (Encrypt('d',status))

@@ -2281,3 +2281,11 @@ msgstr ""
 msgctxt "#30567"
 msgid "[COLOR=gold]Open into root folder[/COLOR]"
 msgstr ""
+
+msgctxt "#30568"
+msgid "[COLOR=gold]DELETE SF FOLDERS[/COLOR]"
+msgstr ""
+
+msgctxt "#30569"
+msgid "Would you also like to delete your installed shares? If you\'ve created your own Super Favourites on this system make sure you back them up first as all SF items will be wiped and the system defaults re-installed."
+msgstr ""

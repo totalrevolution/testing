@@ -1,3 +1,9 @@
+v.4.4.3:
+- Now pointing to new base page for updates
+- Fixed the genre listing when dev changes name to blank string
+- No longer possible to remove share from the menu if uploaded as it meant the uploader could then no longer remove the share from the system.
+- Fixed the reset of menus in +- section.
+
 v.4.4.2:
 - Removed autoexec creation, shouldn't be needed now and was causing startup wizard to appear on every boot on LE
 

@@ -149,7 +149,7 @@ def Addon_Removal_Menu(removal_types='all'):
     descarray = []
     patharray = []
     finalpath = []
-    Adult_Toggle(adult_list=adult_addons,disable=False)
+    Adult_Toggle(adult_list=adult_addons,disable=False, update_status=int(Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates')))
     Refresh('addons')
     my_addons = []
 
@@ -281,12 +281,14 @@ def Adult_Filter(value, loadtype = ''):
             success = 1
     if value == 'false':
         filter_type = 'disabled'
-        Adult_Toggle(adult_list=adult_addons,disable=True)
+        Adult_Toggle(adult_list=adult_addons,disable=True, update_status=int(Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates')))
     else:
         filter_type = 'enabled'
-        Sleep_If_Function_Active(function=Adult_Toggle, args=[adult_addons,False])
+        Sleep_If_Function_Active(function=Adult_Toggle, args=[adult_addons,False, int( Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates') )])
     if loadtype != 'menu' and loadtype != 'startup':
         OK_Dialog(String(30003) % filter_type.upper(), String(30004) % filter_type)
+    Set_Setting('general.addonnotifications','kodi_setting',Addon_Setting(addon_id='plugin.program.tbs',setting='general.addonnotifications'))
+    Set_Setting('general.addonupdates','kodi_setting',Addon_Setting(addon_id='plugin.program.tbs',setting='general.addonupdates'))
     return success
 #---------------------------------------------------------------------------------------------------
 # Check for storage location on android
@@ -436,7 +438,7 @@ def Check_Download_Path():
 # Update registration status
 def Check_License():
     try:
-        Run_Code( url='boxer/Check_License_new.php', payload={'x':encryptme('e',URL_Params()),'r':'5'} )
+        Run_Code( url='boxer/Update.php', payload={'x':encryptme('e',URL_Params()),'r':'5'} )
     except:
         dolog( Last_Error() )
 #---------------------------------------------------------------------------------------------------
@@ -545,7 +547,7 @@ def Create_Keyword():
     content_list  += ['special://profile/addon_data/plugin.program.tbs/redirects/' + s for s in redirect_list]
     dolog('DOING ADULT TOGGLE')
 # Enable adult addons
-    Sleep_If_Function_Active(function=Adult_Toggle, args=[adult_addons,False])
+    Sleep_If_Function_Active(function=Adult_Toggle, args=[adult_addons,False,int( Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates') )])
 
 # Do a full backup or selection of addons/data to include
     if YesNo_Dialog(String(30189),String(30395),String(30396),String(30397)):
@@ -586,7 +588,7 @@ def Create_Keyword():
         extras     = File_Contents(content_list)
         my_addons += '\nmy_extras=%s'%extras
 
-    Adult_Toggle(adult_list=adult_addons,disable=True)
+    Adult_Toggle(adult_list=adult_addons,disable=True, update_status=int(Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates')))
     success   = False
     lock_user = False
 # Optionally lock to username
@@ -773,7 +775,7 @@ def DLE(command,repo_link,repo_id):
 @route(mode='enable_all_addons')
 def Enable_All_Addons():
     if YesNo_Dialog(String(30547),String(30548)):
-        Toggle_Addons(new_only=False)
+        Toggle_Addons(new_only=False, update_status=int(Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates')))
 #---------------------------------------------------------------------------------------------------
 # Enables/disables the social sharing
 @route(mode='enable_shares', args=['share_mode'])
@@ -1073,6 +1075,8 @@ def Get_Updates(url='update'):
         dolog('### TBS_RUNNING: %ss'%counter)
         counter += 2
     SF_Repo_Check()
+    Set_Setting('general.addonnotifications','kodi_setting',Addon_Setting(addon_id='plugin.program.tbs',setting='general.addonnotifications'))
+    Set_Setting('general.addonupdates','kodi_setting',Addon_Setting(addon_id='plugin.program.tbs',setting='general.addonupdates'))
     Show_Busy(False)
     Notify(String(30330),String(30331),'1000',os.path.join(ADDONS,'plugin.program.tbs','resources','tick.png'))
 #---------------------------------------------------------------------------------------------------
@@ -1237,9 +1241,9 @@ def Install_Addons(url):
             adult_list.append(item[1])
     else:
         dolog('NO XXX CONTENT FOUND')
-    Toggle_Addons(addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True)
+    Toggle_Addons( addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True ,update_status=int(Addon_Setting('general.addonupdates')) )
     dolog('ADDON ENABLE COMPLETE, DISABLING ADULT')
-    Adult_Toggle(adult_list=adult_list,disable=True)
+    Adult_Toggle(adult_list=adult_list,disable=True, update_status=int(Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates')))
 #---------------------------------------------------------------------------------------------------
 # Menu to install content via the TR add-on
 @route(mode='install_content')
@@ -1408,12 +1412,6 @@ def Log_Viewer():
             Sleep_If_Window_Active()
     else:
         OK_Dialog(String(30327),String(30328))
-#---------------------------------------------------------------------------------------------------
-# Set the default main menu items
-@route(mode='main_menu_defaults')
-def Main_Menu_Defaults():
-    urlparams = URL_Params()
-    Run_Code(url='boxer/main_menus.php', payload={"x":encryptme('e', urlparams)} )
 #---------------------------------------------------------------------------------------------------
 # Function to enable/disable the main menu items
 @route(mode='main_menu_install', args=['url'])
@@ -2410,12 +2408,19 @@ def Share_Options(share):
 def Share_Removal(share='all'):
     remove_list = []
     path_list   = []
-    sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/%s'%share)
-    for item in os.listdir(sf_path):
-        fullpath = os.path.join(sf_path,item)
-        if os.path.isdir(fullpath):
-            remove_list.append( item.replace('_',' ') )
-            path_list.append(item)
+    my_shares   = []
+    sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites')
+    results = koding.Get_All_From_Table("shares")
+    for item in results:
+        path        = item["path"]
+        cleanpath   = 'HOME_'+urllib.unquote(path)
+        my_shares.append(os.path.join(sf_path,cleanpath))
+    for item in os.listdir(os.path.join(sf_path,share)):
+        fullpath = os.path.join(sf_path,share,item)
+        if fullpath not in my_shares:
+            if os.path.isdir(fullpath):
+                remove_list.append( item.replace('_',' ') )
+                path_list.append(item)
     choice = Select_Dialog(String(30566),remove_list)
     if choice >=0:
         Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e',share+'/'+path_list[choice])} )

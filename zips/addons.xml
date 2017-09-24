@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.4.2">
+<addon id="plugin.program.tbs" name="Maintenance"  provider-name="TotalRevolution" version="4.4.3">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -10,7 +10,7 @@
 		<extension point="xbmc.python.pluginsource" library="default.py">
 			<provides>video audio image executable</provides>
 	</extension>
-	<extension point="xbmc.service" library="service.py" start="startup" />
+<!--	<extension point="xbmc.service" library="service.py" start="startup" />-->
 	<extension point="kodi.context.item" library="context.py">
 		<item>
 			<label>Share...</label>
@@ -68,7 +68,7 @@
   </extension>
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="3.1.4" provider-name="Total Revolution">
+<addon id="script.openwindow" name="Startup Wizard" version="3.1.5" provider-name="Total Revolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -83,7 +83,7 @@
 		<platform>all</platform>
 		<language>en</language>
 		<license>Creative Commons 4.0-NC-ND</license>
-		<news>New keyword system and faster load on restart</news>
+		<news>Changed base and automatically set addon update status</news>
 	</extension>
 </addon>
 </addons>

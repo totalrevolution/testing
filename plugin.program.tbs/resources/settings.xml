@@ -82,6 +82,7 @@
 	<setting id="addons_use_repos"	type="bool"			default="true"	visible="false"/>
 <!-- Remove repos not being used -->
 	<setting id="clean_repos"		type="bool"			default="true"	visible="false"/>
-
+	<setting id="general.addonupdates"			type="text"		default="0"	visible="false"/>
+	<setting id="general.addonnotifications"	type="text"		default="false"	visible="false"/>
 
 </settings>
