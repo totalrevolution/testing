@@ -320,6 +320,21 @@ koding.Network_Settings()
         os.system('nm-connection-editor')
 #----------------------------------------------------------------
 # TUTORIAL #
+def Python_Version():
+    """
+Return the current version of Python as a string. Very useful if you need
+to find out whether or not to return https links (Python 2.6 is not SSL friendly).
+
+CODE: Python_Version()
+
+EXAMPLE CODE:
+py_version = koding.Python_Version()
+dialog.ok('[COLOR gold]PYTHON VERSION[/COLOR]','You are currently running:','Python v.%s'%py_version)
+~"""
+    py_version = '%s.%s'%(sys.version_info[0],sys.version_info[1])
+    return py_version
+#----------------------------------------------------------------
+# TUTORIAL #
 def Refresh(r_mode=['addons', 'repos'], profile_name='default'):
     """
 Refresh a number of items in kodi, choose the order they are
@@ -586,7 +601,6 @@ dialog.ok('FUNCTION COMPLETE','Of course we cannot read that file in just 10 sec
     while thread_alive and counter <= kill_time:
         xbmc.sleep(1000)
         thread_alive = my_thread.isAlive()
-        xbmc.log('%s thread alive for %s seconds' % (function, counter))
         counter += 1
     if show_busy:
         Show_Busy(False)
@@ -625,7 +639,6 @@ dialog.ok('WINDOW CLOSED','The window has now been closed so this dialog code ha
 # Do not get stuck in an infinite loop. Check x amount of times and if condition isn't met after x amount it quits
     while not okwindow and counter < count:
         xbmc.sleep(100)
-        dolog('### %s not active - sleeping (%s)' % (window_type, counter))
         okwindow = xbmc.getCondVisibility('Window.IsActive(%s)' % window_type)
         counter += 1
 
