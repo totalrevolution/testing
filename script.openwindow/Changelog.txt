@@ -1,3 +1,7 @@
+v.3.1.6:
+- Added mac support for some linux based systems
+- Fixed startup wizard ordering when opening from add-on directly
+
 v.3.1.5:
 - Changed the base url to hit and code now auto sets the addon notification and auto update status
 

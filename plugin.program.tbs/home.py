@@ -227,10 +227,11 @@ def showlist(usenan = False):
             except:
                 addon_list = {}
         dolog('addon_list: %s'%addon_list)
-        for item in addon_list.items():
-            if item[0]!='':
-                name = koding.Cleanup_String(item[0])
-                genre_array.append('addon~'+name+'~'+item[1])
+        if addon_list:
+            for item in addon_list.items():
+                if item[0]!='':
+                    name = koding.Cleanup_String(item[0])
+                    genre_array.append('addon~'+name+'~'+item[1])
 
 # Add genre list to our custom list    
     runcode_array += genre_array

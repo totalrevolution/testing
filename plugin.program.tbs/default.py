@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # plugin.program.tbs
 # Total Revolution Maintenance (c) by whufclee (info@totalrevolution.tv)
@@ -967,10 +967,13 @@ def Full_Clean():
 #---------------------------------------------------------------------------------------------------
 # Return mac address, not currently checked on Mac OS
 def Get_Mac(protocol):
+    import binascii
     cont    = 0
     counter = 0
     mac     = ''
-    while mac == '' and counter < 5: 
+    # try:
+    while mac == '' and counter < 5:
+        xbmc.log('attempting mac lookup %s'%counter,2)
         if sys.platform == 'win32': 
             mac = ''
             for line in os.popen("ipconfig /all"):
@@ -1000,7 +1003,6 @@ def Get_Mac(protocol):
                 for line in os.popen("ifconfig en0 | grep ether"):
                     if line.lstrip().startswith('ether'):
                         mac = line.split('ether')[1].strip().replace('-',':').replace(' ','')
-                        dolog('(count: %s) (len: %s) wifi: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
                         else:
@@ -1011,7 +1013,6 @@ def Get_Mac(protocol):
                 for line in os.popen("ifconfig en1 | grep ether"):
                     if line.lstrip().startswith('ether'):
                         mac = line.split('ether')[1].strip().replace('-',':').replace(' ','')
-                        dolog('(count: %s) (len: %s) ethernet: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
                         else:
@@ -1020,13 +1021,14 @@ def Get_Mac(protocol):
 
         elif xbmc.getCondVisibility('System.Platform.Android'):
             mac = ''
-            if os.path.exists('/sys/class/net/wlan0/address') and protocol == 'wifi':
-                readfile = open('/sys/class/net/wlan0/address', mode='r')
-            if os.path.exists('/sys/class/net/eth0/address') and protocol != 'wifi':
-                readfile = open('/sys/class/net/eth0/address', mode='r')
-            mac = readfile.read()
-            readfile.close()
             try:
+                if protocol == 'wifi':
+                    readfile = open('/sys/class/net/wlan0/address', mode='r')
+
+                if protocol != 'wifi':
+                    readfile = open('/sys/class/net/eth0/address', mode='r')
+                mac = readfile.read()
+                readfile.close()
                 mac = mac.replace(' ','')
                 mac = mac[:17]
             except:
@@ -1034,29 +1036,47 @@ def Get_Mac(protocol):
                 counter += 1
 
         else:
+            mac = ''
             if protocol == 'wifi':
-                for line in os.popen("/sbin/ifconfig"): 
+                for line in os.popen("/sbin/ifconfig"):
+                    xbmc.log(line)
                     if line.find('wlan0') > -1: 
                         mac = line.split()[4]
                         if len(mac) == 17:
                             break
-                        else:
-                            mac = ''
-                            counter += 1
+
+                    elif line.startswith('en'):
+                        xbmc.log('line startswith en')
+                        if 'Ethernet'in line and 'HWaddr' in line:
+                            xbmc.log('Ethernet and HWaddr found in line')
+                            mac = line.split('HWaddr')[1].strip()
+                            xbmc.log('mac: %s'%mac)
+                            if len(mac) == 17:
+                                break
 
             else:
                for line in os.popen("/sbin/ifconfig"): 
+                    xbmc.log(line)
                     if line.find('eth0') > -1: 
                         mac = line.split()[4] 
                         if len(mac) == 17:
                             break
-                        else:
-                            mac = ''
-                            counter += 1
-    if mac == '':
-        dolog('Unknown mac')
-        mac = 'Unknown'
 
+                    elif line.startswith('wl'):
+                        xbmc.log('line startswith en')
+                        if 'Ethernet'in line and 'HWaddr' in line:
+                            xbmc.log('Ethernet and HWaddr found in line')
+                            mac = line.split('HWaddr')[1].strip()
+                            xbmc.log('mac: %s'%mac)
+                            if len(mac) == 17:
+                                break
+            if mac == '':
+                counter += 1
+    # except:
+    #     pass
+    xbmc.log('MAC: %s'%mac)
+    if mac == '':
+        return 'Unknown'
     return str(mac)
 #---------------------------------------------------------------------------------------------------
 # Run the social update command and optionally show a busy working symbol until finished
@@ -2649,8 +2669,17 @@ def Upload_Log():
     success = False
     Show_Busy()
     try:
+        user_id = encryptme('d',Addon_Setting(setting='userid'))
+    except:
+        try:
+            Sleep_If_Function_Active(Check_License)
+            user_id = encryptme('d',Addon_Setting(setting='userid'))
+        except:
+            Addon_Setting(setting='userid',value='')
+            user_id = ''
+
+    try:
         my_log  = Grab_Log()
-        user_id = encryptme('d',userid)
     except:
         Show_Busy(False)
         OK_Dialog(String(30327),String(30328))

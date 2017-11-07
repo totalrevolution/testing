@@ -130,7 +130,9 @@ def Get_Mac(protocol = ''):
     cont    = 0
     counter = 0
     mac     = ''
-    while mac == '' and counter < 5: 
+    # try:
+    while mac == '' and counter < 5:
+        xbmc.log('attempting mac lookup %s'%counter,2)
         if sys.platform == 'win32': 
             mac = ''
             for line in os.popen("ipconfig /all"):
@@ -139,7 +141,6 @@ def Get_Mac(protocol = ''):
                         cont = 1
                     if line.lstrip().startswith('Physical Address') and cont == 1:
                         mac = line.split(':')[1].strip().replace('-',':').replace(' ','')
-                        dolog('(count: %s) (len: %s) wifi: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
                         else:
@@ -149,7 +150,6 @@ def Get_Mac(protocol = ''):
                 else:
                     if line.lstrip().startswith('Physical Address'): 
                         mac = line.split(':')[1].strip().replace('-',':').replace(' ','')
-                        dolog('(count: %s) (len: %s) ethernet: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
                         else:
@@ -162,7 +162,6 @@ def Get_Mac(protocol = ''):
                 for line in os.popen("ifconfig en0 | grep ether"):
                     if line.lstrip().startswith('ether'):
                         mac = line.split('ether')[1].strip().replace('-',':').replace(' ','')
-                        dolog('(count: %s) (len: %s) wifi: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
                         else:
@@ -173,7 +172,6 @@ def Get_Mac(protocol = ''):
                 for line in os.popen("ifconfig en1 | grep ether"):
                     if line.lstrip().startswith('ether'):
                         mac = line.split('ether')[1].strip().replace('-',':').replace(' ','')
-                        dolog('(count: %s) (len: %s) ethernet: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
                         else:
@@ -191,39 +189,53 @@ def Get_Mac(protocol = ''):
                 mac = readfile.read()
                 readfile.close()
                 mac = mac.replace(' ','')
-                dolog('(count: %s) (len: %s) mac: %s' % (counter, len(mac), mac))
                 mac = mac[:17]
             except:
-                dolog('Failed to grab valid info for %s' % protocol)
                 mac = ''
                 counter += 1
 
         else:
+            mac = ''
             if protocol == 'wifi':
-                for line in os.popen("/sbin/ifconfig"): 
+                for line in os.popen("/sbin/ifconfig"):
+                    xbmc.log(line)
                     if line.find('wlan0') > -1: 
                         mac = line.split()[4]
-                        dolog('(count: %s) (len: %s) wifi: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
-                        else:
-                            mac = ''
-                            counter += 1
+
+                    elif line.startswith('en'):
+                        xbmc.log('line startswith en')
+                        if 'Ethernet'in line and 'HWaddr' in line:
+                            xbmc.log('Ethernet and HWaddr found in line')
+                            mac = line.split('HWaddr')[1].strip()
+                            xbmc.log('mac: %s'%mac)
+                            if len(mac) == 17:
+                                break
 
             else:
                for line in os.popen("/sbin/ifconfig"): 
+                    xbmc.log(line)
                     if line.find('eth0') > -1: 
                         mac = line.split()[4] 
-                        dolog('(count: %s) (len: %s) ethernet: %s' % (counter, len(mac), mac))
                         if len(mac) == 17:
                             break
-                        else:
-                            mac = ''
-                            counter += 1
-    if mac == '':
-        dolog('#### Unknown %s mac'%protocol)
-        mac = 'Unknown'
 
+                    elif line.startswith('wl'):
+                        xbmc.log('line startswith en')
+                        if 'Ethernet'in line and 'HWaddr' in line:
+                            xbmc.log('Ethernet and HWaddr found in line')
+                            mac = line.split('HWaddr')[1].strip()
+                            xbmc.log('mac: %s'%mac)
+                            if len(mac) == 17:
+                                break
+            if mac == '':
+                counter += 1
+    # except:
+    #     pass
+    xbmc.log('MAC: %s'%mac)
+    if mac == '':
+        return 'Unknown'
     return str(mac)
 #-----------------------------------------------------------------------------
 # Return the params

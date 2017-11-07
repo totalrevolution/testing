@@ -149,6 +149,7 @@ koding.Create_Paths(path=my_path)
 dialog.ok('PATH CREATED','Check in your Kodi home folder and you should now have sub-folders of /test/testing/.','[COLOR=gold]Press ok to remove these folders.[/COLOR]')
 shutil.rmtree(xbmc.translatePath('special://home/test'))
 ~"""
+    path = path.replace('\\','\\\\')
     if path != '' and not os.path.isdir(path) and not os.path.exists(path):
         root_path = path.split(os.sep)
         if root_path[-1] == '':
