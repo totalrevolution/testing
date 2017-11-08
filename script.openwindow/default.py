@@ -763,7 +763,7 @@ def Pages(current='',new_order=main_order):
     global main_order
     if new_order:
         main_order = new_order
-    main_order = new_order
+    current_number = 0
     if current == 'start':
     # Run first item in list - called from Select_Language
         for item in main_order:

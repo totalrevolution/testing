@@ -1,3 +1,6 @@
+v.3.1.7:
+- Bug fix for Select Language option during initial install, can now go back a screen.
+
 v.3.1.6:
 - Added mac support for some linux based systems
 - Fixed startup wizard ordering when opening from add-on directly
