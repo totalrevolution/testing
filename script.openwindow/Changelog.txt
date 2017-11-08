@@ -1,3 +1,6 @@
+v.3.1.8:
+- Reverted Pages function to original otherwise default order loads up on startup
+
 v.3.1.7:
 - Bug fix for Select Language option during initial install, can now go back a screen.
 

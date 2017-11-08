@@ -760,9 +760,10 @@ def Keyword_Search():
 #-----------------------------------------------------------------------------
 # Define which menu items open, set by admin panel
 def Pages(current='',new_order=main_order):
-    global main_order
-    if new_order:
-        main_order = new_order
+# not working, it's still using the defaults
+    # global main_order
+    # if new_order:
+    #     main_order = new_order
     current_number = 0
     if current == 'start':
     # Run first item in list - called from Select_Language
