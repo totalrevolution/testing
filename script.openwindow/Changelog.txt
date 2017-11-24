@@ -1,3 +1,6 @@
+v.3.1.9:
+- New hook into koding for macs
+
 v.3.1.8:
 - Reverted Pages function to original otherwise default order loads up on startup
 

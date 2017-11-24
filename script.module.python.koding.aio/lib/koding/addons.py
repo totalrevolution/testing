@@ -889,7 +889,6 @@ koding.Refresh('container')
     temp_list = []
     for addon_id in addon:
         if not addon_id in exclude_list and addon_id != '':
-            dolog('CHECKING: %s'%addon_id)
             if addon_id in disabled_list and not new_only and enable:
                 temp_list.append(addon_id)
             elif addon_id not in disabled_list and addon_id not in enabled_list:
@@ -932,7 +931,6 @@ koding.Refresh('container')
 
         # If enabling the add-on then we also check for dependencies and enable them first
             if state:
-                dolog('Checking dependencies for : %s'%my_addon)
                 dependencies = Dependency_Check(addon_id=my_addon, recursive=True)
                 mydeps.append(dependencies)
 
@@ -952,21 +950,15 @@ koding.Refresh('container')
                         enable_dep = True
                     if enable_dep:
                         if not item in exclude_list and not item in final_enabled and not item in enabled_list:
-                            dolog('Attempting to enable: %s'%item)
                             if Set_Setting(setting_type='addon_enable', setting=item, value = 'true'):
-                                dolog('%s now %s' % (item, log_value))
                                 final_enabled.append(item)
                     counter += 1
 
     # Now the dependencies are enabled we need to enable the actual main add-ons
         for my_addon in final_addons:
             if not my_addon in final_enabled:
-                dolog('Attempting to enable: %s'%my_addon)
                 if Set_Setting(setting_type='addon_enable', setting=my_addon, value = my_value):
-                    dolog('%s now %s' % (my_addon, log_value))
                     final_enabled.append(addon)
-            else:
-                dolog('Already enabled, skipping: %s'%my_addon)
     if refresh:
         Refresh(['addons','container'])
     Set_Setting('general.addonupdates', 'kodi_setting', '%s'%update_status)

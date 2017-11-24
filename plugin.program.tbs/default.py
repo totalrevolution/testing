@@ -965,120 +965,6 @@ def Full_Clean():
         else:
             Cleanup_Textures()
 #---------------------------------------------------------------------------------------------------
-# Return mac address, not currently checked on Mac OS
-def Get_Mac(protocol):
-    import binascii
-    cont    = 0
-    counter = 0
-    mac     = ''
-    # try:
-    while mac == '' and counter < 5:
-        xbmc.log('attempting mac lookup %s'%counter,2)
-        if sys.platform == 'win32': 
-            mac = ''
-            for line in os.popen("ipconfig /all"):
-                if protocol == 'wifi':
-                    if line.startswith('Wireless LAN adapter Wi'):
-                        cont = 1
-                    if line.lstrip().startswith('Physical Address') and cont == 1:
-                        mac = line.split(':')[1].strip().replace('-',':').replace(' ','')
-                        if len(mac) == 17:
-                            break
-                        else:
-                            mac = ''
-                            counter += 1
-
-                else:
-                    if line.lstrip().startswith('Physical Address'): 
-                        mac = line.split(':')[1].strip().replace('-',':').replace(' ','')
-                        if len(mac) == 17:
-                            break
-                        else:
-                            mac = ''
-                            counter += 1
-
-        elif sys.platform == 'darwin': 
-            mac = ''
-            if protocol == 'wifi':
-                for line in os.popen("ifconfig en0 | grep ether"):
-                    if line.lstrip().startswith('ether'):
-                        mac = line.split('ether')[1].strip().replace('-',':').replace(' ','')
-                        if len(mac) == 17:
-                            break
-                        else:
-                            mac = ''
-                            counter += 1
-
-            else:
-                for line in os.popen("ifconfig en1 | grep ether"):
-                    if line.lstrip().startswith('ether'):
-                        mac = line.split('ether')[1].strip().replace('-',':').replace(' ','')
-                        if len(mac) == 17:
-                            break
-                        else:
-                            mac = ''
-                            counter += 1
-
-        elif xbmc.getCondVisibility('System.Platform.Android'):
-            mac = ''
-            try:
-                if protocol == 'wifi':
-                    readfile = open('/sys/class/net/wlan0/address', mode='r')
-
-                if protocol != 'wifi':
-                    readfile = open('/sys/class/net/eth0/address', mode='r')
-                mac = readfile.read()
-                readfile.close()
-                mac = mac.replace(' ','')
-                mac = mac[:17]
-            except:
-                mac = ''
-                counter += 1
-
-        else:
-            mac = ''
-            if protocol == 'wifi':
-                for line in os.popen("/sbin/ifconfig"):
-                    xbmc.log(line)
-                    if line.find('wlan0') > -1: 
-                        mac = line.split()[4]
-                        if len(mac) == 17:
-                            break
-
-                    elif line.startswith('en'):
-                        xbmc.log('line startswith en')
-                        if 'Ethernet'in line and 'HWaddr' in line:
-                            xbmc.log('Ethernet and HWaddr found in line')
-                            mac = line.split('HWaddr')[1].strip()
-                            xbmc.log('mac: %s'%mac)
-                            if len(mac) == 17:
-                                break
-
-            else:
-               for line in os.popen("/sbin/ifconfig"): 
-                    xbmc.log(line)
-                    if line.find('eth0') > -1: 
-                        mac = line.split()[4] 
-                        if len(mac) == 17:
-                            break
-
-                    elif line.startswith('wl'):
-                        xbmc.log('line startswith en')
-                        if 'Ethernet'in line and 'HWaddr' in line:
-                            xbmc.log('Ethernet and HWaddr found in line')
-                            mac = line.split('HWaddr')[1].strip()
-                            xbmc.log('mac: %s'%mac)
-                            if len(mac) == 17:
-                                break
-            if mac == '':
-                counter += 1
-    # except:
-    #     pass
-    xbmc.log('MAC: %s'%mac)
-    if mac == '':
-        return 'Unknown'
-    return str(mac)
-#---------------------------------------------------------------------------------------------------
 # Run the social update command and optionally show a busy working symbol until finished
 @route(mode='get_updates', args=['url'])
 def Get_Updates(url='update'):
@@ -1613,10 +1499,10 @@ def My_Details():
     if userid != '':
         if username != '':
             username = String(30350)%username
-            my_array = [String(30100),username,String(30354),String(30552)]
+            my_array = [String(30100),username,String(30570),String(30354),String(30552)]
         else:
             username = String(30348)
-            my_array = [String(30100),username,String(30354)]
+            my_array = [String(30100),username,String(30570),String(30354)]
 
         choice = Select_Dialog(String(30349)%userid,my_array)
         if choice >= 0:
@@ -1627,8 +1513,10 @@ def My_Details():
             elif choice == 1:
                 My_Profile()
             if choice == 2:
-                Social_Shares()
+                Support()
             if choice == 3:
+                Social_Shares()
+            if choice == 4:
                 Keyword_Options()
     else:
         OK_Dialog(String(30380),String(30381))
@@ -2496,6 +2384,30 @@ def Social_Shares():
 @route(mode='startup_wizard')
 def Startup_Wizard():
     xbmc.executebuiltin("RunAddon(script.openwindow)")
+#---------------------------------------------------------------------------------------------------
+# Open menu for support
+@route(mode='support')
+def Support():
+    tutorials = os.path.join(USERDATA,'myscripts','tutorials.py')
+    if os.path.exists(tutorials):
+        my_array = [String(30571),String(30447).capitalize(),String(30572)]
+    else:
+        my_array = [String(30571),String(30447).capitalize()]
+
+    choice = Select_Dialog(String(30570),my_array)
+    if choice >= 0:
+        if choice == 0:
+            OK_Dialog('[COLOR dodgerblue]%s[/COLOR][COLOR cyan]%s[/COLOR]'%(String(30575),encryptme('d',userid)),\
+                '[COLOR dodgerblue]%s[/COLOR]%s[CR][COLOR dodgerblue]%s[/COLOR]%s'%\
+                (String(30573),Get_Mac(),String(30574),Get_Mac('wifi')))
+            Support()
+        if choice == 1:
+            Log_Viewer()
+            Support()
+        if choice == 2:
+            xbmc.executebuiltin('RunScript(%s)'%tutorials)
+    else:
+        My_Details()
 #---------------------------------------------------------------------------------------------------
 # Synchronise the default oem addon settings 
 @route(mode='sync_settings')

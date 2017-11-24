@@ -1,3 +1,7 @@
+v.4.4.4:
+- Fixed bug with menus not opening if user wipes all SF addon_data
+- New Support option in Social TV, shows mac addresses, upload log option and if client has a custom dialog select script called tutorials.py it will also link into that.
+
 v.4.4.3.1:
 - Added mac lookup support for some linux based systems
 - Fixed bug with log upload not working unless user had previously opened social tv menu

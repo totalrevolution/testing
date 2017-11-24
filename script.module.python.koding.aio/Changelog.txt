@@ -1,3 +1,6 @@
+v.0.9.9.1.1:
+- Removed excessive logging in addons.py
+
 v.0.9.9.1:
 - Fixed the dolog function, now showing correct file and line numbers
 - Added xml function which will allow for creation/editing of completely new and separate settings.xml files for your add-ons. All credit goes to OptimusGreen for this code.

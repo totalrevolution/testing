@@ -1403,7 +1403,7 @@ msgid "UNREGSITERED"
 msgstr ""
 
 msgctxt "#30348"
-msgid "[COLOR=gold]CLICK HERE TO SET USERNAME[/COLOR]"
+msgid "CLICK HERE TO SET USERNAME"
 msgstr ""
 
 msgctxt "#30349"
@@ -2288,4 +2288,28 @@ msgstr ""
 
 msgctxt "#30569"
 msgid "Would you also like to delete your installed shares? If you\'ve created your own Super Favourites on this system make sure you back them up first as all SF items will be wiped and the system defaults re-installed."
+msgstr ""
+
+msgctxt "#30570"
+msgid "SUPPORT"
+msgstr ""
+
+msgctxt "#30571"
+msgid "Device Info"
+msgstr ""
+
+msgctxt "#30572"
+msgid "Tutorials"
+msgstr ""
+
+msgctxt "#30573"
+msgid "Ethernet Mac: "
+msgstr ""
+
+msgctxt "#30574"
+msgid "Wi-Fi Mac: "
+msgstr ""
+
+msgctxt "#30575"
+msgid "DEVICE ID: "
 msgstr ""

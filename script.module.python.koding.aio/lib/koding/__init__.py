@@ -118,7 +118,7 @@ if not os.path.exists(os.path.join(ADDON_DATA,ORIG_ID,converthex('636f6f6b696573
     os.makedirs(os.path.join(ADDON_DATA,ORIG_ID,converthex('636f6f6b696573')))
 #----------------------------------------------------------------
 # TUTORIAL #
-def dolog(string, my_debug=False, line_info=True):
+def dolog(string, my_debug=False, line_info=False):
     """
 Print to the Kodi log but only if debugging is enabled in settings.xml
 

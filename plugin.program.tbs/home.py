@@ -212,10 +212,11 @@ def showlist(usenan = False):
     id_array         = []
 
     sf_path = xbmc.translatePath('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/%s'%settings_clean)
-    for item in os.listdir(sf_path):
-        fullpath = os.path.join(sf_path,item)
-        if os.path.isdir(fullpath):
-            genre_array.append('share~'+item.replace('_',' ')+'~'+item)
+    if os.path.exists(sf_path):
+        for item in os.listdir(sf_path):
+            fullpath = os.path.join(sf_path,item)
+            if os.path.isdir(fullpath):
+                genre_array.append('share~'+item.replace('_',' ')+'~'+item)
 
     if usenan:
         dolog('mymenu: %s'%mymenu)
