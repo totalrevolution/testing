@@ -1,3 +1,6 @@
+v.3.2:
+- Added back the images that got corrupt on last push
+
 v.3.1.9:
 - New hook into koding for macs
 
