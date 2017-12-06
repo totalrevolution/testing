@@ -394,8 +394,8 @@ def Build_Info():
 # Main category list
 @route(mode='start')
 def Categories():
-    # if debug == 'true':
-    #     Add_Dir('Koding','', "tutorials", True,'','','')
+    if debug == 'true':
+        Add_Dir('Koding','', "tutorials", True,'','','')
     Add_Dir(String(30032),'', 'my_details', False,'','','')
     Add_Dir(String(30033),'','install_content',True,'Search_Addons.png','','')
     Add_Dir(String(30034),'','startup_wizard',False,'Startup_Wizard.png','','')
@@ -2626,12 +2626,14 @@ def Upload_Share(fullpath='',item=''):
     if fullpath != '':
         plugin_check = False
     if item == '':
-        item       = sys.listitem.getLabel()
-        item       = item.replace('[COLOR ]','').replace('[/COLOR]','')
-    if fullpath == '':
-        path       = xbmc.getInfoLabel('ListItem.FolderPath')
-        path       = urllib.unquote(path)
+        item = sys.listitem.getLabel()
+        item = Remove_Formatting(item)
 
+    if fullpath == '':
+        path = xbmc.getInfoLabel('ListItem.FolderPath')
+        path = urllib.unquote(path)
+
+    dolog('fullpath: %s'%fullpath,True,True)
     if urlparams != 'Unknown':
         if fullpath == '':
             try:
