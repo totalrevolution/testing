@@ -400,7 +400,7 @@ def Categories():
     Add_Dir(String(30033),'','install_content',True,'Search_Addons.png','','')
     Add_Dir(String(30034),'','startup_wizard',False,'Startup_Wizard.png','','')
     Add_Dir(String(30035),'none', 'tools',True,'Additional_Tools.png','','')
-    # Add_Dir('SF REPO CHECK','', 'sf_repo_check',False,'Additional_Tools.png','','')
+    # Add_Dir('SYNC SETTINGS','', 'sync_settings',False,'Additional_Tools.png','','')
     # Add_Dir('Video Check','none', 'get_video',False,'Additional_Tools.png','','')
     # Add_Dir('folder','Android Apps','', 'android_apps', 'Additional_Tools.png','','','')
 #---------------------------------------------------------------------------------------------------
@@ -2419,38 +2419,54 @@ def Sync_Settings():
     for item in contents:
         temp_path    = item.replace(End_Path(item),'')
         plugin       = End_Path(temp_path)
-        new_content  = Text_File(item,'r').splitlines()
         resources    = os.path.join(ADDONS,plugin,'resources','settings.xml')
-        if os.path.exists(resources):
-            res_contents = Text_File(resources,'r')
-            res_lines    = res_contents.splitlines()
+        dolog('Sync Settings - checking plugin: %s'%plugin)
 
-        # Check each line of new settings and check to see if we need to make changes in resources folder
-            for line in new_content:
-                setting = Find_In_Text(content=line,start='id="',end='"',show_errors=False)
-                setting = setting[0] if (setting != None) else setting
-                value   = Find_In_Text(content=line,start='value="',end='"',show_errors=False)
-                value   = value[0] if (value != None) else value
-                if setting != None:
-                    if plugin == 'plugin.program.tbs':
-                        cur_set = Addon_Setting(setting=setting,addon_id=plugin)
-                        if not cur_set.endswith('user') and setting.startswith('HOME_'):
-                            Addon_Setting(setting=setting,value=value,addon_id=plugin)
-                    counter = 0
-                    for res_line in res_lines:
-                        counter += 1
-                        if 'id="%s"'%setting in res_line:
-                            current_value = Find_In_Text(content=res_line,start='default="',end='"',show_errors=False)
-                            current_value = current_value[0] if (current_value != None) else None
-                            # if (plugin!='script.trtv') and (setting !='SF_CHANNELS'):
-                            if current_value != value:
+    # Grab a list of all new settings
+        new_content  = Text_File(item,'r').replace('\n','').replace('\t','').replace('\r','').replace("'[",'"[').replace("]'",']"')
+
+        if os.path.exists(resources):
+            orig_contents = Text_File(resources,'r')
+            contents_orig = orig_contents
+
+        # Split current settings up into lines and sanitise lists
+            orig_lines = orig_contents.replace("'[",'"[').replace("]'",']"').splitlines()
+
+            new_settings = re.compile('id="(.*?)" value="(.*?)"').findall(new_content)
+            for records in new_settings:
+                new_setting = records[0]
+                new_value = records[1]
+
+            # If it's TBS only allow changing of menu items. Change these in addon_data
+            # and only if the user hasn't already made customisations to that menu.
+                if plugin == 'plugin.program.tbs':
+                    current_setting = Addon_Setting(setting=new_setting,addon_id=plugin)
+                    if not current_setting.endswith('user') and new_setting.startswith('HOME_'):
+                        Addon_Setting(setting=new_setting,value=new_value,addon_id=plugin)
+
+                else:     
+                    for orig_line in orig_lines:
+                        if 'id="%s"'%new_setting in orig_line:
+                            dolog('found line for %s'%new_setting)
+                            current_value = re.compile('default="(.*?)"').findall(orig_line)
+                            dolog('current_value: %s'%current_value)
+                            current_value = current_value[0] if (len(current_value)>0) else None
+                            if current_value != new_value:
+
+                            # If a default value already exists we replace it
                                 if current_value != None:
-                                    new_line = res_line.replace('default="%s"'%current_value, 'default="%s"'%value)
+                                    new_line = orig_line.replace('default="%s"'%current_value, 'default="%s"'%new_value)
+
+                            # Otherwise we create a new default value
                                 else:
-                                    new_line = res_line.replace(r'/>',' default="%s"'%value+r'/>')
-                                res_contents = res_contents.replace(res_line,new_line)
+                                    new_line = orig_line.replace(r'/>',' default="%s"'%new_value+r'/>')
+
+                                orig_contents = orig_contents.replace(orig_line,new_line.replace('"[',"'[").replace(']"',"]'"))
                                 break
-            Text_File(resources,'w',res_contents)
+            if contents_orig != orig_contents:
+                Text_File(resources,'w',orig_contents)
+        else:
+            dolog('PATH DOES NOT EXIST')
 #---------------------------------------------------------------------------------------------------
 # Maintenance section
 @route(mode='tools')

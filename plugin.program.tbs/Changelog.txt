@@ -1,3 +1,6 @@
+v.4.4.6:
+- Fixed add-on settings.xml synchronisation
+
 v.4.4.5:
 - Improved uploading social shares. Text formatting is removed (bold, color etc.) and if uploaded by the master user for that oem it automatically gets added as a master share rather than a user share and can be edited in admin panel.
 
