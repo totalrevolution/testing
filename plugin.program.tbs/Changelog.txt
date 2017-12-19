@@ -1,3 +1,6 @@
+v.4.4.8:
+- Added spartacus as dependency
+
 v.4.4.7:
 - Fixed the home background image synchronisation
 

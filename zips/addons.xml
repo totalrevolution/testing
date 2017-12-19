@@ -19,6 +19,7 @@
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
+		<import addon="repository.spartacus" version="1.0"/>
 		<import addon="plugin.program.super.favourites" version="1.0.43" optional="true"/>
 	</requires>
 	<extension point="xbmc.python.library" library="default.py"/>
@@ -81,9 +82,10 @@
 	<extension point="xbmc.service" library="service.py" start="[login|startup]" />
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="3.2" provider-name="Total Revolution">
+<addon id="script.openwindow" name="Startup Wizard" version="3.3" provider-name="Total Revolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
+		<import addon="repository.spartacus" version="1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
 	</requires>
 	<extension point="xbmc.python.script" library="default.py" >

@@ -3,6 +3,7 @@
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
+		<import addon="repository.spartacus" version="1.0"/>
 		<import addon="plugin.program.super.favourites" version="1.0.43" optional="true"/>
 	</requires>
 	<extension point="xbmc.python.library" library="default.py"/>

@@ -1,3 +1,6 @@
+v.3.3:
+- Added spartacus as dependency
+
 v.3.2:
 - Added back the images that got corrupt on last push
 
