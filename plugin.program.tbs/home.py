@@ -92,6 +92,34 @@ if mymenu == 'fitness':
 # Set the folder path to check
 folderpath = xbmc.translatePath(os.path.join('special://profile/addon_data/plugin.program.super.favourites/Super Favourites/', settings_clean.replace('SUBMENU_','HOME_')))
 #---------------------------------------------------------------------------------------------------
+def Skin_String(menu,setting='Label'):
+    final_list = {
+    'comedy'       : 'Custom6HomeItem',
+    'cooking'      : 'Custom3HomeItem',
+    'fitness'      : 'Custom4HomeItem',
+    'gaming'       : 'Custom5HomeItem',
+    'kids'         : 'FavoritesHomeItem',
+    'livetv'       : 'LiveTVHomeItem',
+    'movies'       : 'MovieHomeItem',
+    'news'         : 'ProgramsHomeItem',
+    'sports'       : 'VideosHomeItem',
+    'system'       : 'SettingsHomeItem',
+    'technology'   : 'Custom2HomeItem',
+    'travel'       : 'WeatherHomeItem',
+    'tvshows'      : 'TVShowHomeItem',
+    'world'        : 'PicturesHomeItem',
+    'youtube'      : 'ShutdownHomeItem',
+    'xxx'          : 'MusicVideoHomeItem'
+    }
+
+    home_menus = eval(Addon_Setting(addon_id='plugin.program.tbs',setting='home_menus'))
+    mysettings = home_menus[menu]
+    if mysettings[0].startswith('String('):
+        menu_name = eval(mysettings[0])
+    else:
+        menu_name = mysettings[0]
+    return menu_name
+#---------------------------------------------------------------------------------------------------
 def Add_Content(id_array):
     dolog('id_array: %s'%id_array)
     choice = dialog.select(String(30314),[String(30170),String(30323),String(30313),String(30354)])
@@ -298,7 +326,7 @@ def showlist(usenan = False):
     app_array.append(String(30302))
     final_array.append(['remove',String(30302),'Remove_Content(id_array=%s)'%delete_array])
 
-    choice  = dialog.select(cleanname.upper().replace('_', ' '), app_array)
+    choice  = dialog.select(Skin_String(cleanname.replace('_','')), app_array)
     if choice < 0:
         return
     else:

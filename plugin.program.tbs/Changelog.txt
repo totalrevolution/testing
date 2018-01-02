@@ -1,3 +1,6 @@
+v.4.4.9:
+- Home screen dialog selects now show custom titles which match what's set in admin panel
+
 v.4.4.8:
 - Added spartacus as dependency
 
