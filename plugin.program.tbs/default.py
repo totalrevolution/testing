@@ -980,7 +980,8 @@ def Get_Updates(url='update'):
         updates_running = xbmcgui.Window(10000).getProperty('TBS_Running')
         dolog('### TBS_RUNNING: %ss'%counter)
         counter += 2
-    SF_Repo_Check()
+# Disabled, added to update.php
+    # SF_Repo_Check()
     Set_Setting('general.addonnotifications','kodi_setting',Addon_Setting(addon_id='plugin.program.tbs',setting='general.addonnotifications'))
     Set_Setting('general.addonupdates','kodi_setting',Addon_Setting(addon_id='plugin.program.tbs',setting='general.addonupdates'))
     Show_Busy(False)
@@ -1281,7 +1282,7 @@ def Keyword_Full_Backup():
 #---------------------------------------------------------------------------------------------------
 # Show the various keyword options (create, install & delete)
 def Keyword_Options():
-    choice = Select_Dialog('[COLOR=gold]%s[/COLOR]'%String(30552),['[COLOR=dodgerblue]%s[/COLOR]'%String(30189),'[COLOR=lime]%s[/COLOR]'%String(30101),'[COLOR=red]%s[/COLOR]'%String(30550)])
+    choice = Select_Dialog('[COLOR=gold]%s[/COLOR]'%String(30552),[String(30189),String(30101),String(30550)])
     if choice >= 0:
         if choice == 0:
             Create_Keyword()
@@ -1373,6 +1374,7 @@ def Main_Menu_Sync():
     for line in my_defaults:
         xbmc.executebuiltin(line.strip())
     for item in main_list.items():
+
         if item[1][0].startswith('String('):
             name = eval(item[1][0])
         else:
@@ -1389,6 +1391,10 @@ def Main_Menu_Sync():
                     setlabel  = 'Skin.Reset(%s)'%function.replace('Disable','Label')
                     xbmc.executebuiltin("Skin.SetString(%sTrue)"%function)
                     xbmc.executebuiltin("%s"%setlabel)
+# Added this line so the menu names are automatically set on update
+        else:
+            setlabel  = 'Skin.SetString(%s%s)'%(function.replace('Disable','Label'),name)
+            xbmc.executebuiltin("%s"%setlabel)
     xbmcgui.Window(10000).clearProperty('Menu_Running')
 #---------------------------------------------------------------------------------------------------
 # Multiselect Dialog - try the built-in multiselect or fallback to pre-jarvis workaround
@@ -1491,8 +1497,13 @@ def My_Details():
         except:
             Addon_Setting(setting='userid',value='')
             userid = ''
-
-    username = Addon_Setting('username')
+    show_disc   = Addon_Setting('req_disclaimer')
+    disc_status = Addon_Setting('disclaimer')
+    username    = Addon_Setting('username')
+    if disc_status == 'true':
+        disc_status = String(30576)
+    else:
+        disc_status = String(30577)
 
     if os.path.exists(usercheck_file):
         username = encryptme('d',Text_File(usercheck_file,'r'))
@@ -1503,6 +1514,8 @@ def My_Details():
         else:
             username = String(30348)
             my_array = [String(30100),username,String(30570),String(30354)]
+        if show_disc == 'true':
+            my_array.extend(['--------------------------------',disc_status])
 
         choice = Select_Dialog(String(30349)%userid,my_array)
         if choice >= 0:
@@ -1512,12 +1525,17 @@ def My_Details():
                 Run_Code(url="boxer/User_Registration.php")
             elif choice == 1:
                 My_Profile()
-            if choice == 2:
+            if my_array[choice] == String(30570):
                 Support()
-            if choice == 3:
+            if my_array[choice] == String(30354):
                 Social_Shares()
-            if choice == 4:
+            if my_array[choice] == String(30552):
                 Keyword_Options()
+            if (my_array[choice] == String(30576)) or  (my_array[choice] == String(30577)):
+                Run_Code( url='boxer/Update.php', payload={'x':encryptme('e',URL_Params()),'r':'6','v':XBMC_VERSION} )
+                My_Details()
+            if my_array[choice] == '--------------------------------':
+                My_Details()
     else:
         OK_Dialog(String(30380),String(30381))
         Register_Device()

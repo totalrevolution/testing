@@ -1,3 +1,6 @@
+v.4.5.0:
+- Disclaimer option now shows in the Social TV menu so you can enable/disable at any time.
+
 v.4.4.9:
 - Home screen dialog selects now show custom titles which match what's set in admin panel
 

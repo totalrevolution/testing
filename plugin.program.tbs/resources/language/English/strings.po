@@ -2313,3 +2313,11 @@ msgstr ""
 msgctxt "#30575"
 msgid "DEVICE ID: "
 msgstr ""
+
+msgctxt "#30576"
+msgid "Disclaimer Status: [COLOR lime]ACCEPTED[/COLOR]"
+msgstr ""
+
+msgctxt "#30577"
+msgid "Disclaimer Status: [COLOR red]DECLINED[/COLOR]"
+msgstr ""
