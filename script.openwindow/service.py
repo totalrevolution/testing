@@ -17,7 +17,7 @@ from koding import Addon_Setting, Physical_Path
 AddonID         = 'script.openwindow'
 sleep           = Addon_Setting('sleep')
 PROFILE         = Physical_Path('special://profile')
-OPENWINDOW_DATA = os.path.join(PROFILE,'addon_data',ADDONID)
+OPENWINDOW_DATA = os.path.join(PROFILE,'addon_data',AddonID)
 NON_REGISTERED  = os.path.join(OPENWINDOW_DATA,'unregistered')
 Addon_Setting(addon_id='script.openwindow',setting='base',value='http://totalrevolution.xyz/')
 
