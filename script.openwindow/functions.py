@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 
 # script.openwindow
-# Startup Wizard (c) by whufclee (info@totalrevolution.tv)
+# Startup Wizard (c) by Total Revolution support@trmc.freshdesk.com)
 
 # Total Revolution Startup Wizard is licensed under a
 # Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.

@@ -26,6 +26,24 @@
 	</extension>
 </addon>
 
+<addon id="plugin.video.addons.ini.creator"
+version="10.0"
+name="addons.ini Creator"
+provider-name="primaeval, modded by TR">
+<requires>
+  <import addon="xbmc.python" version="2.20.0"/>
+  <import addon="script.module.xbmcswift2" version="2.4.0"/>
+  <import addon="script.module.requests" version="2.9.1" />
+</requires>
+<extension point="xbmc.python.pluginsource" library="main.py">
+</extension>
+<extension point="xbmc.addon.metadata">
+  <summary lang="en">addons.ini Creator</summary>
+  <description lang="en"></description>
+  <disclaimer lang="en">.</disclaimer>
+</extension>
+</addon>
+
 <addon id="repository.spartacus" name="Module Repo" version="2.4" provider-name="TRMC">
 	<extension point="xbmc.addon.repository" name="Module Repo">
 		<dir>
@@ -45,7 +63,7 @@
 	<extension point="xbmc.service" library="service.py" start="[login|startup]" />
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="3.3" provider-name="Total Revolution">
+<addon id="script.openwindow" name="Startup Wizard" version="3.4" provider-name="Total Revolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="repository.spartacus" version="1.0"/>
@@ -95,23 +113,5 @@
 		<license>GPLv2</license>
 		<disclaimer>To be able to stream from your cable/satellite/antenna you will require extra hardware. This option is not for anyone who struggles with technology - setting up a PVR system can be quite complex!</disclaimer>
 	</extension>
-</addon>
-
-<addon id="plugin.video.addons.ini.creator"
-version="10.0"
-name="addons.ini Creator"
-provider-name="primaeval, modded by TR">
-<requires>
-  <import addon="xbmc.python" version="2.20.0"/>
-  <import addon="script.module.xbmcswift2" version="2.4.0"/>
-  <import addon="script.module.requests" version="2.9.1" />
-</requires>
-<extension point="xbmc.python.pluginsource" library="main.py">
-</extension>
-<extension point="xbmc.addon.metadata">
-  <summary lang="en">addons.ini Creator</summary>
-  <description lang="en"></description>
-  <disclaimer lang="en">.</disclaimer>
-</extension>
 </addon>
 </addons>

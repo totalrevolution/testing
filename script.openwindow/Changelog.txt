@@ -1,3 +1,8 @@
+v.3.4:
+- Bugfix for language selection on Kodi 17+
+- Initial update service only runs if registered
+- Removed old yt module
+
 v.3.3:
 - Added spartacus as dependency
 

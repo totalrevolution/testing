@@ -1,7 +1,7 @@
 # - coding: utf-8 -*-
 
 # script.openwindow
-# Startup Wizard (c) by whufclee (info@totalrevolution.tv)
+# Startup Wizard (c) by Total Revolution support@trmc.freshdesk.com)
 
 # Total Revolution Startup Wizard is licensed under a
 # Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
@@ -17,7 +17,6 @@ import urllib
 import xbmc
 import xbmcaddon
 import xbmcgui
-import yt
 import zipfile
 
 from functions import *
@@ -808,6 +807,17 @@ def Set_Language():
         selected_country = language_array[country].replace('[COLOR=dodgerblue]','').replace('[/COLOR]','')
         choice = YesNo_Dialog(String(30004),String(30144) % selected_country.upper()+'\n'+String(30145))
     xbmc.executebuiltin('SetGUILanguage(%s)' % selected_country)
+    counter=0
+    if int(XBMC_VERSION) >= 17 and selected_country != current_language:
+        isyesno=xbmc.getCondVisibility('Window.IsVisible(yesnodialog)')
+        while not isyesno and counter <30:
+            counter += 1
+            xbmc.sleep(150)
+            isyesno=xbmc.getCondVisibility('Window.IsVisible(yesnodialog)')
+        if counter <30:
+            xbmc.executebuiltin('SetFocus(11)')
+            xbmc.sleep(250)
+            xbmc.executebuiltin('Action(Select)')
 #-----------------------------------------------------------------------------
 # Not registered, show details of how to register
 def Show_Registration():
