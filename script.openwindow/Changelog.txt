@@ -1,3 +1,7 @@
+v.3.4.2:
+- Service now only runs if online mode is installed, the registration check hasn't yet been
+done or the unit is registered
+
 v.3.4:
 - Bugfix for language selection on Kodi 17+
 - Initial update service only runs if registered

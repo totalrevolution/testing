@@ -63,7 +63,7 @@ provider-name="primaeval, modded by TR">
 	<extension point="xbmc.service" library="service.py" start="[login|startup]" />
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="3.4.1" provider-name="Total Revolution">
+<addon id="script.openwindow" name="Startup Wizard" version="3.4.2" provider-name="Total Revolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="repository.spartacus" version="1.0"/>
