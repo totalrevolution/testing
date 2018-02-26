@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # plugin.program.tbs
-# Total Revolution Maintenance (c) by whufclee (info@totalrevolution.tv)
+# Total Revolution Maintenance (c) by TOTALREVOLUTION LTD (support@trmc.freshdesk.com)
 
 # Total Revolution Maintenance is licensed under a
 # Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
@@ -93,16 +93,9 @@ ACTION_MOVE_UP   =  3
 ACTION_MOVE_DOWN =  4
 
 try:
-    adult_list = Addon_Genre(custom_url='http://totalrevolution.xyz/addons/addon_list.txt').items()
+    adult_addons = List_From_Dict(Addon_Genre(custom_url='http://totalrevolution.xyz/addons/addon_list_new.txt'))
 except:
-    try:
-        adult_list = Addon_Genre().items()
-    except:
-        adult_list = []
-
-adult_addons = []
-for item in adult_list:
-    adult_addons.append(item[1])
+    adult_addons = []
 
 if os.path.exists(BRANDART):
     FANART = BRANDART
@@ -178,6 +171,118 @@ def Addon_Removal_Menu(removal_types='all'):
         finalpath.append([newname,newpath])
     if len(finalpath) > 0:
         Remove_Addons(finalpath)
+#---------------------------------------------------------------------------------------------------
+# Function to browse and launch the installed add-ons
+@route(mode='addon_launcher')
+def Addon_Launcher():
+    addon_list = {}
+    my_addons = Get_Contents(path=ADDONS, exclude_list=['packages','temp'],full_path=False)
+    buttons = [String(518,'system'),String(24020,'system'),String(222,'system')]
+    realname = Addon_Setting('script.openwindow','realname')
+    # Create full genre lists of all known addons
+    genres = {
+                'adult'         : 30075,
+                'anime'         : 30578,
+                'audiobooks'    : 30579,
+                'comedy'        : 30061,
+                'comics'        : 30580,
+                'documentary'   : 30581,
+                'food'          : 30582,
+                'gaming'        : 30063,
+                'health'        : 30583,
+                'howto'         : 30572,
+                'kids'          : 30064,
+                'livetv'        : 30065,
+                'movies'        : 30066,
+                'music'         : 30067,
+                'news'          : 30584,
+                'podcasts'      : 30585,
+                'radio'         : 30586,
+                'religion'      : 30587,
+                'space'         : 30588,
+                'sports'        : 30069,
+                'subscription'  : 30589,
+                'tech'          : 30070,
+                'trailers'      : 30590,
+                'tvshows'       : 30072,
+                'world'         : 30073
+            }
+    for genre in List_From_Dict(genres):
+        exec ('%s = List_From_Dict(Addon_Genre("%s"))'%(genre,genre))
+        exec ('%s_installed = []'%genre)
+
+    # Loop through the installed add-ons and add to relevant lists
+    for item in my_addons:
+        try:
+            addon_id = Get_Addon_ID(item)
+            addon_type = Addon_Info(id='type',addon_id=addon_id)
+            type_list = {'xbmc.python.pluginsource':'Plugin','xbmc.python.script':String(24009,'system')}
+            if addon_type in ['xbmc.python.pluginsource','xbmc.python.script']:
+                name = Addon_Info(id='name',addon_id=addon_id)
+                description = Addon_Info(id='description',addon_id=addon_id)
+                addon_type = Addon_Info(id='type',addon_id=addon_id)
+                author = Addon_Info(id='author',addon_id=addon_id)
+                version = Addon_Info(id='version',addon_id=addon_id)
+                icon = Addon_Info(id='icon',addon_id=addon_id)
+                fanart = Addon_Info(id='fanart',addon_id=addon_id)
+                addon_type = type_list[addon_type]
+                addon_list[addon_id] = [name,description,author,version,icon,fanart,addon_type]
+                for genre in List_From_Dict(genres):
+                    if addon_id in eval(genre):
+                        exec('%s_installed.append("%s")'%(genre,addon_id))
+        except:
+            dolog(Last_Error())
+
+    # Create a final list to show to the user
+    clean_list = []
+    final_list = {}
+    for genre in List_From_Dict(genres):
+        if len(eval('%s_installed'%genre)) > 0:
+            clean_list.append(String(genres[genre]))
+            final_list[String(genres[genre])] = eval('%s_installed'%genre)
+    clean_list = sorted(clean_list)
+
+    success = False
+    while not success:
+        new_list = []
+        choice = Select_Dialog('ADD-ON LAUNCHER',clean_list)
+        if choice > -1:
+            final_choice_list = final_list[clean_list[choice]]
+            for item in final_choice_list:
+
+                # Need to edit the else so it creates a list using the custom names from genre list
+                if realname == 'true':
+                    new_list.append(addon_list[item][0])
+                else:
+                    new_list.append(addon_list[item][0])
+
+            new_list.append('------------------------------')
+            new_list.append(String(30301))
+            choice2 = Select_Dialog(clean_list[choice],new_list)
+            if choice2 > -1:
+                if new_list[choice2] == '------------------------------':
+                    pass
+                elif new_list[choice2] == String(30301):
+                    Addon_Install_Menu()
+                    success = True
+                else:
+                    addon_id = final_choice_list[choice2]
+                    addon_name = addon_list[addon_id][0]
+                    description = '[COLOR dodgerblue]Add-on ID:[/COLOR] %s[CR][COLOR dodgerblue]Version:[/COLOR] %s[CR]'\
+                    '[COLOR dodgerblue]Author(s):[/COLOR] %s[CR][COLOR dodgerblue]Type:[/COLOR] %s[CR][CR][CR][CR][COLOR dodgerblue]Description:[/COLOR] %s'\
+                    %(addon_id,addon_list[addon_id][3],addon_list[addon_id][2],addon_list[addon_id][6],addon_list[addon_id][1])
+                    icon = addon_list[addon_id][4]
+                    fanart = addon_list[addon_id][5]
+
+                    choice3 = Custom_Dialog(header=addon_name, main_content=description,buttons=buttons, icon=icon)
+                    if choice3 == 0:
+                        xbmc.executebuiltin('RunAddon(%s)'%final_choice_list[choice2])
+                        success = True
+                    elif choice3 == 1:
+                        Open_Settings(addon_id)
+                        success = True
+        else:
+            success = True
 #---------------------------------------------------------------------------------------------------
 # Function to browse the userdata/addon_data folder
 @route(mode='addon_browser', args=['browser_type','header','skiparray','addons'])
@@ -292,6 +397,10 @@ def Adult_Filter(value, loadtype = ''):
     return success
 #---------------------------------------------------------------------------------------------------
 # Check for storage location on android
+def Addon_Install_Menu():
+    xbmc.log('Show a custom_dialog for genres and manual search',2)
+#---------------------------------------------------------------------------------------------------
+# Check for storage location on android
 def Android_Path_Check():
     content = Grab_Log()
     localstorage  = re.compile('External storage path = (.+?);').findall(content)
@@ -400,7 +509,7 @@ def Categories():
     Add_Dir(String(30033),'','install_content',True,'Search_Addons.png','','')
     Add_Dir(String(30034),'','startup_wizard',False,'Startup_Wizard.png','','')
     Add_Dir(String(30035),'none', 'tools',True,'Additional_Tools.png','','')
-    # Add_Dir('SYNC SETTINGS','', 'sync_settings',False,'Additional_Tools.png','','')
+    # Add_Dir('Addon Launcher','', 'addon_launcher',False,'Addon_Launcher.png','','')
     # Add_Dir('Video Check','none', 'get_video',False,'Additional_Tools.png','','')
     # Add_Dir('folder','Android Apps','', 'android_apps', 'Additional_Tools.png','','','')
 #---------------------------------------------------------------------------------------------------
@@ -1135,19 +1244,9 @@ def Install_Addons(url):
                     Sleep_If_Function_Active(function=Extract,args=[temp_zip,ADDONS],show_busy=False,kill_time=180)
     dolog('### ENABLING ADDONS')
     try:
-        mylist = Addon_Genre(custom_url=BASE+'addons/addon_list.txt')
+        adult_list = List_From_Dict(Addon_Genre(custom_url=BASE+'addons/addon_list_new.txt'))
     except:
-        try:
-            mylist = Addon_Genre()
-        except:
-            mylist = {}
-    adult_list = []
-    if mylist:
-        adult_dict = mylist.items()
-        for item in adult_dict:
-            adult_list.append(item[1])
-    else:
-        dolog('NO XXX CONTENT FOUND')
+        adult_list = []
     Toggle_Addons( addon='all', enable=True, safe_mode=True, exclude_list=adult_list, new_only=True, refresh=True ,update_status=int(Addon_Setting('general.addonupdates')) )
     dolog('ADDON ENABLE COMPLETE, DISABLING ADULT')
     Adult_Toggle(adult_list=adult_list,disable=True, update_status=int(Addon_Setting(addon_id='plugin.program.tbs', setting='general.addonupdates')))
@@ -1705,6 +1804,7 @@ def Open_SF():
             if os.path.exists(xml_path):
                 final_array.append([xml_path.replace('favourites.xml',''),item])
                 clean_array.append(item.replace('_',' '))
+        xbmc.log('final_array: %s'%repr(final_array),2)
         choice = Select_Dialog(String(30359)%menu_array[choice],clean_array)
         if choice == 0:
             xbmc.executebuiltin( 'ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s",return)' % (category) )
@@ -1718,7 +1818,7 @@ def Open_SF():
                 if share_choice == 0:
                     Upload_Share( fullpath=xml_path, item=share )
                 if share_choice == 1:
-                    xbmc.executebuiltin( 'ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)' % (category,share) )
+                    xbmc.executebuiltin( 'ActivateWindow(programs,"plugin://plugin.program.super.favourites/?folder=%s/%s",return)' % (category,urllib.quote_plus(share)) )
             else:
                 Social_Shares()
         else:
@@ -2326,7 +2426,7 @@ def Share_Options(share):
             if YesNo_Dialog( String(30044),String(30358) ):
                 shutil.rmtree(local_path,ignore_errors=True)
         if choice == 1:
-            Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e','HOME_'+urllib.unquote(share).upper()),"z":"1"} )
+            Run_Code( url='boxer/Remove_Share.php', payload={"x":encryptme('e',URL_Params()),"y":encryptme('e','HOME_'+urllib.unquote(share)),"z":"1"} )
         if choice == 2:
             Upload_Share(fullpath=local_path,item=share)
 #---------------------------------------------------------------------------------------------------

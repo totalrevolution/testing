@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.program.tbs" name="Maintenance" version="4.5.0" provider-name="Total Revolution">
+<addon id="plugin.program.tbs" name="Maintenance" version="4.5.1" provider-name="Total Revolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.python.koding.aio" version="0.5"/>
@@ -22,13 +22,13 @@
 		<summary lang="en">Maintenance - powered by Total Revolution</summary>
 		<description lang="en">Your one stop add-on for everything you could possibly need.</description>
 		<platform>all</platform>
-		<news>Improved home background sync</news>
+		<news>Bug fixes to custom lists inc. speed improvements on loading times of menus</news>
 	</extension>
 </addon>
 
 <addon id="script.module.python.koding.aio"
    name="Python Koding AIO"
-   version="0.9.9.4.1"
+   version="0.9.9.4.3"
    provider-name="Total Revolution">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -47,7 +47,7 @@
     <license>Creative Commons 4.0-NC-ND</license>
     <forum>http://totalrevolution.tv/forum</forum>
     <website>http://totalrevolution.tv</website>
-    <news>Added custom resolver option for Play_Video</news>
+    <news>Added extra art options to Custom_Dialog and new Merge_Dict function</news>
     <source>https://github.com/totalrevolution/python-koding/tree/master/script.module.python.koding.aio</source>
   </extension>
 </addon>
@@ -71,7 +71,7 @@
 	<extension point="xbmc.service" library="service.py" start="[login|startup]" />
 </addon>
 
-<addon id="script.openwindow" name="Startup Wizard" version="3.4.2" provider-name="Total Revolution">
+<addon id="script.openwindow" name="Startup Wizard" version="3.4.3" provider-name="Total Revolution">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="repository.spartacus" version="1.0"/>

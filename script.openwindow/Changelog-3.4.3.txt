@@ -1,3 +1,6 @@
+v.3.4.3:
+- Added support for custom add-on names
+
 v.3.4.2:
 - Service now only runs if online mode is installed, the registration check hasn't yet been
 done or the unit is registered

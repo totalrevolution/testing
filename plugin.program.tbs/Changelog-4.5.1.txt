@@ -1,3 +1,9 @@
+v.4.5.1:
+- Bug fixes to custom lists (removal/adding of items)
+- Speed improvements on loading times of custom menus
+- Fixed the Removal of public shares
+- New addon_browser function available
+
 v.4.5.0:
 - Disclaimer option now shows in the Social TV menu so you can enable/disable at any time.
 

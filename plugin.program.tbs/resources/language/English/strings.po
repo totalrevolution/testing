@@ -2321,3 +2321,55 @@ msgstr ""
 msgctxt "#30577"
 msgid "Disclaimer Status: [COLOR red]DECLINED[/COLOR]"
 msgstr ""
+
+msgctxt "#30578"
+msgid "Anime"
+msgstr ""
+
+msgctxt "#30579"
+msgid "Audiobooks"
+msgstr ""
+
+msgctxt "#30580"
+msgid "Comics"
+msgstr ""
+
+msgctxt "#30581"
+msgid "Documentary"
+msgstr ""
+
+msgctxt "#30582"
+msgid "Food & Drink"
+msgstr ""
+
+msgctxt "#30583"
+msgid "Health & Fitness"
+msgstr ""
+
+msgctxt "#30584"
+msgid "News & Weather"
+msgstr ""
+
+msgctxt "#30585"
+msgid "Podcasts"
+msgstr ""
+
+msgctxt "#30586"
+msgid "Radio"
+msgstr ""
+
+msgctxt "#30587"
+msgid "Religion"
+msgstr ""
+
+msgctxt "#30588"
+msgid "Space & Sci-Fi"
+msgstr ""
+
+msgctxt "#30589"
+msgid "Subscription"
+msgstr ""
+
+msgctxt "#30590"
+msgid "Trailers"
+msgstr ""
